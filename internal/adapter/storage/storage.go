@@ -31,7 +31,7 @@ type (
 
 func NewStorage(config Config) (*Storage, error) {
 	s := &Storage{config: config}
-	if err := s.loadItems(); err != nil {
+	if err := s.loadData(); err != nil {
 		return nil, fmt.Errorf("load items: %w", err)
 	}
 	return s, nil
@@ -88,7 +88,7 @@ func (s *Storage) GetItems() []model.Item {
 	return s.items
 }
 
-func (s *Storage) loadItems() error {
+func (s *Storage) loadData() error {
 	f, err := os.Open(s.config.Filename)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
@@ -106,6 +106,7 @@ func (s *Storage) loadItems() error {
 		return fmt.Errorf("json decode: %w", err)
 	}
 
+	s.lastID = data.LastID
 	s.items = make([]model.Item, 0, len(data.Items))
 
 	for i := range data.Items {

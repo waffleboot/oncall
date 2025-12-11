@@ -9,14 +9,15 @@ import (
 
 type Service struct {
 	storage port.Storage
+	gen     port.IDGenerator
 }
 
-func NewService(storage port.Storage) *Service {
-	return &Service{storage: storage}
+func NewService(storage port.Storage, gen port.IDGenerator) *Service {
+	return &Service{storage: storage, gen: gen}
 }
 
 func (s *Service) CreateItem() model.Item {
-	return model.Item{ID: s.storage.GenerateID()}
+	return model.Item{ID: s.gen.GenerateID()}
 }
 
 func (s *Service) AddItem(item model.Item) error {

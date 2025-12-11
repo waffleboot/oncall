@@ -22,7 +22,7 @@ func run() error {
 		return fmt.Errorf("new storage: %w", err)
 	}
 
-	p := tea.NewController(tea.WithService(facade.NewService(s)))
+	p := tea.NewController(tea.WithService(facade.NewService(s, s)))
 	if err := p.Run(); err != nil {
 		return fmt.Errorf("tea run: %w", err)
 	}
