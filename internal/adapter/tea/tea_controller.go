@@ -33,7 +33,7 @@ func (c *controller) Run() error {
 func WithOnCallService(onCallService port.OnCallService) func(c *controller) {
 	return func(controller *controller) {
 		controller.startModel = func() *startModel {
-			return NewStartModel(controller)
+			return NewStartModel(controller, onCallService)
 		}
 	}
 }
