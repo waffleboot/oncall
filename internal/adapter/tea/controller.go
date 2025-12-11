@@ -10,6 +10,7 @@ import (
 type (
 	controller struct {
 		startModel func() *startModel
+		editModel  func(prev tea.Model, item string) *editModel
 	}
 	option func(*controller)
 )
@@ -34,6 +35,9 @@ func WithOnCallService(onCallService port.OnCallService) func(c *controller) {
 	return func(controller *controller) {
 		controller.startModel = func() *startModel {
 			return NewStartModel(controller, onCallService)
+		}
+		controller.editModel = func(prev tea.Model, item string) *editModel {
+			return NewEditModel(prev, item)
 		}
 	}
 }

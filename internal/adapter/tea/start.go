@@ -38,6 +38,13 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter", " ":
 			if m.cursor == 0 {
 				m.service.AddItem()
+			} else {
+				i := m.cursor - 1
+				items := m.service.Items()
+				if i < len(items) {
+					return m.controller.editModel(m, items[i]), nil
+				}
+
 			}
 		}
 	}
