@@ -5,11 +5,11 @@ import (
 )
 
 type editModel struct {
-	prev tea.Model
 	item string
+	prev tea.Model
 }
 
-func NewEditModel(prev tea.Model, item string) *editModel {
+func NewEditModel(item string, prev tea.Model) *editModel {
 	return &editModel{prev: prev, item: item}
 }
 

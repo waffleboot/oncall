@@ -9,11 +9,11 @@ import (
 
 type startModel struct {
 	controller *controller
-	service    port.OnCallService
+	service    port.Service
 	cursor     int
 }
 
-func NewStartModel(controller *controller, service port.OnCallService) *startModel {
+func NewStartModel(controller *controller, service port.Service) *startModel {
 	return &startModel{controller: controller, service: service}
 }
 
@@ -25,7 +25,7 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "q":
+		case "ctrl+c", "q", "esc":
 			return m, tea.Quit
 		case "up", "k":
 			if m.cursor > 0 {
@@ -37,12 +37,14 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "enter", " ":
 			if m.cursor == 0 {
-				m.service.AddItem()
+				if err := m.service.AddItem(); err != nil {
+					return m.controller.errorModel(err.Error(), m), nil
+				}
 			} else {
 				i := m.cursor - 1
 				items := m.service.Items()
 				if i < len(items) {
-					return m.controller.editModel(m, items[i]), nil
+					return m.controller.editModel(items[i], m), nil
 				}
 
 			}

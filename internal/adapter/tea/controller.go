@@ -10,7 +10,8 @@ import (
 type (
 	controller struct {
 		startModel func() *startModel
-		editModel  func(prev tea.Model, item string) *editModel
+		editModel  func(item string, prev tea.Model) *editModel
+		errorModel func(message string, prev tea.Model) *errorModel
 	}
 	option func(*controller)
 )
@@ -31,13 +32,12 @@ func (c *controller) Run() error {
 	return nil
 }
 
-func WithOnCallService(onCallService port.OnCallService) func(c *controller) {
+func WithService(service port.Service) func(c *controller) {
 	return func(controller *controller) {
 		controller.startModel = func() *startModel {
-			return NewStartModel(controller, onCallService)
+			return NewStartModel(controller, service)
 		}
-		controller.editModel = func(prev tea.Model, item string) *editModel {
-			return NewEditModel(prev, item)
-		}
+		controller.editModel = NewEditModel
+		controller.errorModel = NewErrorModel
 	}
 }
