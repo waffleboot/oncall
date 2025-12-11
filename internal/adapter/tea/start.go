@@ -34,14 +34,12 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor--
 			}
 		case "down", "j":
-			if m.cursor < len(m.service.Items()) {
+			if m.cursor < len(m.service.GetItems()) {
 				m.cursor++
 			}
 		case "enter", " ":
 			if m.cursor == 0 {
-				items := m.service.Items()
-
-				newItem := fmt.Sprintf("Item %d", len(items)+1)
+				newItem := m.service.CreateItem()
 
 				if err := m.service.AddItem(newItem); err != nil {
 					return m.controller.errorModel(err.Error(), m), nil
@@ -52,7 +50,7 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return next, next.Init()
 			} else {
 				i := m.cursor - 1
-				items := m.service.Items()
+				items := m.service.GetItems()
 				if i < len(items) {
 					next := m.controller.editModel(items[i], m)
 					return next, next.Init()
@@ -69,8 +67,8 @@ func (m *startModel) View() string {
 
 	s.WriteString(m.menu(0, "Новая запись"))
 
-	for i, item := range m.service.Items() {
-		s.WriteString(m.menu(i+1, item))
+	for i, item := range m.service.GetItems() {
+		s.WriteString(m.menu(i+1, fmt.Sprintf("#%d", item.ID)))
 	}
 
 	return s.String()

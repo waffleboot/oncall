@@ -4,13 +4,14 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
 )
 
 type (
 	controller struct {
 		startModel func() *startModel
-		editModel  func(item string, prev tea.Model) *editModel
+		editModel  func(item model.Item, prev tea.Model) *editModel
 		errorModel func(message string, prev tea.Model) *errorModel
 	}
 	option func(*controller)
@@ -37,7 +38,7 @@ func WithService(service port.Service) func(c *controller) {
 		controller.startModel = func() *startModel {
 			return NewStartModel(controller, service)
 		}
-		controller.editModel = func(item string, prev tea.Model) *editModel {
+		controller.editModel = func(item model.Item, prev tea.Model) *editModel {
 			return NewEditModel(controller, service, item, prev)
 		}
 		controller.errorModel = NewErrorModel

@@ -1,21 +1,23 @@
 package tea
 
 import (
+	"fmt"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
 )
 
 type editModel struct {
 	controller *controller
 	service    port.Service
-	item       string
+	item       model.Item
 	prev       tea.Model
 	cursor     int
 }
 
-func NewEditModel(controller *controller, service port.Service, item string, prev tea.Model) *editModel {
+func NewEditModel(controller *controller, service port.Service, item model.Item, prev tea.Model) *editModel {
 	return &editModel{controller: controller, service: service, prev: prev, item: item}
 }
 
@@ -57,7 +59,7 @@ func (m *editModel) View() string {
 	var s strings.Builder
 
 	s.WriteString("  ")
-	s.WriteString(m.item)
+	s.WriteString(fmt.Sprintf("#%d", m.item.ID))
 	s.WriteString("\n")
 
 	s.WriteString(m.menu(0, "Выйти"))

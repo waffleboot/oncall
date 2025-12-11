@@ -7,6 +7,8 @@ import (
 	"io/fs"
 	"os"
 	"slices"
+
+	"github.com/waffleboot/oncall/internal/model"
 )
 
 type (
@@ -15,10 +17,15 @@ type (
 	}
 	Storage struct {
 		config Config
-		items  []string
+		lastID int
+		items  []model.Item
+	}
+	storedData struct {
+		LastID int          `json:"last_id"`
+		Items  []storedItem `json:"items"`
 	}
 	storedItem struct {
-		Name string `json:"name"`
+		ID int `json:"id"`
 	}
 )
 
@@ -30,33 +37,45 @@ func NewStorage(config Config) (*Storage, error) {
 	return s, nil
 }
 
-func (s *Storage) AddItem(item string) error {
-	items := make([]storedItem, len(s.items)+1)
-	for i := range s.items {
-		items[i].fromDomain(s.items[i])
-	}
-	items[len(items)-1].fromDomain(item)
+func (s *Storage) GenerateID() int {
+	s.lastID++
+	return s.lastID
+}
 
-	if err := s.saveItems(items); err != nil {
+func (s *Storage) AddItem(newItem model.Item) error {
+	storedItems := make([]storedItem, len(s.items)+1)
+	for i := range s.items {
+		storedItems[i].fromDomain(s.items[i])
+	}
+
+	storedItems[len(storedItems)-1].fromDomain(newItem)
+
+	if err := s.saveData(storedData{
+		LastID: s.lastID,
+		Items:  storedItems,
+	}); err != nil {
 		return fmt.Errorf("save items: %w", err)
 	}
 
-	s.items = append(s.items, item)
+	s.items = append(s.items, newItem)
 
 	return nil
 }
 
-func (s *Storage) DeleteItem(item string) error {
-	newItems := slices.DeleteFunc(s.items, func(it string) bool {
-		return it == item
+func (s *Storage) DeleteItem(item model.Item) error {
+	newItems := slices.DeleteFunc(s.items, func(it model.Item) bool {
+		return it.ID == item.ID
 	})
 
-	items := make([]storedItem, len(newItems))
+	storedItems := make([]storedItem, len(newItems))
 	for i := range newItems {
-		items[i].fromDomain(newItems[i])
+		storedItems[i].fromDomain(newItems[i])
 	}
 
-	if err := s.saveItems(items); err != nil {
+	if err := s.saveData(storedData{
+		LastID: s.lastID,
+		Items:  storedItems,
+	}); err != nil {
 		return fmt.Errorf("save items: %w", err)
 	}
 
@@ -65,7 +84,7 @@ func (s *Storage) DeleteItem(item string) error {
 	return nil
 }
 
-func (s *Storage) Items() []string {
+func (s *Storage) GetItems() []model.Item {
 	return s.items
 }
 
@@ -81,22 +100,22 @@ func (s *Storage) loadItems() error {
 		err = errors.Join(err, f.Close())
 	}()
 
-	var items []storedItem
+	var data storedData
 
-	if err := json.NewDecoder(f).Decode(&items); err != nil {
+	if err := json.NewDecoder(f).Decode(&data); err != nil {
 		return fmt.Errorf("json decode: %w", err)
 	}
 
-	s.items = make([]string, 0, len(items))
+	s.items = make([]model.Item, 0, len(data.Items))
 
-	for i := range items {
-		s.items = append(s.items, items[i].toDomain())
+	for i := range data.Items {
+		s.items = append(s.items, data.Items[i].toDomain())
 	}
 
 	return nil
 }
 
-func (s *Storage) saveItems(items []storedItem) error {
+func (s *Storage) saveData(data storedData) error {
 	f, err := os.Create(s.config.Filename)
 	if err != nil {
 		return fmt.Errorf("os create: %w", err)
@@ -108,7 +127,7 @@ func (s *Storage) saveItems(items []storedItem) error {
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", " ")
 
-	if err := enc.Encode(items); err != nil {
+	if err := enc.Encode(data); err != nil {
 		return fmt.Errorf("json encode: %w", err)
 	}
 
@@ -119,10 +138,10 @@ func (s *Storage) saveItems(items []storedItem) error {
 	return nil
 }
 
-func (s *storedItem) fromDomain(item string) {
-	s.Name = item
+func (s *storedItem) fromDomain(item model.Item) {
+	s.ID = item.ID
 }
 
-func (s *storedItem) toDomain() string {
-	return s.Name
+func (s *storedItem) toDomain() model.Item {
+	return model.Item{ID: s.ID}
 }

@@ -1,7 +1,10 @@
 package port
 
+import "github.com/waffleboot/oncall/internal/model"
+
 type Service interface {
-	AddItem(item string) error
-	DeleteItem(item string) error
-	Items() []string
+	CreateItem() model.Item
+	AddItem(item model.Item) error
+	DeleteItem(item model.Item) error
+	GetItems() []model.Item
 }
