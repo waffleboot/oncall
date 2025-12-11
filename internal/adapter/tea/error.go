@@ -22,7 +22,7 @@ func (m *errorModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
-			return m.prev, nil
+			return m.prev, m.prev.Init()
 		}
 	}
 	return m, nil

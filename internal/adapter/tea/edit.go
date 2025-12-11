@@ -20,6 +20,7 @@ func NewEditModel(controller *controller, service port.Service, item string, pre
 }
 
 func (m *editModel) Init() tea.Cmd {
+	m.cursor = 0
 	return nil
 }
 
@@ -27,7 +28,7 @@ func (m *editModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc":
+		case "esc", "q":
 			return m.prev, nil
 		case "up", "k":
 			if m.cursor > 0 {
@@ -38,11 +39,14 @@ func (m *editModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor++
 			}
 		case "enter", " ":
+			if m.cursor == 0 {
+				return m.prev, m.prev.Init()
+			}
 			if m.cursor == 1 {
 				if err := m.service.DeleteItem(m.item); err != nil {
 					return m.controller.errorModel(err.Error(), m.prev), nil
 				}
-				return m.prev, nil
+				return m.prev, m.prev.Init()
 			}
 		}
 	}
@@ -51,7 +55,12 @@ func (m *editModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *editModel) View() string {
 	var s strings.Builder
-	s.WriteString(m.menu(0, m.item))
+
+	s.WriteString("  ")
+	s.WriteString(m.item)
+	s.WriteString("\n")
+
+	s.WriteString(m.menu(0, "Выйти"))
 	s.WriteString(m.menu(1, "Удалить"))
 	return s.String()
 }

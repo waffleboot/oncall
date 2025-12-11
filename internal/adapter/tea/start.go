@@ -19,6 +19,7 @@ func NewStartModel(controller *controller, service port.Service) *startModel {
 }
 
 func (m *startModel) Init() tea.Cmd {
+	m.cursor = 0
 	return nil
 }
 
@@ -46,20 +47,15 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m.controller.errorModel(err.Error(), m), nil
 				}
 
-				items = m.service.Items()
+				next := m.controller.editModel(newItem, m)
 
-				for i := range items {
-					if items[i] == newItem {
-						m.cursor = i + 1
-						break
-					}
-				}
-
+				return next, next.Init()
 			} else {
 				i := m.cursor - 1
 				items := m.service.Items()
 				if i < len(items) {
-					return m.controller.editModel(items[i], m), nil
+					next := m.controller.editModel(items[i], m)
+					return next, next.Init()
 				}
 
 			}
@@ -71,17 +67,9 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *startModel) View() string {
 	var s strings.Builder
 
-	items := m.service.Items()
-
-	if len(items) == 0 {
-		m.cursor = 0
-	} else if m.cursor > len(items) {
-		m.cursor = len(items)
-	}
-
 	s.WriteString(m.menu(0, "Новая запись"))
 
-	for i, item := range items {
+	for i, item := range m.service.Items() {
 		s.WriteString(m.menu(i+1, item))
 	}
 
