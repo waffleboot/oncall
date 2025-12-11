@@ -1,6 +1,7 @@
 package port
 
 type Service interface {
-	AddItem() error
+	AddItem(item string) error
+	DeleteItem(item string) error
 	Items() []string
 }

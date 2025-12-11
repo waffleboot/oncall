@@ -18,11 +18,17 @@ func (s *Service) Items() []string {
 	return s.storage.Items()
 }
 
-func (s *Service) AddItem() error {
-	items := s.storage.Items()
-	if err := s.storage.AddItem(fmt.Sprintf("item %d", len(items)+1)); err != nil {
+func (s *Service) AddItem(item string) error {
+	if err := s.storage.AddItem(item); err != nil {
 		return fmt.Errorf("add item: %w", err)
 	}
 
+	return nil
+}
+
+func (s *Service) DeleteItem(item string) error {
+	if err := s.storage.DeleteItem(item); err != nil {
+		return fmt.Errorf("delete item: %w", err)
+	}
 	return nil
 }

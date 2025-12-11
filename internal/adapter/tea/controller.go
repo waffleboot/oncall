@@ -37,7 +37,9 @@ func WithService(service port.Service) func(c *controller) {
 		controller.startModel = func() *startModel {
 			return NewStartModel(controller, service)
 		}
-		controller.editModel = NewEditModel
+		controller.editModel = func(item string, prev tea.Model) *editModel {
+			return NewEditModel(controller, service, item, prev)
+		}
 		controller.errorModel = NewErrorModel
 	}
 }

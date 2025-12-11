@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"slices"
 )
 
 type (
@@ -21,7 +22,7 @@ type (
 	}
 )
 
-func NewStorage(config Config) (_ *Storage, err error) {
+func NewStorage(config Config) (*Storage, error) {
 	s := &Storage{config: config}
 	if err := s.loadItems(); err != nil {
 		return nil, fmt.Errorf("load items: %w", err)
@@ -29,7 +30,7 @@ func NewStorage(config Config) (_ *Storage, err error) {
 	return s, nil
 }
 
-func (s *Storage) AddItem(item string) (err error) {
+func (s *Storage) AddItem(item string) error {
 	items := make([]storedItem, len(s.items)+1)
 	for i := range s.items {
 		items[i].fromDomain(s.items[i])
@@ -41,6 +42,25 @@ func (s *Storage) AddItem(item string) (err error) {
 	}
 
 	s.items = append(s.items, item)
+
+	return nil
+}
+
+func (s *Storage) DeleteItem(item string) error {
+	newItems := slices.DeleteFunc(s.items, func(it string) bool {
+		return it == item
+	})
+
+	items := make([]storedItem, len(newItems))
+	for i := range newItems {
+		items[i].fromDomain(newItems[i])
+	}
+
+	if err := s.saveItems(items); err != nil {
+		return fmt.Errorf("save items: %w", err)
+	}
+
+	s.items = newItems
 
 	return nil
 }

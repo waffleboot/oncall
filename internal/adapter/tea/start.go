@@ -1,6 +1,7 @@
 package tea
 
 import (
+	"fmt"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -37,9 +38,23 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "enter", " ":
 			if m.cursor == 0 {
-				if err := m.service.AddItem(); err != nil {
+				items := m.service.Items()
+
+				newItem := fmt.Sprintf("Item %d", len(items)+1)
+
+				if err := m.service.AddItem(newItem); err != nil {
 					return m.controller.errorModel(err.Error(), m), nil
 				}
+
+				items = m.service.Items()
+
+				for i := range items {
+					if items[i] == newItem {
+						m.cursor = i + 1
+						break
+					}
+				}
+
 			} else {
 				i := m.cursor - 1
 				items := m.service.Items()
@@ -56,21 +71,31 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *startModel) View() string {
 	var s strings.Builder
 
-	if m.cursor == 0 {
-		s.WriteString("> Новая запись\n")
+	items := m.service.Items()
+
+	if len(items) == 0 {
+		m.cursor = 0
+	} else if m.cursor > len(items) {
+		m.cursor = len(items)
+	}
+
+	s.WriteString(m.menu(0, "Новая запись"))
+
+	for i, item := range items {
+		s.WriteString(m.menu(i+1, item))
+	}
+
+	return s.String()
+}
+
+func (m *startModel) menu(i int, text string) string {
+	var s strings.Builder
+	if m.cursor == i {
+		s.WriteString("> ")
 	} else {
-		s.WriteString("  Новая запись\n")
+		s.WriteString("  ")
 	}
-
-	for i, item := range m.service.Items() {
-		if m.cursor == i+1 {
-			s.WriteString("> ")
-		} else {
-			s.WriteString("  ")
-		}
-		s.WriteString(item)
-		s.WriteString("\n")
-	}
-
+	s.WriteString(text)
+	s.WriteString("\n")
 	return s.String()
 }

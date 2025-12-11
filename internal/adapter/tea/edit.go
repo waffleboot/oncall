@@ -1,16 +1,22 @@
 package tea
 
 import (
+	"strings"
+
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/waffleboot/oncall/internal/port"
 )
 
 type editModel struct {
-	item string
-	prev tea.Model
+	controller *controller
+	service    port.Service
+	item       string
+	prev       tea.Model
+	cursor     int
 }
 
-func NewEditModel(item string, prev tea.Model) *editModel {
-	return &editModel{prev: prev, item: item}
+func NewEditModel(controller *controller, service port.Service, item string, prev tea.Model) *editModel {
+	return &editModel{controller: controller, service: service, prev: prev, item: item}
 }
 
 func (m *editModel) Init() tea.Cmd {
@@ -23,11 +29,41 @@ func (m *editModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "esc":
 			return m.prev, nil
+		case "up", "k":
+			if m.cursor > 0 {
+				m.cursor--
+			}
+		case "down", "j":
+			if m.cursor < 1 {
+				m.cursor++
+			}
+		case "enter", " ":
+			if m.cursor == 1 {
+				if err := m.service.DeleteItem(m.item); err != nil {
+					return m.controller.errorModel(err.Error(), m.prev), nil
+				}
+				return m.prev, nil
+			}
 		}
 	}
 	return m, nil
 }
 
 func (m *editModel) View() string {
-	return m.item
+	var s strings.Builder
+	s.WriteString(m.menu(0, m.item))
+	s.WriteString(m.menu(1, "Удалить"))
+	return s.String()
+}
+
+func (m *editModel) menu(i int, text string) string {
+	var s strings.Builder
+	if m.cursor == i {
+		s.WriteString("> ")
+	} else {
+		s.WriteString("  ")
+	}
+	s.WriteString(text)
+	s.WriteString("\n")
+	return s.String()
 }
