@@ -7,7 +7,3 @@ type Storage interface {
 	DeleteItem(item model.Item) error
 	GetItems() []model.Item
 }
-
-type IDGenerator interface {
-	GenerateID() int
-}
