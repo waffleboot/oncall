@@ -35,6 +35,10 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.cursor < len(m.service.Items()) {
 				m.cursor++
 			}
+		case "enter", " ":
+			if m.cursor == 0 {
+				m.service.AddItem()
+			}
 		}
 	}
 	return m, nil
