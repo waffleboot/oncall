@@ -56,7 +56,6 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					next := m.controller.editModel(items[i], m)
 					return next, next.Init()
 				}
-
 			}
 		}
 	}
