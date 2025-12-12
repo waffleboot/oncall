@@ -39,7 +39,6 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor++
 			}
 		case "enter", " ":
-
 			switch g, p := m.menu().getGroup(m.cursor); {
 			case g == "new" && p == 0:
 				newItem := m.builder.CreateItem()
