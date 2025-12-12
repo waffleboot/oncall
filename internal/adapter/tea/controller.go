@@ -33,10 +33,10 @@ func (c *controller) Run() error {
 	return nil
 }
 
-func WithService(service port.Service) func(c *controller) {
+func WithService(service port.Service, builder port.ItemBuilder) func(c *controller) {
 	return func(controller *controller) {
 		controller.startModel = func() *startModel {
-			return NewStartModel(controller, service)
+			return NewStartModel(controller, service, builder)
 		}
 		controller.editModel = func(item model.Item, prev tea.Model) *editModel {
 			return NewEditModel(controller, service, item, prev)

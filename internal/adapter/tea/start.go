@@ -11,11 +11,12 @@ import (
 type startModel struct {
 	controller *controller
 	service    port.Service
+	builder    port.ItemBuilder
 	cursor     int
 }
 
-func NewStartModel(controller *controller, service port.Service) *startModel {
-	return &startModel{controller: controller, service: service}
+func NewStartModel(controller *controller, service port.Service, builder port.ItemBuilder) *startModel {
+	return &startModel{controller: controller, service: service, builder: builder}
 }
 
 func (m *startModel) Init() tea.Cmd {
@@ -39,7 +40,7 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "enter", " ":
 			if m.cursor == 0 {
-				newItem := m.service.CreateItem()
+				newItem := m.builder.CreateItem()
 
 				if err := m.service.AddItem(newItem); err != nil {
 					return m.controller.errorModel(err.Error(), m), nil
