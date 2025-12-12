@@ -70,7 +70,7 @@ func (m *startModel) menu() menu {
 	n.labelGen = func(group string, pos int) string {
 		switch {
 		case group == "new" && pos == 0:
-			return fmt.Sprintf("Новое обращение %d %d", m.cursor, n.maxCursor())
+			return "Новое обращение"
 		case group == "items":
 			return fmt.Sprintf("#%d", items[pos].ID)
 		}
