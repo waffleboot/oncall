@@ -2,7 +2,6 @@ package tea
 
 import (
 	"fmt"
-	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/port"
@@ -60,32 +59,25 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *startModel) View() string {
-	var s strings.Builder
-
-	s.WriteString(m.addMenu(0, "Новое обращение"))
-
-	for i, item := range m.service.GetItems() {
-		s.WriteString(m.addMenu(i+1, fmt.Sprintf("#%d", item.ID)))
-	}
-
-	return s.String()
-}
-
-func (m *startModel) addMenu(i int, text string) string {
-	var s strings.Builder
-	if m.cursor == i {
-		s.WriteString("> ")
-	} else {
-		s.WriteString("  ")
-	}
-	s.WriteString(text)
-	s.WriteString("\n")
-	return s.String()
+	return m.menu().generateMenu(m.cursor)
 }
 
 func (m *startModel) menu() menu {
+	items := m.service.GetItems()
+
 	var n menu
+
+	n.labelGen = func(group string, pos int) string {
+		switch {
+		case group == "new" && pos == 0:
+			return fmt.Sprintf("Новое обращение %d %d", m.cursor, n.maxCursor())
+		case group == "items":
+			return fmt.Sprintf("#%d", items[pos].ID)
+		}
+		return "xwx"
+	}
+
 	n.addGroup("new", 1)
-	n.addGroup("items", len(m.service.GetItems()))
+	n.addGroup("items", len(items))
 	return n
 }

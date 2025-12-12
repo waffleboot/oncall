@@ -1,6 +1,9 @@
 package tea
 
+import "strings"
+
 type menu struct {
+	labelGen   func(group string, pos int) string
 	groupNames []string
 	groupSizes []int
 }
@@ -8,6 +11,26 @@ type menu struct {
 func (m *menu) addGroup(group string, size int) {
 	m.groupNames = append(m.groupNames, group)
 	m.groupSizes = append(m.groupSizes, size)
+}
+
+func (m menu) generateMenu(cursor int) string {
+	var s strings.Builder
+
+	for i := 0; i < m.maxCursor(); i++ {
+		if i == cursor {
+			s.WriteString("> ")
+		} else {
+			s.WriteString("  ")
+		}
+		s.WriteString(m.labelGen(m.getGroup(i)))
+		s.WriteString("\n")
+	}
+
+	return s.String()
+}
+
+func (m menu) label(i int) string {
+	return m.labelGen(m.getGroup(i))
 }
 
 func (m menu) getGroup(cursor int) (group string, item int) {
