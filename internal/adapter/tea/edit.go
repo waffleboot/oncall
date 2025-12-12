@@ -58,9 +58,7 @@ func (m *editModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *editModel) View() string {
 	var s strings.Builder
 
-	s.WriteString("  ")
-	s.WriteString(fmt.Sprintf("#%d", m.item.ID))
-	s.WriteString("\n")
+	s.WriteString(fmt.Sprintf("  #%d\n\n", m.item.ID))
 
 	s.WriteString(m.addMenu(0, "Выйти"))
 	s.WriteString(m.addMenu(1, "Удалить"))
