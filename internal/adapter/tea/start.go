@@ -65,7 +65,7 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *startModel) View() string {
 	var s strings.Builder
 
-	s.WriteString(m.menu(0, "Новая запись"))
+	s.WriteString(m.menu(0, "Новое обращение"))
 
 	for i, item := range m.service.GetItems() {
 		s.WriteString(m.menu(i+1, fmt.Sprintf("#%d", item.ID)))
