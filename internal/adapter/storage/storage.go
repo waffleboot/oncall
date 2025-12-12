@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"slices"
+	"time"
 
 	"github.com/waffleboot/oncall/internal/model"
 )
@@ -18,14 +18,18 @@ type (
 	Storage struct {
 		config Config
 		lastID int
-		items  []model.Item
+		items  []storedItem
 	}
 	storedData struct {
-		LastID int          `json:"last_id"`
-		Items  []storedItem `json:"items"`
+		LastID int          `json:"last_id,omitempty"`
+		Items  []storedItem `json:"items,omitempty"`
 	}
 	storedItem struct {
-		ID int `json:"id"`
+		ID        int       `json:"id"`
+		SleepAt   time.Time `json:"sleepAt,omitempty"`
+		ClosedAt  time.Time `json:"closedAt,omitempty"`
+		DeletedAt time.Time `json:"deletedAt,omitempty"`
+		Type      string    `json:"type,omitempty"`
 	}
 )
 
@@ -43,49 +47,86 @@ func (s *Storage) GenerateID() int {
 }
 
 func (s *Storage) AddItem(newItem model.Item) error {
-	storedItems := make([]storedItem, len(s.items)+1)
+	var st storedItem
+	st.fromDomain(newItem)
+
+	s.items = append(s.items, st)
+
+	if err := s.saveData(); err != nil {
+		return fmt.Errorf("save data: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Storage) GetItem(itemID int) (model.Item, error) {
 	for i := range s.items {
-		storedItems[i].fromDomain(s.items[i])
+		if s.items[i].ID == itemID {
+			return s.items[i].toDomain(), nil
+		}
 	}
 
-	storedItems[len(storedItems)-1].fromDomain(newItem)
+	return model.Item{}, errors.New("not found")
+}
 
-	if err := s.saveData(storedData{
-		LastID: s.lastID,
-		Items:  storedItems,
-	}); err != nil {
-		return fmt.Errorf("save items: %w", err)
+func (s *Storage) UpdateItem(item model.Item) error {
+	var found bool
+
+	for i := range s.items {
+		if s.items[i].ID == item.ID {
+			s.items[i].fromDomain(item)
+			found = true
+		}
 	}
 
-	s.items = append(s.items, newItem)
+	if !found {
+		return fmt.Errorf("item not found")
+	}
+
+	if err := s.saveData(); err != nil {
+		return fmt.Errorf("save data: %w", err)
+	}
 
 	return nil
 }
 
-func (s *Storage) DeleteItem(item model.Item) error {
-	newItems := slices.DeleteFunc(s.items, func(it model.Item) bool {
-		return it.ID == item.ID
-	})
+func (s *Storage) DeleteItem(itemID int) error {
+	var found bool
 
-	storedItems := make([]storedItem, len(newItems))
-	for i := range newItems {
-		storedItems[i].fromDomain(newItems[i])
+	for i := range s.items {
+		if s.items[i].ID == itemID {
+			s.items[i].DeletedAt = time.Now()
+			found = true
+		}
 	}
 
-	if err := s.saveData(storedData{
-		LastID: s.lastID,
-		Items:  storedItems,
-	}); err != nil {
-		return fmt.Errorf("save items: %w", err)
+	if !found {
+		return fmt.Errorf("item not found")
 	}
 
-	s.items = newItems
+	if err := s.saveData(); err != nil {
+		return fmt.Errorf("save data: %w", err)
+	}
 
 	return nil
 }
 
-func (s *Storage) GetItems() []model.Item {
-	return s.items
+func (s *Storage) GetItems() ([]model.Item, error) {
+	items := make([]model.Item, 0, len(s.items))
+
+	for i := range s.items {
+		if s.items[i].DeletedAt.IsZero() {
+			items = append(items, s.items[i].toDomain())
+		}
+	}
+
+	return items, nil
+}
+
+func (s *Storage) CloseJournal() error {
+	s.lastID = 0
+	s.items = nil
+	return s.saveData()
 }
 
 func (s *Storage) loadData() error {
@@ -107,16 +148,12 @@ func (s *Storage) loadData() error {
 	}
 
 	s.lastID = data.LastID
-	s.items = make([]model.Item, 0, len(data.Items))
-
-	for i := range data.Items {
-		s.items = append(s.items, data.Items[i].toDomain())
-	}
+	s.items = data.Items
 
 	return nil
 }
 
-func (s *Storage) saveData(data storedData) error {
+func (s *Storage) saveData() error {
 	f, err := os.Create(s.config.Filename)
 	if err != nil {
 		return fmt.Errorf("os create: %w", err)
@@ -128,7 +165,10 @@ func (s *Storage) saveData(data storedData) error {
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", " ")
 
-	if err := enc.Encode(data); err != nil {
+	if err := enc.Encode(storedData{
+		LastID: s.lastID,
+		Items:  s.items,
+	}); err != nil {
 		return fmt.Errorf("json encode: %w", err)
 	}
 
@@ -141,8 +181,16 @@ func (s *Storage) saveData(data storedData) error {
 
 func (s *storedItem) fromDomain(item model.Item) {
 	s.ID = item.ID
+	s.SleepAt = item.SleepAt.UTC()
+	s.ClosedAt = item.ClosedAt.UTC()
+	s.Type = string(item.Type)
 }
 
 func (s *storedItem) toDomain() model.Item {
-	return model.Item{ID: s.ID}
+	return model.Item{
+		ID:       s.ID,
+		SleepAt:  s.SleepAt,
+		ClosedAt: s.ClosedAt,
+		Type:     model.ItemType(s.Type),
+	}
 }

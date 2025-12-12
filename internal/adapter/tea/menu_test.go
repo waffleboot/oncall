@@ -1,64 +1,130 @@
 package tea
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/suite"
+)
+
+type MenuTestSuite struct {
+	suite.Suite
+	menu *Menu
+}
 
 func TestMenu(t *testing.T) {
-	var m menu
+	suite.Run(t, &MenuTestSuite{})
+}
 
-	m.addGroup("action 1", 1)
-	m.addGroup("items", 3)
-	m.addGroup("action 2", 1)
-	m.addGroup("action 3", 1)
+func (s *MenuTestSuite) SetupTest() {
+	s.menu = NewMenu(func(group string, pos int) string {
+		switch group {
+		case "action 1", "action 2", "action 3":
+			return group
+		case "items":
+			return fmt.Sprintf("item %d", pos+1)
+		}
+		return ""
+	})
 
+	s.menu.AddGroup("action 1")
+	s.menu.AddGroupWithItems("items", 3)
+	s.menu.AddGroup("action 2")
+	s.menu.AddDelimiter()
+	s.menu.AddGroup("action 3")
+}
+
+func (s *MenuTestSuite) TestMoveCursorDown() {
 	testCases := []struct {
-		givenCursor int
-		wantGroup   string
-		wantPos     int
+		wantGroup string
+		wantPos   int
 	}{
-		{
-			givenCursor: 0,
-			wantGroup:   "action 1",
-			wantPos:     0,
-		},
-		{
-			givenCursor: 1,
-			wantGroup:   "items",
-			wantPos:     0,
-		},
-		{
-			givenCursor: 2,
-			wantGroup:   "items",
-			wantPos:     1,
-		},
-		{
-			givenCursor: 3,
-			wantGroup:   "items",
-			wantPos:     2,
-		},
-		{
-			givenCursor: 4,
-			wantGroup:   "action 2",
-			wantPos:     0,
-		},
-		{
-			givenCursor: 5,
-			wantGroup:   "action 3",
-			wantPos:     0,
-		},
+		{wantGroup: "action 1", wantPos: 0},
+		{wantGroup: "items", wantPos: 0},
+		{wantGroup: "items", wantPos: 1},
+		{wantGroup: "items", wantPos: 2},
+		{wantGroup: "action 2", wantPos: 0},
+		{wantGroup: "action 3", wantPos: 0},
+		{wantGroup: "action 1", wantPos: 0},
 	}
 
 	for _, tt := range testCases {
-		t.Run("", func(t *testing.T) {
-			g, p := m.getGroup(tt.givenCursor)
-			if g != tt.wantGroup || p != tt.wantPos {
-				t.Fail()
-			}
-		})
+		g, p := s.menu.GetGroup()
+		s.Equal(tt.wantGroup, g)
+		s.Equal(tt.wantPos, p)
+		s.menu.MoveCursorDown()
+	}
+}
+
+func (s *MenuTestSuite) TestMoveCursorUp() {
+	testCases := []struct {
+		wantGroup string
+		wantPos   int
+	}{
+		{wantGroup: "action 1", wantPos: 0},
+		{wantGroup: "action 3", wantPos: 0},
+		{wantGroup: "action 2", wantPos: 0},
+		{wantGroup: "items", wantPos: 2},
+		{wantGroup: "items", wantPos: 1},
+		{wantGroup: "items", wantPos: 0},
+		{wantGroup: "action 1", wantPos: 0},
+		{wantGroup: "action 3", wantPos: 0},
 	}
 
-	t.Run("", func(t *testing.T) {
-		if m.maxCursor() != 5 {
-			t.Fail()
-		}
+	for _, tt := range testCases {
+		g, p := s.menu.GetGroup()
+		s.Equal(tt.wantGroup, g)
+		s.Equal(tt.wantPos, p)
+		s.menu.MoveCursorUp()
+	}
+}
+
+//func (s *MenuTestSuite) TestMaxCursor() {
+//	s.Equal(5, s.m.maxCursor())
+//}
+
+func (s *MenuTestSuite) TestGenerateMenu() {
+	s.Run("0", func() {
+		s.Equal(`> action 1
+  item 1
+  item 2
+  item 3
+  action 2
+
+  action 3
+`, s.menu.GenerateMenu())
 	})
+
+	s.menu.JumpToGroup("action 2")
+
+	s.Run("4", func() {
+		s.Equal(`  action 1
+  item 1
+  item 2
+  item 3
+> action 2
+
+  action 3
+`, s.menu.GenerateMenu())
+	})
+
+	s.menu.JumpToGroup("action 3")
+
+	s.Run("5", func() {
+		s.Equal(`  action 1
+  item 1
+  item 2
+  item 3
+  action 2
+
+> action 3
+`, s.menu.GenerateMenu())
+	})
+
+	s.menu.JumpToGroup("unknown")
+
+	g, p := s.menu.GetGroup()
+
+	s.Equal("action 1", g)
+	s.Equal(0, p)
 }

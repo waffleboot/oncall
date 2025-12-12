@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"go.uber.org/zap"
 	"os"
 
 	"github.com/waffleboot/oncall/internal/adapter/facade"
@@ -16,18 +18,41 @@ func main() {
 	}
 }
 
-func run() error {
+func run() (err error) {
 	s, err := storage.NewStorage(storage.Config{Filename: "oncall.json"})
 	if err != nil {
 		return fmt.Errorf("new storage: %w", err)
 	}
 
-	f := facade.NewService(s, s)
+	log, err := getLogger()
+	if err != nil {
+		return fmt.Errorf("get logger: %w", err)
+	}
+	defer func() {
+		err = errors.Join(err, log.Sync())
+	}()
 
-	p := tea.NewController(tea.WithService(f, f))
+	itemService := facade.NewItemService(s, s)
+
+	journalService := facade.NewJournalService(s)
+
+	p := tea.NewController(tea.WithService(itemService, journalService, log))
 	if err := p.Run(); err != nil {
 		return fmt.Errorf("tea run: %w", err)
 	}
 
 	return nil
+}
+
+func getLogger() (*zap.Logger, error) {
+	config := zap.NewDevelopmentConfig()
+	config.OutputPaths = []string{"debug.log"}
+	config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
+
+	log, err := config.Build()
+	if err != nil {
+		return nil, fmt.Errorf("build logger: %w", err)
+	}
+
+	return log, nil
 }
