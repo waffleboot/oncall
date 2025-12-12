@@ -37,14 +37,14 @@ func (m *editModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor--
 			}
 		case "down", "j":
-			if m.cursor < 1 {
+			if m.cursor < m.menu().maxCursor() {
 				m.cursor++
 			}
 		case "enter", " ":
-			if m.cursor == 0 {
+			switch g, p := m.menu().getGroup(m.cursor); {
+			case g == "exit" && p == 0:
 				return m.prev, m.prev.Init()
-			}
-			if m.cursor == 1 {
+			case g == "delete" && p == 0:
 				if err := m.service.DeleteItem(m.item); err != nil {
 					return m.controller.errorModel(err.Error(), m.prev), nil
 				}
@@ -62,12 +62,12 @@ func (m *editModel) View() string {
 	s.WriteString(fmt.Sprintf("#%d", m.item.ID))
 	s.WriteString("\n")
 
-	s.WriteString(m.menu(0, "Выйти"))
-	s.WriteString(m.menu(1, "Удалить"))
+	s.WriteString(m.addMenu(0, "Выйти"))
+	s.WriteString(m.addMenu(1, "Удалить"))
 	return s.String()
 }
 
-func (m *editModel) menu(i int, text string) string {
+func (m *editModel) addMenu(i int, text string) string {
 	var s strings.Builder
 	if m.cursor == i {
 		s.WriteString("> ")
@@ -77,4 +77,11 @@ func (m *editModel) menu(i int, text string) string {
 	s.WriteString(text)
 	s.WriteString("\n")
 	return s.String()
+}
+
+func (m *editModel) menu() menu {
+	var n menu
+	n.addGroup("exit", 1)
+	n.addGroup("delete", 1)
+	return n
 }

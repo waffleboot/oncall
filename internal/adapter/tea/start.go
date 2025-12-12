@@ -35,11 +35,13 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor--
 			}
 		case "down", "j":
-			if m.cursor < len(m.service.GetItems()) {
+			if m.cursor < m.menu().maxCursor() {
 				m.cursor++
 			}
 		case "enter", " ":
-			if m.cursor == 0 {
+
+			switch g, p := m.menu().getGroup(m.cursor); {
+			case g == "new" && p == 0:
 				newItem := m.builder.CreateItem()
 
 				if err := m.service.AddItem(newItem); err != nil {
@@ -49,13 +51,9 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				next := m.controller.editModel(newItem, m)
 
 				return next, next.Init()
-			} else {
-				i := m.cursor - 1
-				items := m.service.GetItems()
-				if i < len(items) {
-					next := m.controller.editModel(items[i], m)
-					return next, next.Init()
-				}
+			case g == "items":
+				next := m.controller.editModel(m.service.GetItems()[p], m)
+				return next, next.Init()
 			}
 		}
 	}
@@ -65,16 +63,16 @@ func (m *startModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *startModel) View() string {
 	var s strings.Builder
 
-	s.WriteString(m.menu(0, "Новое обращение"))
+	s.WriteString(m.addMenu(0, "Новое обращение"))
 
 	for i, item := range m.service.GetItems() {
-		s.WriteString(m.menu(i+1, fmt.Sprintf("#%d", item.ID)))
+		s.WriteString(m.addMenu(i+1, fmt.Sprintf("#%d", item.ID)))
 	}
 
 	return s.String()
 }
 
-func (m *startModel) menu(i int, text string) string {
+func (m *startModel) addMenu(i int, text string) string {
 	var s strings.Builder
 	if m.cursor == i {
 		s.WriteString("> ")
@@ -84,4 +82,11 @@ func (m *startModel) menu(i int, text string) string {
 	s.WriteString(text)
 	s.WriteString("\n")
 	return s.String()
+}
+
+func (m *startModel) menu() menu {
+	var n menu
+	n.addGroup("new", 1)
+	n.addGroup("items", len(m.service.GetItems()))
+	return n
 }
