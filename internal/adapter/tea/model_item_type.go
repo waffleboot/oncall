@@ -13,6 +13,7 @@ type ModelItemType struct {
 	controller  *Controller
 	itemService port.ItemService
 	item        model.Item
+	next        tea.Model
 	menu        *Menu
 }
 
@@ -20,11 +21,13 @@ func NewModelItemType(
 	controller *Controller,
 	itemService port.ItemService,
 	item model.Item,
+	next tea.Model,
 ) *ModelItemType {
 	m := &ModelItemType{
 		controller:  controller,
 		itemService: itemService,
 		item:        item,
+		next:        next,
 	}
 
 	m.menu = NewMenu(func(group string, pos int) string {
@@ -63,8 +66,7 @@ func (m *ModelItemType) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
-			next := m.controller.modelEdit(m.item.ID)
-			return next, next.Init()
+			return m.next, m.next.Init()
 		case "enter", " ":
 			g, _ := m.menu.GetGroup()
 			return m, func() tea.Msg {
@@ -78,8 +80,7 @@ func (m *ModelItemType) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.controller.modelError(msg.Error(), m), nil
 	case string:
 		if msg == "done" {
-			next := m.controller.modelEdit(m.item.ID)
-			return next, next.Init()
+			return m.next, m.next.Init()
 		}
 	}
 	return m, nil

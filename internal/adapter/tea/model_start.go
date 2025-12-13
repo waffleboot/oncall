@@ -6,6 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
+	"go.uber.org/zap"
 )
 
 const (
@@ -16,15 +17,18 @@ const (
 	startExit  = "exit"
 )
 
-type ModelStart struct {
-	controller  *Controller
-	itemService port.ItemService
-	items       []model.Item
-	menu        *Menu
-}
+type (
+	ModelStart struct {
+		controller  *Controller
+		itemService port.ItemService
+		items       []model.Item
+		menu        *Menu
+		log         *zap.Logger
+	}
+)
 
-func NewStartModel(controller *Controller, itemService port.ItemService) *ModelStart {
-	m := &ModelStart{controller: controller, itemService: itemService}
+func NewModelStart(controller *Controller, itemService port.ItemService, log *zap.Logger) *ModelStart {
+	m := &ModelStart{controller: controller, itemService: itemService, log: log}
 	m.menu = NewMenu(func(group string, pos int) string {
 		switch {
 		case group == startNew:
@@ -40,17 +44,13 @@ func NewStartModel(controller *Controller, itemService port.ItemService) *ModelS
 		}
 		return ""
 	})
+	m.resetMenu()
+	m.menu.JumpToGroup(startNew)
 	return m
 }
 
 func (m *ModelStart) Init() tea.Cmd {
-	return func() tea.Msg {
-		items, err := m.itemService.GetItems()
-		if err != nil {
-			return fmt.Errorf("get items: %w", err)
-		}
-		return items
-	}
+	return m.getItems
 }
 
 func (m *ModelStart) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -67,70 +67,51 @@ func (m *ModelStart) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch g, p := m.menu.GetGroup(); g {
 			case startNew:
 				return m, func() tea.Msg {
-					newItem := m.itemService.CreateItem()
-					if err := m.itemService.AddItem(newItem); err != nil {
+					item := m.itemService.CreateItem()
+					if err := m.itemService.AddItem(item); err != nil {
 						return fmt.Errorf("add item: %w", err)
 					}
-					return newItem
+
+					return item
 				}
 			case startItems:
-				next := m.controller.modelEdit(m.items[p].ID)
+				next := m.controller.modelEdit(m.items[p], m)
 				return next, next.Init()
 			case startClose:
-				return m.controller.modelCloseJournal(), nil
+				return m.controller.modelCloseJournal(m), nil
 			case startExit:
 				return m, tea.Quit
 			}
-
 		}
 	case []model.Item:
 		m.items = msg
 		m.resetMenu()
 		return m, nil
 	case model.Item:
-		next := m.controller.modelEdit(msg.ID)
-		return next, next.Init()
+		m.items = append(m.items, msg)
+		m.resetMenu()
+		m.menu.JumpToItem(startItems, func(pos int) (found bool) {
+			return m.items[pos].ID == msg.ID
+		})
+		return m, nil
 	case error:
 		return m.controller.modelError(msg.Error(), m), nil
 	}
-	return m, nil
+	return m, m.getItems
 }
 
 func (m *ModelStart) View() string {
 	return m.menu.GenerateMenu()
 }
 
-// func (m *ModelStart) resetItems() (tea.Model, tea.Cmd) {
-// 	if g, _ := m.menu.GetGroup(); g == "" {
-// 		m.menu.JumpToGroup(startNew)
-// 		m.menu.MoveCursorUp()
-// 	}
-
-// 	return m, nil
-// }
-
-// func (m *ModelStart) resetItemsAndJump(itemID int) (tea.Model, tea.Cmd) {
-
-// 	m.menu.JumpToItem(startItems, func(pos int) (found bool) {
-// 		return m.items[pos].ID == itemID
-// 	})
-
-// 	return m, nil
-// }
-
 func (m *ModelStart) resetMenu() {
 	m.menu.ResetMenu()
-
 	m.menu.AddGroup(startExit)
 	m.menu.AddGroup(startNew)
 	m.menu.AddGroup(startClose)
 	m.menu.AddGroup(startPrint)
 	m.menu.AddGroupWithItems(startItems, len(m.items))
-
-	if g, _ := m.menu.GetGroup(); g == "" {
-		m.menu.JumpToGroup(startNew)
-		m.menu.MoveCursorUp()
-	}
+	m.menu.AdjustCursor()
 }
 
 func (m *ModelStart) itemLabel(item model.Item) string {
@@ -142,4 +123,12 @@ func (m *ModelStart) itemLabel(item model.Item) string {
 	default:
 		return fmt.Sprintf("  #%d - %s", item.ID, item.Type)
 	}
+}
+
+func (m *ModelStart) getItems() tea.Msg {
+	items, err := m.itemService.GetItems()
+	if err != nil {
+		return fmt.Errorf("get items: %w", err)
+	}
+	return items
 }

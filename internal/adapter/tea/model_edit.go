@@ -26,13 +26,13 @@ const (
 type ModelEdit struct {
 	controller  *Controller
 	itemService port.ItemService
-	itemID      int
 	item        model.Item
 	menu        *Menu
+	next        tea.Model
 }
 
-func NewModelEdit(controller *Controller, itemService port.ItemService, itemID int) *ModelEdit {
-	m := &ModelEdit{controller: controller, itemService: itemService, itemID: itemID}
+func NewModelEdit(controller *Controller, itemService port.ItemService, item model.Item, next tea.Model) *ModelEdit {
+	m := &ModelEdit{controller: controller, itemService: itemService, item: item, next: next}
 	m.menu = NewMenu(func(group string, pos int) string {
 		switch {
 		case group == editExit:
@@ -73,58 +73,47 @@ func (m *ModelEdit) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc", "q", "e":
-			next := m.controller.modelStart()
-			return next, next.Init()
+		case "esc", "q":
+			return m.next, func() tea.Msg { return "" }
+		case "s":
+			if m.item.IsSleep() {
+				return m, m.awake()
+			} else {
+				return m, m.sleep()
+			}
 		case "enter", " ":
 			switch g, _ := m.menu.GetGroup(); g {
 			case editExit:
-				next := m.controller.modelStart()
-				return next, next.Init()
+				return m.next, func() tea.Msg { return "" }
 			case editSleep:
-				return m, func() tea.Msg {
-					if err := m.itemService.SleepItem(m.item); err != nil {
-						return fmt.Errorf("sleep item: %w", err)
-					}
-					return m.getItem()
-				}
+				return m, m.sleep()
 			case editAwake:
-				return m, func() tea.Msg {
-					if err := m.itemService.AwakeItem(m.item); err != nil {
-						return fmt.Errorf("awake item: %w", err)
-					}
-					return m.getItem()
-				}
+				return m, m.awake()
 			case editClose:
-				return m, func() tea.Msg {
+				return m.next, func() tea.Msg {
 					if err := m.itemService.CloseItem(m.item); err != nil {
 						return fmt.Errorf("close item: %w", err)
 					}
-					return "closed"
+					return ""
 				}
 			case editDelete:
-				return m, func() tea.Msg {
+				return m.next, func() tea.Msg {
 					if err := m.itemService.DeleteItem(m.item); err != nil {
 						return fmt.Errorf("delete item: %w", err)
 					}
-					return "deleted"
+					return ""
 				}
 			case editType:
-				next := m.controller.modelItemType(m.item)
+				next := m.controller.modelItemType(m.item, m)
 				return next, next.Init()
 			}
 		}
-	case error:
-		return m.controller.modelError(msg.Error(), m), nil
 	case model.Item:
 		m.item = msg
 		m.resetMenu()
 		return m, nil
-	case string:
-		if msg == "closed" || msg == "deleted" {
-			next := m.controller.modelStart()
-			return next, next.Init()
-		}
+	case error:
+		return m.controller.modelError(msg.Error(), m), nil
 	}
 	return m, nil
 }
@@ -183,9 +172,27 @@ func (m *ModelEdit) resetMenu() {
 }
 
 func (m *ModelEdit) getItem() tea.Msg {
-	item, err := m.itemService.GetItem(m.itemID)
+	item, err := m.itemService.GetItem(m.item.ID)
 	if err != nil {
 		return fmt.Errorf("get item: %w", err)
 	}
 	return item
+}
+
+func (m *ModelEdit) sleep() tea.Cmd {
+	return func() tea.Msg {
+		if err := m.itemService.SleepItem(m.item); err != nil {
+			return fmt.Errorf("sleep item: %w", err)
+		}
+		return m.getItem()
+	}
+}
+
+func (m *ModelEdit) awake() tea.Cmd {
+	return func() tea.Msg {
+		if err := m.itemService.AwakeItem(m.item); err != nil {
+			return fmt.Errorf("awake item: %w", err)
+		}
+		return m.getItem()
+	}
 }

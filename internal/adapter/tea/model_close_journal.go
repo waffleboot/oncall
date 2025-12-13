@@ -17,10 +17,11 @@ type ModelCloseJournal struct {
 	controller     *Controller
 	journalService port.JournalService
 	menu           *Menu
+	next           tea.Model
 }
 
-func NewModelCloseJournal(controller *Controller, journalService port.JournalService) *ModelCloseJournal {
-	m := &ModelCloseJournal{controller: controller, journalService: journalService}
+func NewModelCloseJournal(controller *Controller, journalService port.JournalService, next tea.Model) *ModelCloseJournal {
+	m := &ModelCloseJournal{controller: controller, journalService: journalService, next: next}
 	m.menu = NewMenu(func(group string, pos int) string {
 		switch group {
 		case closeJournalYes:
@@ -49,29 +50,20 @@ func (m *ModelCloseJournal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
-			next := m.controller.modelStart()
-			return next, next.Init()
+			return m.next, nil
 		case "enter", " ":
 			switch g, _ := m.menu.GetGroup(); g {
 			case closeJournalYes:
-				return m, func() tea.Msg {
+				return m.next, func() tea.Msg {
 					if err := m.journalService.CloseJournal(); err != nil {
 						return fmt.Errorf("close journal: %w", err)
 					}
 					return "journal closed"
 				}
 			case closeJournalNo:
-				next := m.controller.modelStart()
-				return next, next.Init()
+				return m.next, nil
 			}
 		}
-	case string:
-		if msg == "journal closed" {
-			next := m.controller.modelStart()
-			return next, next.Init()
-		}
-	case error:
-		return m.controller.modelError(msg.Error(), m), nil
 	}
 	return m, nil
 }

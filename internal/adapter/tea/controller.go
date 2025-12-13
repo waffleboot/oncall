@@ -13,9 +13,9 @@ type (
 	Prev       func() (tea.Model, tea.Cmd)
 	Controller struct {
 		modelStart        func() *ModelStart
-		modelEdit         func(itemID int) *ModelEdit
-		modelCloseJournal func() *ModelCloseJournal
-		modelItemType     func(item model.Item) *ModelItemType
+		modelEdit         func(item model.Item, next tea.Model) *ModelEdit
+		modelCloseJournal func(next tea.Model) *ModelCloseJournal
+		modelItemType     func(item model.Item, next tea.Model) *ModelItemType
 		modelError        func(message string, next tea.Model) *ModelError
 	}
 	option func(*Controller)
@@ -40,17 +40,17 @@ func (c *Controller) Run() error {
 func WithService(itemService port.ItemService, journalService port.JournalService, log *zap.Logger) func(c *Controller) {
 	return func(controller *Controller) {
 		controller.modelStart = func() *ModelStart {
-			return NewStartModel(controller, itemService)
+			return NewModelStart(controller, itemService, log.With(zap.String("model", "start")))
 		}
-		controller.modelEdit = func(itemID int) *ModelEdit {
-			return NewModelEdit(controller, itemService, itemID)
+		controller.modelEdit = func(item model.Item, next tea.Model) *ModelEdit {
+			return NewModelEdit(controller, itemService, item, next)
 		}
 		controller.modelError = NewModelError
-		controller.modelCloseJournal = func() *ModelCloseJournal {
-			return NewModelCloseJournal(controller, journalService)
+		controller.modelCloseJournal = func(next tea.Model) *ModelCloseJournal {
+			return NewModelCloseJournal(controller, journalService, next)
 		}
-		controller.modelItemType = func(item model.Item) *ModelItemType {
-			return NewModelItemType(controller, itemService, item)
+		controller.modelItemType = func(item model.Item, next tea.Model) *ModelItemType {
+			return NewModelItemType(controller, itemService, item, next)
 		}
 	}
 }

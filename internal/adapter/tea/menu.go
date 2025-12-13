@@ -1,9 +1,10 @@
 package tea
 
 import (
+	"strings"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"go.uber.org/zap"
-	"strings"
 )
 
 const menuDelimiter = "---"
@@ -63,6 +64,12 @@ func (m *Menu) AddGroup(group string) {
 func (m *Menu) AddGroupWithItems(group string, itemsCount int) {
 	m.groupNames = append(m.groupNames, group)
 	m.groupSizes = append(m.groupSizes, itemsCount)
+}
+
+func (m *Menu) AdjustCursor() {
+	if g, _ := m.GetGroup(); g == "" {
+		m.cursor = m.maxCursor()
+	}
 }
 
 func (m *Menu) AddDelimiter() {
