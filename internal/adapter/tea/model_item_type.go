@@ -1,10 +1,12 @@
 package tea
 
 import (
+	"fmt"
+	"strings"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
-	"strings"
 )
 
 type ItemTypeModel struct {
@@ -19,13 +21,11 @@ func NewItemTypeModel(
 	controller *Controller,
 	itemService port.ItemService,
 	item model.Item,
-	prev Prev,
 ) *ItemTypeModel {
 	m := &ItemTypeModel{
 		controller:  controller,
 		itemService: itemService,
 		item:        item,
-		prev:        prev,
 	}
 
 	m.menu = NewMenu(func(group string, pos int) string {
@@ -68,11 +68,18 @@ func (m *ItemTypeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.prev()
 		case "enter", " ":
 			g, _ := m.menu.GetGroup()
-			if err := m.itemService.SetItemType(m.item, model.ItemType(g)); err != nil {
-				return m.controller.errorModel(err.Error(), m.prev), nil
+			return m, func() tea.Msg {
+				if err := m.itemService.SetItemType(m.item, model.ItemType(g)); err != nil {
+					return fmt.Errorf("set item type: %w", err)
+				}
+				return m.item
 			}
-			return m.prev()
 		}
+	case error:
+		return m.controller.errorModel(msg.Error(), m), nil
+	case model.Item:
+		next := m.controller.editModel(msg)
+		return next, next.Init()
 	}
 	return m, nil
 }

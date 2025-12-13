@@ -1,9 +1,11 @@
 package tea
 
 import (
+	"fmt"
+	"strings"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/port"
-	"strings"
 )
 
 const (
@@ -14,12 +16,11 @@ const (
 type CloseJournalModel struct {
 	controller     *Controller
 	journalService port.JournalService
-	prev           Prev
 	menu           *Menu
 }
 
-func NewCloseJournalModel(controller *Controller, journalService port.JournalService, prev Prev) *CloseJournalModel {
-	m := &CloseJournalModel{controller: controller, journalService: journalService, prev: prev}
+func NewCloseJournalModel(controller *Controller, journalService port.JournalService) *CloseJournalModel {
+	m := &CloseJournalModel{controller: controller, journalService: journalService}
 	m.menu = NewMenu(func(group string, pos int) string {
 		switch group {
 		case closeJournalYes:
@@ -48,17 +49,24 @@ func (m *CloseJournalModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
-			return m.prev()
+			return m.controller.startModel(), nil
 		case "enter", " ":
 			switch g, _ := m.menu.GetGroup(); g {
 			case closeJournalYes:
-				if err := m.journalService.CloseJournal(); err != nil {
-					return m.controller.errorModel(err.Error(), m.prev), nil
+				return m, func() tea.Msg {
+					if err := m.journalService.CloseJournal(); err != nil {
+						return fmt.Errorf("close journal: %w", err)
+					}
+					return "journal closed"
 				}
-				return m.prev()
 			case closeJournalNo:
-				return m.prev()
+				return m.controller.startModel(), nil
 			}
+		}
+	case string:
+		if msg == "journal closed" {
+			next := m.controller.startModel()
+			return next, next.Init()
 		}
 	}
 	return m, nil

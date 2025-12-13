@@ -2,8 +2,9 @@ package tea
 
 import (
 	"fmt"
-	"github.com/waffleboot/oncall/internal/model"
 	"strings"
+
+	"github.com/waffleboot/oncall/internal/model"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/port"
@@ -26,12 +27,11 @@ type EditModel struct {
 	controller  *Controller
 	itemService port.ItemService
 	item        model.Item
-	prev        Prev
 	menu        *Menu
 }
 
-func NewEditModel(controller *Controller, itemService port.ItemService, item model.Item, prev Prev) *EditModel {
-	m := &EditModel{controller: controller, itemService: itemService, prev: prev, item: item}
+func NewEditModel(controller *Controller, itemService port.ItemService, item model.Item) *EditModel {
+	m := &EditModel{controller: controller, itemService: itemService, item: item}
 
 	m.menu = NewMenu(func(group string, pos int) string {
 		switch {
@@ -59,7 +59,7 @@ func NewEditModel(controller *Controller, itemService port.ItemService, item mod
 		return ""
 	})
 
-	m.resetMenu(item)
+	m.resetMenu()
 
 	return m
 }
@@ -77,36 +77,51 @@ func (m *EditModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
-			return m.prev()
+			next := m.controller.startModel()
+			return next, next.Init()
 		case "enter", " ":
 			switch g, _ := m.menu.GetGroup(); g {
 			case editExit:
-				return m.prev()
+				next := m.controller.startModel()
+				return next, next.Init()
 			case editSleep:
-				if err := m.itemService.SleepItem(m.item); err != nil {
-					return m.controller.errorModel(err.Error(), m.prev), nil
+				return m, func() tea.Msg {
+					if err := m.itemService.SleepItem(m.item); err != nil {
+						return fmt.Errorf("sleep item: %w", err)
+					}
+					return m.item
 				}
-				return m.resetItem()
 			case editAwake:
-				if err := m.itemService.AwakeItem(m.item); err != nil {
-					return m.controller.errorModel(err.Error(), m.prev), nil
+				return m, func() tea.Msg {
+					if err := m.itemService.AwakeItem(m.item); err != nil {
+						return fmt.Errorf("awake item: %w", err)
+					}
+					return m.item
 				}
-				return m.resetItem()
 			case editClose:
-				if err := m.itemService.CloseItem(m.item); err != nil {
-					return m.controller.errorModel(err.Error(), m.prev), nil
+				return m, func() tea.Msg {
+					if err := m.itemService.CloseItem(m.item); err != nil {
+						return fmt.Errorf("close item: %w", err)
+					}
+					return m.item
 				}
-				return m.prev()
 			case editDelete:
-				if err := m.itemService.DeleteItem(m.item); err != nil {
-					return m.controller.errorModel(err.Error(), m.prev), nil
+				return m, func() tea.Msg {
+					if err := m.itemService.DeleteItem(m.item); err != nil {
+						return fmt.Errorf("delete item: %w", err)
+					}
+					return m.item
 				}
-				return m.prev()
 			case editType:
-				next := m.controller.itemTypeModel(m.item, m.resetItem)
+				next := m.controller.itemTypeModel(m.item)
 				return next, next.Init()
 			}
 		}
+	case error:
+		return m.controller.errorModel(msg.Error(), m), nil
+	case model.Item:
+		m.item = msg
+		m.resetMenu()
 	}
 	return m, nil
 }
@@ -133,20 +148,7 @@ func (m *EditModel) View() string {
 	return s.String()
 }
 
-func (m *EditModel) resetItem() (tea.Model, tea.Cmd) {
-	item, err := m.itemService.GetItem(m.item.ID)
-	if err != nil {
-		return m.controller.errorModel(err.Error(), m.prev), nil
-	}
-
-	m.resetMenu(item)
-
-	return m, nil
-}
-
-func (m *EditModel) resetMenu(item model.Item) {
-	m.item = item
-
+func (m *EditModel) resetMenu() {
 	m.menu.ResetMenu()
 
 	m.menu.AddGroup(editExit)

@@ -2,6 +2,7 @@ package tea
 
 import (
 	"fmt"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
@@ -15,25 +16,18 @@ const (
 	startExit  = "exit"
 )
 
-type StartModel struct {
+type ModelStart struct {
 	controller  *Controller
 	itemService port.ItemService
 	items       []model.Item
 	menu        *Menu
 }
 
-func NewStartModel(
-	controller *Controller,
-	itemService port.ItemService,
-) (*StartModel, error) {
-	m := &StartModel{
-		controller:  controller,
-		itemService: itemService,
-	}
-
+func NewStartModel(controller *Controller, itemService port.ItemService) *ModelStart {
+	m := &ModelStart{controller: controller, itemService: itemService}
 	m.menu = NewMenu(func(group string, pos int) string {
 		switch {
-		case group == startNew && pos == 0:
+		case group == startNew:
 			return "Новое обращение"
 		case group == startItems:
 			return m.itemLabel(m.items[pos])
@@ -46,22 +40,20 @@ func NewStartModel(
 		}
 		return ""
 	})
+	return m
+}
 
-	items, err := itemService.GetItems()
-	if err != nil {
-		return nil, fmt.Errorf("get items: %w", err)
+func (m *ModelStart) Init() tea.Cmd {
+	return func() tea.Msg {
+		items, err := m.itemService.GetItems()
+		if err != nil {
+			return fmt.Errorf("get items: %w", err)
+		}
+		return items
 	}
-
-	m.resetMenu(items)
-
-	return m, nil
 }
 
-func (m *StartModel) Init() tea.Cmd {
-	return nil
-}
-
-func (m *StartModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *ModelStart) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.menu.ProcessMsg(msg) {
 		return m, nil
 	}
@@ -74,43 +66,41 @@ func (m *StartModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter", " ":
 			switch g, p := m.menu.GetGroup(); g {
 			case startNew:
-				newItem := m.itemService.CreateItem()
+				return m, func() tea.Msg {
+					newItem := m.itemService.CreateItem()
 
-				if err := m.itemService.AddItem(newItem); err != nil {
-					return m.controller.errorModel(err.Error(), m.resetItems), nil
+					if err := m.itemService.AddItem(newItem); err != nil {
+						return fmt.Errorf("add item: %w", err)
+					}
+
+					return newItem
 				}
-
-				next := m.controller.editModel(newItem, func() (tea.Model, tea.Cmd) {
-					return m.resetItemsAndJump(newItem.ID)
-				})
-
-				return next, next.Init()
 			case startItems:
-				next := m.controller.editModel(m.items[p], m.resetItems)
-				return next, next.Init()
+				return m.controller.editModel(m.items[p]), nil
 			case startClose:
-				next := m.controller.closeJournalModel(m.resetItems)
-				return next, next.Init()
+				return m.controller.closeJournalModel(), nil
 			case startExit:
 				return m, tea.Quit
 			}
+
 		}
+	case []model.Item:
+		m.items = msg
+		m.resetMenu()
+		return m, nil
+	case model.Item:
+		return m.controller.editModel(msg), nil
+	case error:
+		return m.controller.errorModel(msg.Error(), m), nil
 	}
 	return m, nil
 }
 
-func (m *StartModel) View() string {
+func (m *ModelStart) View() string {
 	return m.menu.GenerateMenu()
 }
 
-func (m *StartModel) resetItems() (tea.Model, tea.Cmd) {
-	items, err := m.itemService.GetItems()
-	if err != nil {
-		return m.controller.errorModel(err.Error(), m.resetItems), nil
-	}
-
-	m.resetMenu(items)
-
+func (m *ModelStart) resetItems() (tea.Model, tea.Cmd) {
 	if g, _ := m.menu.GetGroup(); g == "" {
 		m.menu.JumpToGroup(startNew)
 		m.menu.MoveCursorUp()
@@ -119,13 +109,7 @@ func (m *StartModel) resetItems() (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *StartModel) resetItemsAndJump(itemID int) (tea.Model, tea.Cmd) {
-	items, err := m.itemService.GetItems()
-	if err != nil {
-		return m.controller.errorModel(err.Error(), m.resetItems), nil
-	}
-
-	m.resetMenu(items)
+func (m *ModelStart) resetItemsAndJump(itemID int) (tea.Model, tea.Cmd) {
 
 	m.menu.JumpToItem(startItems, func(pos int) (found bool) {
 		return m.items[pos].ID == itemID
@@ -134,17 +118,22 @@ func (m *StartModel) resetItemsAndJump(itemID int) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *StartModel) resetMenu(items []model.Item) {
-	m.items = items
+func (m *ModelStart) resetMenu() {
 	m.menu.ResetMenu()
+
 	m.menu.AddGroup(startExit)
 	m.menu.AddGroup(startNew)
 	m.menu.AddGroup(startClose)
 	m.menu.AddGroup(startPrint)
-	m.menu.AddGroupWithItems(startItems, len(items))
+	m.menu.AddGroupWithItems(startItems, len(m.items))
+
+	if g, _ := m.menu.GetGroup(); g == "" {
+		m.menu.JumpToGroup(startNew)
+		m.menu.MoveCursorUp()
+	}
 }
 
-func (m *StartModel) itemLabel(item model.Item) string {
+func (m *ModelStart) itemLabel(item model.Item) string {
 	switch {
 	case item.IsSleep():
 		return fmt.Sprintf("? #%d - %s", item.ID, item.Type)

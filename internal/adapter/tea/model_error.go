@@ -6,10 +6,10 @@ import (
 
 type ErrorModel struct {
 	message string
-	prev    Prev
+	prev    tea.Model
 }
 
-func NewErrorModel(message string, prev Prev) *ErrorModel {
+func NewErrorModel(message string, prev tea.Model) *ErrorModel {
 	return &ErrorModel{message: message, prev: prev}
 }
 
@@ -22,7 +22,7 @@ func (m *ErrorModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
-			return m.prev()
+			return m.prev, nil
 		case "q":
 			return m, tea.Quit
 		}
