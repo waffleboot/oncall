@@ -13,14 +13,14 @@ const (
 	closeJournalNo  = "no"
 )
 
-type CloseJournalModel struct {
+type ModelCloseJournal struct {
 	controller     *Controller
 	journalService port.JournalService
 	menu           *Menu
 }
 
-func NewCloseJournalModel(controller *Controller, journalService port.JournalService) *CloseJournalModel {
-	m := &CloseJournalModel{controller: controller, journalService: journalService}
+func NewModelCloseJournal(controller *Controller, journalService port.JournalService) *ModelCloseJournal {
+	m := &ModelCloseJournal{controller: controller, journalService: journalService}
 	m.menu = NewMenu(func(group string, pos int) string {
 		switch group {
 		case closeJournalYes:
@@ -36,11 +36,11 @@ func NewCloseJournalModel(controller *Controller, journalService port.JournalSer
 	return m
 }
 
-func (m *CloseJournalModel) Init() tea.Cmd {
+func (m *ModelCloseJournal) Init() tea.Cmd {
 	return nil
 }
 
-func (m *CloseJournalModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *ModelCloseJournal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.menu.ProcessMsg(msg) {
 		return m, nil
 	}
@@ -49,7 +49,8 @@ func (m *CloseJournalModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
-			return m.controller.startModel(), nil
+			next := m.controller.modelStart()
+			return next, next.Init()
 		case "enter", " ":
 			switch g, _ := m.menu.GetGroup(); g {
 			case closeJournalYes:
@@ -60,23 +61,24 @@ func (m *CloseJournalModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return "journal closed"
 				}
 			case closeJournalNo:
-				return m.controller.startModel(), nil
+				next := m.controller.modelStart()
+				return next, next.Init()
 			}
 		}
 	case string:
 		if msg == "journal closed" {
-			next := m.controller.startModel()
+			next := m.controller.modelStart()
 			return next, next.Init()
 		}
+	case error:
+		return m.controller.modelError(msg.Error(), m), nil
 	}
 	return m, nil
 }
 
-func (m *CloseJournalModel) View() string {
+func (m *ModelCloseJournal) View() string {
 	var s strings.Builder
-
 	s.WriteString("  Закрыть журнал?\n\n")
 	s.WriteString(m.menu.GenerateMenu())
-
 	return s.String()
 }

@@ -12,11 +12,11 @@ import (
 type (
 	Prev       func() (tea.Model, tea.Cmd)
 	Controller struct {
-		startModel        func() *ModelStart
-		editModel         func(item model.Item) *EditModel
-		errorModel        func(message string, next tea.Model) *ErrorModel
-		closeJournalModel func() *CloseJournalModel
-		itemTypeModel     func(item model.Item) *ItemTypeModel
+		modelStart        func() *ModelStart
+		modelEdit         func(itemID int) *ModelEdit
+		modelCloseJournal func() *ModelCloseJournal
+		modelItemType     func(item model.Item) *ModelItemType
+		modelError        func(message string, next tea.Model) *ModelError
 	}
 	option func(*Controller)
 )
@@ -30,7 +30,7 @@ func NewController(opts ...option) *Controller {
 }
 
 func (c *Controller) Run() error {
-	p := tea.NewProgram(c.startModel())
+	p := tea.NewProgram(c.modelStart())
 	if _, err := p.Run(); err != nil {
 		return fmt.Errorf("tea run: %w", err)
 	}
@@ -39,18 +39,18 @@ func (c *Controller) Run() error {
 
 func WithService(itemService port.ItemService, journalService port.JournalService, log *zap.Logger) func(c *Controller) {
 	return func(controller *Controller) {
-		controller.startModel = func() *ModelStart {
+		controller.modelStart = func() *ModelStart {
 			return NewStartModel(controller, itemService)
 		}
-		controller.editModel = func(item model.Item) *EditModel {
-			return NewEditModel(controller, itemService, item)
+		controller.modelEdit = func(itemID int) *ModelEdit {
+			return NewModelEdit(controller, itemService, itemID)
 		}
-		controller.errorModel = NewErrorModel
-		controller.closeJournalModel = func() *CloseJournalModel {
-			return NewCloseJournalModel(controller, journalService)
+		controller.modelError = NewModelError
+		controller.modelCloseJournal = func() *ModelCloseJournal {
+			return NewModelCloseJournal(controller, journalService)
 		}
-		controller.itemTypeModel = func(item model.Item) *ItemTypeModel {
-			return NewItemTypeModel(controller, itemService, item)
+		controller.modelItemType = func(item model.Item) *ModelItemType {
+			return NewModelItemType(controller, itemService, item)
 		}
 	}
 }

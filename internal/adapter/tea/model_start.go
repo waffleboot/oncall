@@ -68,17 +68,16 @@ func (m *ModelStart) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case startNew:
 				return m, func() tea.Msg {
 					newItem := m.itemService.CreateItem()
-
 					if err := m.itemService.AddItem(newItem); err != nil {
 						return fmt.Errorf("add item: %w", err)
 					}
-
 					return newItem
 				}
 			case startItems:
-				return m.controller.editModel(m.items[p]), nil
+				next := m.controller.modelEdit(m.items[p].ID)
+				return next, next.Init()
 			case startClose:
-				return m.controller.closeJournalModel(), nil
+				return m.controller.modelCloseJournal(), nil
 			case startExit:
 				return m, tea.Quit
 			}
@@ -89,9 +88,10 @@ func (m *ModelStart) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.resetMenu()
 		return m, nil
 	case model.Item:
-		return m.controller.editModel(msg), nil
+		next := m.controller.modelEdit(msg.ID)
+		return next, next.Init()
 	case error:
-		return m.controller.errorModel(msg.Error(), m), nil
+		return m.controller.modelError(msg.Error(), m), nil
 	}
 	return m, nil
 }
@@ -100,23 +100,23 @@ func (m *ModelStart) View() string {
 	return m.menu.GenerateMenu()
 }
 
-func (m *ModelStart) resetItems() (tea.Model, tea.Cmd) {
-	if g, _ := m.menu.GetGroup(); g == "" {
-		m.menu.JumpToGroup(startNew)
-		m.menu.MoveCursorUp()
-	}
+// func (m *ModelStart) resetItems() (tea.Model, tea.Cmd) {
+// 	if g, _ := m.menu.GetGroup(); g == "" {
+// 		m.menu.JumpToGroup(startNew)
+// 		m.menu.MoveCursorUp()
+// 	}
 
-	return m, nil
-}
+// 	return m, nil
+// }
 
-func (m *ModelStart) resetItemsAndJump(itemID int) (tea.Model, tea.Cmd) {
+// func (m *ModelStart) resetItemsAndJump(itemID int) (tea.Model, tea.Cmd) {
 
-	m.menu.JumpToItem(startItems, func(pos int) (found bool) {
-		return m.items[pos].ID == itemID
-	})
+// 	m.menu.JumpToItem(startItems, func(pos int) (found bool) {
+// 		return m.items[pos].ID == itemID
+// 	})
 
-	return m, nil
-}
+// 	return m, nil
+// }
 
 func (m *ModelStart) resetMenu() {
 	m.menu.ResetMenu()

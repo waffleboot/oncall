@@ -4,20 +4,20 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type ErrorModel struct {
+type ModelError struct {
 	message string
 	prev    tea.Model
 }
 
-func NewErrorModel(message string, prev tea.Model) *ErrorModel {
-	return &ErrorModel{message: message, prev: prev}
+func NewModelError(message string, prev tea.Model) *ModelError {
+	return &ModelError{message: message, prev: prev}
 }
 
-func (m *ErrorModel) Init() tea.Cmd {
+func (m *ModelError) Init() tea.Cmd {
 	return nil
 }
 
-func (m *ErrorModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *ModelError) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -30,6 +30,6 @@ func (m *ErrorModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *ErrorModel) View() string {
+func (m *ModelError) View() string {
 	return m.message
 }

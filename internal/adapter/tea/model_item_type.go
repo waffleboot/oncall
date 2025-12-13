@@ -9,20 +9,19 @@ import (
 	"github.com/waffleboot/oncall/internal/port"
 )
 
-type ItemTypeModel struct {
+type ModelItemType struct {
 	controller  *Controller
 	itemService port.ItemService
 	item        model.Item
 	menu        *Menu
-	prev        Prev
 }
 
-func NewItemTypeModel(
+func NewModelItemType(
 	controller *Controller,
 	itemService port.ItemService,
 	item model.Item,
-) *ItemTypeModel {
-	m := &ItemTypeModel{
+) *ModelItemType {
+	m := &ModelItemType{
 		controller:  controller,
 		itemService: itemService,
 		item:        item,
@@ -46,17 +45,16 @@ func NewItemTypeModel(
 	m.menu.AddGroup(string(model.ItemTypeAdhoc))
 	m.menu.AddGroup(string(model.ItemTypeAsk))
 	m.menu.AddGroup(string(model.ItemTypeAlert))
-
 	m.menu.JumpToGroup(string(item.Type))
 
 	return m
 }
 
-func (m *ItemTypeModel) Init() tea.Cmd {
+func (m *ModelItemType) Init() tea.Cmd {
 	return nil
 }
 
-func (m *ItemTypeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *ModelItemType) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.menu.ProcessMsg(msg) {
 		return m, nil
 	}
@@ -65,26 +63,29 @@ func (m *ItemTypeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
-			return m.prev()
+			next := m.controller.modelEdit(m.item.ID)
+			return next, next.Init()
 		case "enter", " ":
 			g, _ := m.menu.GetGroup()
 			return m, func() tea.Msg {
 				if err := m.itemService.SetItemType(m.item, model.ItemType(g)); err != nil {
 					return fmt.Errorf("set item type: %w", err)
 				}
-				return m.item
+				return "done"
 			}
 		}
 	case error:
-		return m.controller.errorModel(msg.Error(), m), nil
-	case model.Item:
-		next := m.controller.editModel(msg)
-		return next, next.Init()
+		return m.controller.modelError(msg.Error(), m), nil
+	case string:
+		if msg == "done" {
+			next := m.controller.modelEdit(m.item.ID)
+			return next, next.Init()
+		}
 	}
 	return m, nil
 }
 
-func (m *ItemTypeModel) View() string {
+func (m *ModelItemType) View() string {
 	var s strings.Builder
 
 	s.WriteString("  Тип обращения:\n\n")
