@@ -46,19 +46,6 @@ func (s *Storage) GenerateID() int {
 	return s.lastID
 }
 
-func (s *Storage) AddItem(newItem model.Item) error {
-	var st storedItem
-	st.fromDomain(newItem)
-
-	s.items = append(s.items, st)
-
-	if err := s.saveData(); err != nil {
-		return fmt.Errorf("save data: %w", err)
-	}
-
-	return nil
-}
-
 func (s *Storage) GetItem(itemID int) (model.Item, error) {
 	for i := range s.items {
 		if s.items[i].ID == itemID {
@@ -80,7 +67,9 @@ func (s *Storage) UpdateItem(item model.Item) error {
 	}
 
 	if !found {
-		return fmt.Errorf("item not found")
+		var st storedItem
+		st.fromDomain(item)
+		s.items = append(s.items, st)
 	}
 
 	if err := s.saveData(); err != nil {

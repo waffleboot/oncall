@@ -25,7 +25,7 @@ func (s *ItemService) CreateItem() model.Item {
 }
 
 func (s *ItemService) AddItem(item model.Item) error {
-	if err := s.storage.AddItem(item); err != nil {
+	if err := s.storage.UpdateItem(item); err != nil {
 		return fmt.Errorf("create item: %w", err)
 	}
 
