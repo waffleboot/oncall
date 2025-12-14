@@ -11,3 +11,7 @@ type ItemService interface {
 	AwakeItem(model.Item) error
 	DeleteItem(model.Item) error
 }
+
+type JournalService interface {
+	CloseJournal() error
+}

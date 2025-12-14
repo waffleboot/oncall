@@ -16,12 +16,13 @@ const (
 type (
 	screen   string
 	TeaModel struct {
-		itemService   port.ItemService
-		currentScreen screen
-		items         []model.Item
-		selectedItem  int
-		allItemsMenu  *Menu
-		editItemMenu  *Menu
+		itemService    port.ItemService
+		journalService port.JournalService
+		currentScreen  screen
+		items          []model.Item
+		selectedItem   int
+		allItemsMenu   *Menu
+		editItemMenu   *Menu
 	}
 	itemCreatedMsg struct {
 		newItem model.Item
@@ -31,8 +32,8 @@ type (
 	itemDeletedMsg struct{}
 )
 
-func NewTeaModel(itemService port.ItemService) *TeaModel {
-	return &TeaModel{itemService: itemService}
+func NewTeaModel(itemService port.ItemService, journalService port.JournalService) *TeaModel {
+	return &TeaModel{itemService: itemService, journalService: journalService}
 }
 
 func (m *TeaModel) Init() tea.Cmd {
