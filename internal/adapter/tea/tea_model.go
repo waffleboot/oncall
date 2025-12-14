@@ -61,7 +61,7 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.allItemsModel.menu.AddGroup("close_journal")
 		m.allItemsModel.menu.AddGroup("print_journal")
 		m.allItemsModel.menu.AddGroupWithItems("items", len(m.items))
-	case newItemCreateMsg:
+	case newItemCreatedMsg:
 		m.items = msg.items
 		m.selectedItem = msg.newItem
 		m.allItemsModel.menu.ResetMenu()

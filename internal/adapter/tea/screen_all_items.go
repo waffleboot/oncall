@@ -11,7 +11,7 @@ type (
 	allItemsModel struct {
 		menu *Menu
 	}
-	newItemCreateMsg struct {
+	newItemCreatedMsg struct {
 		items   []model.Item
 		newItem model.Item
 	}
@@ -43,7 +43,7 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 						return fmt.Errorf("get items: %w", err)
 					}
 
-					return newItemCreateMsg{items: items, newItem: item}
+					return newItemCreatedMsg{items: items, newItem: item}
 				}
 			case "close_journal":
 			case "print_journal":
