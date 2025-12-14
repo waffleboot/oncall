@@ -37,6 +37,12 @@ func (m *TeaModel) Init() tea.Cmd {
 }
 
 func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg.(type) {
+	case tea.KeyMsg:
+		switch "ctrl+c":
+		
+	}
+
 	switch m.currentScreen() {
 	case screenAllItems:
 		return m.updateAllItems(msg)
