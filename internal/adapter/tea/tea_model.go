@@ -26,7 +26,6 @@ type (
 		allItemsModel allItemsModel
 		editItemModel editItemModel
 	}
-	allItemsModel struct{}
 	editItemModel struct{}
 )
 

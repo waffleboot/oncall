@@ -8,6 +8,10 @@ import (
 	"github.com/waffleboot/oncall/internal/model"
 )
 
+type allItemsModel struct {
+	menu *Menu
+}
+
 func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case []model.Item:
