@@ -53,3 +53,11 @@ func (s *ItemService) AwakeItem(item model.Item) error {
 	}
 	return fmt.Errorf("not found")
 }
+
+func (s *ItemService) CloseItem(item model.Item) error {
+	return nil
+}
+
+func (s *ItemService) DeleteItem(item model.Item) error {
+	return nil
+}
