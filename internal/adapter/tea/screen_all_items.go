@@ -25,6 +25,9 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.allItemsModel.menu.AddGroup("print_journal")
 		m.allItemsModel.menu.AddGroupWithItems("items", len(m.items))
 		m.allItemsModel.menu.AdjustCursor()
+		m.allItemsModel.menu.JumpToItem("items", func(pos int) (found bool) {
+			return m.items[pos].ID == m.selectedItemID
+		})
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
@@ -39,20 +42,15 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 					if err := m.config.ItemService.UpdateItem(item); err != nil {
 						return fmt.Errorf("create item: %w", err)
 					}
+					m.selectedItemID = item.ID
 					return m.getItems()
 				}
 			case "close_journal":
 			case "print_journal":
 			case "items":
-				m.selectedItem = p
+				m.selectedItemID = m.items[p].ID
 				m.screenPush(screenEditItem)
 			}
-		case "1":
-			m.selectedItem = 0
-			m.screenPush(screenEditItem)
-		case "2":
-			m.selectedItem = 1
-			m.screenPush(screenEditItem)
 		}
 	}
 	return m, nil

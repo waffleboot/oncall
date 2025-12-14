@@ -18,12 +18,12 @@ type (
 		ItemService port.ItemService
 	}
 	TeaModel struct {
-		config        TeaModelConfig
-		screens       []screen
-		items         []model.Item
-		selectedItem  int
-		allItemsModel allItemsModel
-		editItemModel editItemModel
+		config         TeaModelConfig
+		screens        []screen
+		items          []model.Item
+		selectedItemID int
+		allItemsModel  allItemsModel
+		editItemModel  editItemModel
 	}
 	editItemModel struct{}
 )
