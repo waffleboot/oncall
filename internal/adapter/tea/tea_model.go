@@ -11,6 +11,7 @@ import (
 
 const (
 	screenAllItems screen = "all_items"
+	screenEditItem screen = "edit_item"
 )
 
 type (
@@ -21,9 +22,12 @@ type (
 		config        TeaModelConfig
 		screens       []screen
 		items         []model.Item
+		selectedItem  int
 		allItemsModel allItemsModel
+		editItemModel editItemModel
 	}
 	allItemsModel struct{}
+	editItemModel struct{}
 )
 
 func NewTeaModel(config TeaModelConfig) *TeaModel {
@@ -48,6 +52,8 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch m.currentScreen() {
 	case screenAllItems:
 		return m.updateAllItems(msg)
+	case screenEditItem:
+		return m.updateEditItem(msg)
 	}
 	return m, nil
 }
@@ -56,8 +62,41 @@ func (m *TeaModel) View() string {
 	switch m.currentScreen() {
 	case screenAllItems:
 		return m.viewAllItems()
+	case screenEditItem:
+		return m.viewEditItem()
 	}
 	return ""
+}
+
+func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case []model.Item:
+		m.items = msg
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "q", "esc":
+			return m, tea.Quit
+		case "1":
+			m.selectedItem = 0
+			m.screenPush(screenEditItem)
+		case "2":
+			m.selectedItem = 1
+			m.screenPush(screenEditItem)
+		}
+	}
+	return m, nil
+}
+
+func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "esc", "q":
+			m.screenPop()
+			return m, nil
+		}
+	}
+	return m, nil
 }
 
 func (m *TeaModel) viewAllItems() string {
@@ -68,12 +107,8 @@ func (m *TeaModel) viewAllItems() string {
 	return s.String()
 }
 
-func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case []model.Item:
-		m.items = msg
-	}
-	return m, nil
+func (m *TeaModel) viewEditItem() string {
+	return fmt.Sprintf("#%d\n", m.items[m.selectedItem].ID)
 }
 
 func (m TeaModel) getItems() tea.Msg {
