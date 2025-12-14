@@ -2,8 +2,10 @@ package tea
 
 import (
 	"fmt"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/waffleboot/oncall/internal/model"
 )
 
 func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -24,7 +26,27 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TeaModel) viewEditItem() string {
-	return fmt.Sprintf("#%d\n", m.items[m.selectedItem].ID)
+	var state string
+
+	item := m.items[m.selectedItem]
+
+	switch {
+	case item.IsSleep():
+		state = " в ожидании"
+	case item.IsClosed():
+		switch item.Type {
+		case model.ItemTypeAsk:
+			state = " закрыто"
+		default:
+			state = " закрыт"
+		}
+	}
+
+	var s strings.Builder
+	s.WriteString(fmt.Sprintf("  #%d %s%s\n\n", item.ID, item.Type, state))
+	s.WriteString(m.editItemMenu.GenerateMenu())
+
+	return s.String()
 }
 
 func (m *TeaModel) resetEditItemMenu() {
