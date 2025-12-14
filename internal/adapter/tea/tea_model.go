@@ -31,6 +31,21 @@ type (
 func NewTeaModel(config TeaModelConfig) *TeaModel {
 	m := &TeaModel{config: config}
 	m.screenPush(screenAllItems)
+	m.allItemsModel.menu = NewMenu(func(group string, pos int) string {
+		switch {
+		case group == startNew:
+			return "Новое обращение"
+		case group == startItems:
+			return m.itemLabel(m.items[pos])
+		case group == startClose:
+			return "Закрыть журнал"
+		case group == startPrint:
+			return "Распечатать журнал"
+		case group == startExit:
+			return "Exit"
+		}
+		return ""
+	})
 	return m
 }
 
@@ -42,22 +57,13 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case []model.Item:
 		m.items = msg
-		m.allItemsModel.menu = NewMenu(func(group string, pos int) string {
-			switch {
-			case group == startNew:
-				return "Новое обращение"
-			case group == startItems:
-				return m.itemLabel(m.items[pos])
-			case group == startClose:
-				return "Закрыть журнал"
-			case group == startPrint:
-				return "Распечатать журнал"
-			case group == startExit:
-				return "Exit"
-			}
-			return ""
-		})
-
+		m.allItemsModel.menu.ResetMenu()
+		m.allItemsModel.menu.AddGroup(startExit)
+		m.allItemsModel.menu.AddGroup(startNew)
+		m.allItemsModel.menu.AddGroup(startClose)
+		m.allItemsModel.menu.AddGroup(startPrint)
+		m.allItemsModel.menu.AddGroupWithItems(startItems, len(m.items))
+		m.allItemsModel.menu.AdjustCursor()
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
