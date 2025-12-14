@@ -4,12 +4,7 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/waffleboot/oncall/internal/model"
 )
-
-type newItemCreatedMsg struct {
-	newItem model.Item
-}
 
 func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.allItemsMenu.ProcessMsg(msg) {

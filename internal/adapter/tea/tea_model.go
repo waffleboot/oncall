@@ -23,6 +23,10 @@ type (
 		allItemsMenu  *Menu
 		editItemMenu  *Menu
 	}
+	newItemCreatedMsg struct {
+		newItem model.Item
+	}
+	itemUpdatedMsg struct{}
 )
 
 func NewTeaModel(itemService port.ItemService) *TeaModel {
@@ -100,6 +104,9 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.allItemsMenu.AddGroup("print_journal")
 		m.allItemsMenu.AddGroupWithItems("items", len(m.items))
 		m.allItemsMenu.JumpToPos("items", len(m.items)-1)
+	case itemUpdatedMsg:
+		m.allItemsMenu.ResetMenu()
+		m.resetEditItemMenu()
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":

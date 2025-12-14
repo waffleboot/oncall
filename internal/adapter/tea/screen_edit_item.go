@@ -25,7 +25,23 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.currentScreen = screenAllItems
 				return m, nil
 			}
-
+		case "s":
+			item := m.items[m.selectedItem]
+			if item.IsSleep() {
+				return m, func() tea.Msg {
+					if err := m.itemService.Awake(item); err != nil {
+						return fmt.Errorf("awake: %w", err)
+					}
+					return itemUpdatedMsg{}
+				}
+			} else {
+				return m, func() tea.Msg {
+					if err := m.itemService.Sleep(item); err != nil {
+						return fmt.Errorf("awake: %w", err)
+					}
+					return itemUpdatedMsg{}
+				}
+			}
 		}
 	}
 
