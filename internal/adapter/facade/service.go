@@ -1,7 +1,9 @@
 package facade
 
 import (
+	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/waffleboot/oncall/internal/model"
@@ -35,29 +37,44 @@ func (s *ItemService) GetItems() ([]model.Item, error) {
 }
 
 func (s *ItemService) SleepItem(item model.Item) error {
-	for i := range s.items {
-		if s.items[i].ID == item.ID {
-			s.items[i].Sleep(time.Now())
-			return nil
-		}
+	i, err := s.getItem(item.ID)
+	if err != nil {
+		return fmt.Errorf("get item: %w", err)
 	}
-	return fmt.Errorf("not found")
+	s.items[i].Sleep(time.Now())
+	return nil
 }
 
 func (s *ItemService) AwakeItem(item model.Item) error {
-	for i := range s.items {
-		if s.items[i].ID == item.ID {
-			s.items[i].Awake()
-			return nil
-		}
+	i, err := s.getItem(item.ID)
+	if err != nil {
+		return fmt.Errorf("get item: %w", err)
 	}
-	return fmt.Errorf("not found")
+	s.items[i].Awake()
+	return nil
 }
 
 func (s *ItemService) CloseItem(item model.Item) error {
+	i, err := s.getItem(item.ID)
+	if err != nil {
+		return fmt.Errorf("get item: %w", err)
+	}
+	s.items[i].Close(time.Now())
 	return nil
 }
 
 func (s *ItemService) DeleteItem(item model.Item) error {
+	s.items = slices.DeleteFunc(s.items, func(it model.Item) bool {
+		return it.ID == item.ID
+	})
 	return nil
+}
+
+func (s *ItemService) getItem(itemID int) (int, error) {
+	for i := range s.items {
+		if s.items[i].ID == itemID {
+			return i, nil
+		}
+	}
+	return 0, errors.New("not found")
 }

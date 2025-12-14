@@ -28,13 +28,14 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 						return fmt.Errorf("create item: %w", err)
 					}
 
-					return newItemCreatedMsg{newItem: item}
+					return itemCreatedMsg{newItem: item}
 				}
 			case "close_journal":
 			case "print_journal":
 			case "items":
 				m.selectedItem = p
 				m.currentScreen = screenEditItem
+				m.editItemMenu.JumpToGroup("exit")
 				m.resetEditItemMenu()
 			}
 		}
@@ -53,7 +54,11 @@ func (m *TeaModel) resetAllItemsMenu() {
 	m.allItemsMenu.AddGroup("close_journal")
 	m.allItemsMenu.AddGroup("print_journal")
 	m.allItemsMenu.AddGroupWithItems("items", len(m.items))
-	m.allItemsMenu.AdjustCursor()
+	if len(m.items) > 0 {
+		m.allItemsMenu.AdjustCursor()
+	} else {
+		m.allItemsMenu.JumpToGroup("new")
+	}
 }
 
 func (m *TeaModel) itemLabel(item model.Item) string {

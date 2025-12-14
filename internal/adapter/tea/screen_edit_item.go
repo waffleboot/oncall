@@ -13,6 +13,8 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
+	item := m.items[m.selectedItem]
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -24,9 +26,36 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "exit":
 				m.currentScreen = screenAllItems
 				return m, nil
+			case "sleep":
+				return m, func() tea.Msg {
+					if err := m.itemService.SleepItem(item); err != nil {
+						return fmt.Errorf("sleep item: %w", err)
+					}
+					return itemUpdatedMsg{}
+				}
+			case "awake":
+				return m, func() tea.Msg {
+					if err := m.itemService.AwakeItem(item); err != nil {
+						return fmt.Errorf("awake item: %w", err)
+					}
+					return itemUpdatedMsg{}
+				}
+			case "close":
+				return m, func() tea.Msg {
+					if err := m.itemService.CloseItem(item); err != nil {
+						return fmt.Errorf("close item: %w", err)
+					}
+					return itemClosedMsg{}
+				}
+			case "delete":
+				return m, func() tea.Msg {
+					if err := m.itemService.DeleteItem(item); err != nil {
+						return fmt.Errorf("delete item: %w", err)
+					}
+					return itemDeletedMsg{}
+				}
 			}
 		case "s":
-			item := m.items[m.selectedItem]
 			if item.IsSleep() {
 				return m, func() tea.Msg {
 					if err := m.itemService.AwakeItem(item); err != nil {
@@ -103,4 +132,8 @@ func (m *TeaModel) resetEditItemMenu() {
 
 	m.editItemMenu.AddDelimiter()
 	m.editItemMenu.AddGroup("delete")
+
+	if g, _ := m.editItemMenu.GetGroup(); g == "" {
+		m.editItemMenu.JumpToGroup("exit")
+	}
 }

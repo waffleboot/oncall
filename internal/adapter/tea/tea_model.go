@@ -23,10 +23,12 @@ type (
 		allItemsMenu  *Menu
 		editItemMenu  *Menu
 	}
-	newItemCreatedMsg struct {
+	itemCreatedMsg struct {
 		newItem model.Item
 	}
 	itemUpdatedMsg struct{}
+	itemClosedMsg  struct{}
+	itemDeletedMsg struct{}
 )
 
 func NewTeaModel(itemService port.ItemService) *TeaModel {
@@ -75,13 +77,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return ""
 	})
-	return func() tea.Msg {
-		items, err := m.itemService.GetItems()
-		if err != nil {
-			return fmt.Errorf("get items: %w", err)
-		}
-		return items
-	}
+	return m.getItems
 }
 
 func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -89,14 +85,22 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case []model.Item:
 		m.items = msg
 		m.resetAllItemsMenu()
-	case newItemCreatedMsg:
+	case itemCreatedMsg:
 		m.items = append(m.items, msg.newItem)
 		m.resetAllItemsMenu()
-		m.selectedItem = len(m.items) - 1
-		m.allItemsMenu.JumpToPos("items", m.selectedItem)
+		m.allItemsMenu.JumpToPos("items", len(m.items)-1)
 	case itemUpdatedMsg:
-		m.resetAllItemsMenu()
 		m.resetEditItemMenu()
+		return m, m.getItems
+	case itemClosedMsg:
+		m.currentScreen = screenAllItems
+		return m, m.getItems
+	case itemDeletedMsg:
+		m.currentScreen = screenAllItems
+		if len(m.items) == 0 {
+			m.allItemsMenu.JumpToGroup("new")
+		}
+		return m, m.getItems
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
@@ -121,4 +125,12 @@ func (m *TeaModel) View() string {
 		return m.viewEditItem()
 	}
 	return ""
+}
+
+func (m *TeaModel) getItems() tea.Msg {
+	items, err := m.itemService.GetItems()
+	if err != nil {
+		return fmt.Errorf("get items: %w", err)
+	}
+	return items
 }
