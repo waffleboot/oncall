@@ -15,7 +15,13 @@ type allItemsModel struct {
 func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case []model.Item:
-		m.items = msg
+		m.allItemsModel.menu.ResetMenu()
+		m.allItemsModel.menu.AddGroup("exit")
+		m.allItemsModel.menu.AddGroup("new")
+		m.allItemsModel.menu.AddGroup("close_journal")
+		m.allItemsModel.menu.AddGroup("print_journal")
+		m.allItemsModel.menu.AddGroupWithItems("items", len(m.items))
+		m.allItemsModel.menu.AdjustCursor()
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "esc":
