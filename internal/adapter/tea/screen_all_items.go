@@ -12,8 +12,8 @@ type (
 		menu *Menu
 	}
 	newItemCreateMsg struct {
-		items     []model.Item
-		newItemID int
+		items   []model.Item
+		newItem model.Item
 	}
 )
 
@@ -43,12 +43,12 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 						return fmt.Errorf("get items: %w", err)
 					}
 
-					return newItemCreateMsg{items: items, newItemID: item.ID}
+					return newItemCreateMsg{items: items, newItem: item}
 				}
 			case "close_journal":
 			case "print_journal":
 			case "items":
-				m.selectedItemID = m.items[p].ID
+				m.selectedItem = m.items[p]
 				m.screenPush(screenEditItem)
 			}
 		}

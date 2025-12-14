@@ -18,12 +18,12 @@ type (
 		ItemService port.ItemService
 	}
 	TeaModel struct {
-		config         TeaModelConfig
-		screens        []screen
-		items          []model.Item
-		selectedItemID int
-		allItemsModel  allItemsModel
-		editItemModel  editItemModel
+		config        TeaModelConfig
+		screens       []screen
+		items         []model.Item
+		selectedItem  model.Item
+		allItemsModel allItemsModel
+		editItemModel editItemModel
 	}
 	editItemModel struct{}
 )
@@ -63,6 +63,7 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.allItemsModel.menu.AddGroupWithItems("items", len(m.items))
 	case newItemCreateMsg:
 		m.items = msg.items
+		m.selectedItem = msg.newItem
 		m.allItemsModel.menu.ResetMenu()
 		m.allItemsModel.menu.AddGroup("exit")
 		m.allItemsModel.menu.AddGroup("new")
@@ -70,7 +71,7 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.allItemsModel.menu.AddGroup("print_journal")
 		m.allItemsModel.menu.AddGroupWithItems("items", len(m.items))
 		m.allItemsModel.menu.JumpToItem("items", func(pos int) (found bool) {
-			return m.items[pos].ID == msg.newItemID
+			return m.items[pos].ID == m.selectedItem.ID
 		})
 	case tea.KeyMsg:
 		switch msg.String() {

@@ -20,7 +20,7 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *TeaModel) viewEditItem() string {
 	for i := range m.items {
-		if m.items[i].ID == m.selectedItemID {
+		if m.items[i].ID == m.selectedItem.ID {
 			return fmt.Sprintf("#%d\n", m.items[i].ID)
 		}
 	}
