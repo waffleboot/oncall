@@ -1,13 +1,12 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"go.uber.org/zap"
 	"os"
 
+	"go.uber.org/zap"
+
 	"github.com/waffleboot/oncall/internal/adapter/facade"
-	"github.com/waffleboot/oncall/internal/adapter/storage"
 	"github.com/waffleboot/oncall/internal/adapter/tea"
 )
 
@@ -19,22 +18,11 @@ func main() {
 }
 
 func run() (err error) {
-	s, err := storage.NewStorage(storage.Config{Filename: "oncall.json"})
-	if err != nil {
-		return fmt.Errorf("new storage: %w", err)
-	}
+	itemService := facade.NewItemService()
 
-	log, err := getLogger()
-	if err != nil {
-		return fmt.Errorf("get logger: %w", err)
-	}
-	defer func() {
-		err = errors.Join(err, log.Sync())
-	}()
-
-	itemService := facade.NewItemService(s, s)
-
-	journalService := facade.NewJournalService(s)
+	teaModel := tea.NewTeaModel(tea.TeaModelConfig{
+		ItemService: itemService,
+	})
 
 	p := tea.NewController(tea.WithService(itemService, journalService, log))
 	if err := p.Run(); err != nil {

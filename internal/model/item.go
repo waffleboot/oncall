@@ -1,7 +1,5 @@
 package model
 
-import "time"
-
 const (
 	ItemTypeInc   ItemType = "inc"
 	ItemTypeAdhoc ItemType = "adhoc"
@@ -12,36 +10,10 @@ const (
 type (
 	ItemType string
 	Item     struct {
-		ID       int
-		SleepAt  time.Time
-		ClosedAt time.Time
-		Type     ItemType
+		ID   int
+		Type ItemType
 	}
 )
-
-func (i *Item) IsActive() bool {
-	return !i.IsClosed() && i.SleepAt.IsZero()
-}
-
-func (i *Item) IsSleep() bool {
-	return !i.IsClosed() && !i.SleepAt.IsZero()
-}
-
-func (i *Item) IsClosed() bool {
-	return !i.ClosedAt.IsZero()
-}
-
-func (i *Item) Sleep(at time.Time) {
-	i.SleepAt = at
-}
-
-func (i *Item) Awake() {
-	i.SleepAt = time.Time{}
-}
-
-func (i *Item) Close(at time.Time) {
-	i.ClosedAt = at
-}
 
 func (t ItemType) String() string {
 	switch t {
