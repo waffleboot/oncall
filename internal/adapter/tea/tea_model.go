@@ -88,24 +88,14 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case []model.Item:
 		m.items = msg
-		m.allItemsMenu.ResetMenu()
-		m.allItemsMenu.AddGroup("exit")
-		m.allItemsMenu.AddGroup("new")
-		m.allItemsMenu.AddGroup("close_journal")
-		m.allItemsMenu.AddGroup("print_journal")
-		m.allItemsMenu.AddGroupWithItems("items", len(m.items))
+		m.resetAllItemsMenu()
 	case newItemCreatedMsg:
 		m.items = append(m.items, msg.newItem)
+		m.resetAllItemsMenu()
 		m.selectedItem = len(m.items) - 1
-		m.allItemsMenu.ResetMenu()
-		m.allItemsMenu.AddGroup("exit")
-		m.allItemsMenu.AddGroup("new")
-		m.allItemsMenu.AddGroup("close_journal")
-		m.allItemsMenu.AddGroup("print_journal")
-		m.allItemsMenu.AddGroupWithItems("items", len(m.items))
-		m.allItemsMenu.JumpToPos("items", len(m.items)-1)
+		m.allItemsMenu.JumpToPos("items", m.selectedItem)
 	case itemUpdatedMsg:
-		m.allItemsMenu.ResetMenu()
+		m.resetAllItemsMenu()
 		m.resetEditItemMenu()
 	case tea.KeyMsg:
 		switch msg.String() {

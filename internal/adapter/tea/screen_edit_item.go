@@ -29,14 +29,14 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 			item := m.items[m.selectedItem]
 			if item.IsSleep() {
 				return m, func() tea.Msg {
-					if err := m.itemService.Awake(item); err != nil {
+					if err := m.itemService.AwakeItem(item); err != nil {
 						return fmt.Errorf("awake: %w", err)
 					}
 					return itemUpdatedMsg{}
 				}
 			} else {
 				return m, func() tea.Msg {
-					if err := m.itemService.Sleep(item); err != nil {
+					if err := m.itemService.SleepItem(item); err != nil {
 						return fmt.Errorf("awake: %w", err)
 					}
 					return itemUpdatedMsg{}

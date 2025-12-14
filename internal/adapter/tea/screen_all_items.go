@@ -44,3 +44,13 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *TeaModel) viewAllItems() string {
 	return m.allItemsMenu.GenerateMenu()
 }
+
+func (m *TeaModel) resetAllItemsMenu() {
+	m.allItemsMenu.ResetMenu()
+	m.allItemsMenu.AddGroup("exit")
+	m.allItemsMenu.AddGroup("new")
+	m.allItemsMenu.AddGroup("close_journal")
+	m.allItemsMenu.AddGroup("print_journal")
+	m.allItemsMenu.AddGroupWithItems("items", len(m.items))
+	m.allItemsMenu.AdjustCursor()
+}

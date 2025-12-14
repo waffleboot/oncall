@@ -1,6 +1,11 @@
 package facade
 
-import "github.com/waffleboot/oncall/internal/model"
+import (
+	"fmt"
+	"time"
+
+	"github.com/waffleboot/oncall/internal/model"
+)
 
 type ItemService struct {
 	items []model.Item
@@ -27,4 +32,24 @@ func (s *ItemService) UpdateItem(item model.Item) error {
 
 func (s *ItemService) GetItems() ([]model.Item, error) {
 	return s.items, nil
+}
+
+func (s *ItemService) SleepItem(item model.Item) error {
+	for i := range s.items {
+		if s.items[i].ID == item.ID {
+			s.items[i].Sleep(time.Now())
+			return nil
+		}
+	}
+	return fmt.Errorf("not found")
+}
+
+func (s *ItemService) AwakeItem(item model.Item) error {
+	for i := range s.items {
+		if s.items[i].ID == item.ID {
+			s.items[i].Awake()
+			return nil
+		}
+	}
+	return fmt.Errorf("not found")
 }
