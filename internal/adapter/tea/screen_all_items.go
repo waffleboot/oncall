@@ -25,8 +25,19 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.allItemsModel.menu.AdjustCursor()
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "q", "esc":
+		case "esc", "q":
 			return m, tea.Quit
+		case "enter", " ":
+			switch g, p := m.allItemsModel.menu.GetGroup(); g {
+			case "exit":
+				return m, tea.Quit
+			case "new":
+			case "close_journal":
+			case "print_journal":
+			case "items":
+				m.selectedItem = p
+				m.screenPush(screenEditItem)
+			}
 		case "1":
 			m.selectedItem = 0
 			m.screenPush(screenEditItem)
