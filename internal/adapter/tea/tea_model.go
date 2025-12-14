@@ -9,9 +9,13 @@ import (
 )
 
 const (
-	screenAllItems     screen = "all_items"
-	screenEditItem     screen = "edit_item"
-	screenEditItemType screen = "edit_item_type"
+	screenAllItems  screen = "all_items"
+	screenEditItem  screen = "edit_item"
+	screenItemType  screen = "item_type"
+	screenItemLinks screen = "item_links"
+	screenItemNodes screen = "item_nodes"
+	screenItemNotes screen = "item_notes"
+	screenItemVMs   screen = "item_vms"
 )
 
 type (
@@ -69,15 +73,15 @@ func (m *TeaModel) Init() tea.Cmd {
 			return "Закрыть"
 		case group == "delete":
 			return "Удалить"
-		case group == "edit_item_type":
+		case group == "item_type":
 			return fmt.Sprintf("Тип обращения: (%s)...", m.items[m.selectedItem].Type)
-		case group == "notes":
+		case group == "item_notes":
 			return "Заметки..."
-		case group == "links":
+		case group == "item_links":
 			return "Ссылки..."
-		case group == "nodes":
+		case group == "item_nodes":
 			return "Хосты, узлы..."
-		case group == "vms":
+		case group == "item_vms":
 			return "ВМ-ки..."
 		}
 		return ""
@@ -95,10 +99,10 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return ""
 	})
-	m.editItemTypeMenu.AddGroup(string(model.ItemTypeInc))
-	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAdhoc))
 	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAsk))
 	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAlert))
+	m.editItemTypeMenu.AddGroup(string(model.ItemTypeInc))
+	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAdhoc))
 	return m.getItems
 }
 
@@ -117,7 +121,7 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case itemUpdatedMsg:
 		m.items[m.selectedItem] = msg.item
 		m.resetEditItemMenu()
-		if m.currentScreen == screenEditItemType {
+		if m.currentScreen == screenItemType {
 			m.currentScreen = screenEditItem
 		}
 		return m, m.getItems
@@ -139,8 +143,16 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateAllItems(msg)
 	case screenEditItem:
 		return m.updateEditItem(msg)
-	case screenEditItemType:
-		return m.updateEditItemType(msg)
+	case screenItemType:
+		return m.updateItemType(msg)
+	case screenItemNodes:
+		return m.updateItemNodes(msg)
+	case screenItemNotes:
+		return m.updateItemNotes(msg)
+	case screenItemLinks:
+		return m.updateItemLinks(msg)
+	case screenItemVMs:
+		return m.updateItemVMs(msg)
 	}
 	return m, nil
 }
@@ -151,8 +163,16 @@ func (m *TeaModel) View() string {
 		return m.viewAllItems()
 	case screenEditItem:
 		return m.viewEditItem()
-	case screenEditItemType:
-		return m.viewEditItemType()
+	case screenItemType:
+		return m.viewItemType()
+	case screenItemNodes:
+		return m.viewItemNodes()
+	case screenItemNotes:
+		return m.viewItemNotes()
+	case screenItemLinks:
+		return m.viewItemLinks()
+	case screenItemVMs:
+		return m.viewItemVMs()
 	}
 	return ""
 }

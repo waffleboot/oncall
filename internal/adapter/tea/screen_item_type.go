@@ -8,7 +8,7 @@ import (
 	"github.com/waffleboot/oncall/internal/model"
 )
 
-func (m *TeaModel) updateEditItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.editItemTypeMenu.ProcessMsg(msg) {
 		return m, nil
 	}
@@ -20,7 +20,6 @@ func (m *TeaModel) updateEditItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "esc", "q":
 			m.currentScreen = screenEditItem
-			return m, nil
 		case "enter", " ":
 			g, _ := m.editItemTypeMenu.GetGroup()
 			return m, func() tea.Msg {
@@ -35,7 +34,7 @@ func (m *TeaModel) updateEditItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *TeaModel) viewEditItemType() string {
+func (m *TeaModel) viewItemType() string {
 	var s strings.Builder
 	s.WriteString("  Тип обращения:\n\n")
 	s.WriteString(m.editItemTypeMenu.GenerateMenu())

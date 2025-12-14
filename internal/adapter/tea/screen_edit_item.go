@@ -20,12 +20,10 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "esc", "q":
 			m.currentScreen = screenAllItems
-			return m, nil
 		case "enter", " ":
 			switch g, _ := m.editItemMenu.GetGroup(); g {
 			case "exit":
 				m.currentScreen = screenAllItems
-				return m, nil
 			case "sleep":
 				return m, func() tea.Msg {
 					if item, err := m.itemService.SleepItem(item); err != nil {
@@ -56,9 +54,16 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 					}
 					return itemDeletedMsg{}
 				}
-			case "edit_item_type":
-				m.currentScreen = screenEditItemType
-				return m, nil
+			case "item_type":
+				m.currentScreen = screenItemType
+			case "item_nodes":
+				m.currentScreen = screenItemNodes
+			case "item_notes":
+				m.currentScreen = screenItemNotes
+			case "item_links":
+				m.currentScreen = screenItemLinks
+			case "item_vms":
+				m.currentScreen = screenItemVMs
 			}
 		case "s":
 			if item.IsSleep() {
@@ -116,13 +121,13 @@ func (m *TeaModel) resetEditItemMenu() {
 	m.editItemMenu.AddGroup("exit")
 
 	if !item.IsClosed() {
-		m.editItemMenu.AddGroup("edit_item_type")
+		m.editItemMenu.AddGroup("item_type")
 	}
 
-	m.editItemMenu.AddGroup("nodes")
-	m.editItemMenu.AddGroup("vms")
-	m.editItemMenu.AddGroup("notes")
-	m.editItemMenu.AddGroup("links")
+	m.editItemMenu.AddGroup("item_nodes")
+	m.editItemMenu.AddGroup("item_vms")
+	m.editItemMenu.AddGroup("item_notes")
+	m.editItemMenu.AddGroup("item_links")
 	m.editItemMenu.AddDelimiter()
 
 	if item.IsActive() {
