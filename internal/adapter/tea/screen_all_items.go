@@ -38,8 +38,8 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case "print_journal":
 			case "items":
-				m.selectedItem = p
 				m.currentScreen = screenEditItem
+				m.selectedItemID = m.items[p].ID
 				m.editItemMenu.JumpToGroup("exit")
 				m.resetEditItemMenu()
 			}

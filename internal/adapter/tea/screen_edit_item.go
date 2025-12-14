@@ -13,7 +13,11 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	item := m.items[m.selectedItem]
+	item, found := m.getSelectedItem()
+	if !found {
+		m.currentScreen = screenAllItems
+		return m, m.getItems
+	}
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -92,7 +96,10 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *TeaModel) viewEditItem() string {
 	var state string
 
-	item := m.items[m.selectedItem]
+	item, found := m.getSelectedItem()
+	if !found {
+		return "item not found\n"
+	}
 
 	switch {
 	case item.IsSleep():
@@ -114,7 +121,10 @@ func (m *TeaModel) viewEditItem() string {
 }
 
 func (m *TeaModel) resetEditItemMenu() {
-	item := m.items[m.selectedItem]
+	item, found := m.getSelectedItem()
+	if !found {
+		return
+	}
 
 	m.editItemMenu.ResetMenu()
 
@@ -148,4 +158,13 @@ func (m *TeaModel) resetEditItemMenu() {
 	if g, _ := m.editItemMenu.GetGroup(); g == "" {
 		m.editItemMenu.JumpToGroup("exit")
 	}
+}
+
+func (m *TeaModel) getSelectedItem() (_ model.Item, found bool) {
+	for i := range m.items {
+		if m.items[i].ID == m.selectedItemID {
+			return m.items[i], true
+		}
+	}
+	return model.Item{}, false
 }

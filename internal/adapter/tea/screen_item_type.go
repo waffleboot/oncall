@@ -13,7 +13,11 @@ func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	item := m.items[m.selectedItem]
+	item, found := m.getSelectedItem()
+	if !found {
+		m.currentScreen = screenAllItems
+		return m, m.getItems
+	}
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:

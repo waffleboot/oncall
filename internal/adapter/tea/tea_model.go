@@ -25,7 +25,7 @@ type (
 		journalService   port.JournalService
 		currentScreen    screen
 		items            []model.Item
-		selectedItem     int
+		selectedItemID   int
 		allItemsMenu     *Menu
 		editItemMenu     *Menu
 		editItemTypeMenu *Menu
@@ -62,6 +62,10 @@ func (m *TeaModel) Init() tea.Cmd {
 		return ""
 	})
 	m.editItemMenu = NewMenu(func(group string, pos int) string {
+		item, found := m.getSelectedItem()
+		if !found {
+			return "item not found"
+		}
 		switch {
 		case group == "exit":
 			return "Exit"
@@ -74,7 +78,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		case group == "delete":
 			return "Удалить"
 		case group == "item_type":
-			return fmt.Sprintf("Тип обращения: (%s)...", m.items[m.selectedItem].Type)
+			return fmt.Sprintf("Тип обращения: (%s)...", item.Type)
 		case group == "item_notes":
 			return "Заметки..."
 		case group == "item_links":
@@ -119,7 +123,12 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.resetAllItemsMenu()
 		m.allItemsMenu.JumpToPos("items", len(m.items)-1)
 	case itemUpdatedMsg:
-		m.items[m.selectedItem] = msg.item
+		for i := range m.items {
+			if m.items[i].ID == msg.item.ID {
+				m.items[i] = msg.item
+				break
+			}
+		}
 		m.resetEditItemMenu()
 		if m.currentScreen == screenItemType {
 			m.currentScreen = screenEditItem
