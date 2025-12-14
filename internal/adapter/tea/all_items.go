@@ -1,9 +1,6 @@
 package tea
 
 import (
-	"fmt"
-	"strings"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
 )
@@ -13,6 +10,10 @@ type allItemsModel struct {
 }
 
 func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if m.allItemsModel.menu.ProcessMsg(msg) {
+		return m, nil
+	}
+
 	switch msg := msg.(type) {
 	case []model.Item:
 		m.allItemsModel.menu.ResetMenu()
@@ -38,9 +39,5 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TeaModel) viewAllItems() string {
-	var s strings.Builder
-	for i := range m.items {
-		s.WriteString(fmt.Sprintf("#%d\n", m.items[i].ID))
-	}
-	return s.String()
+	return m.allItemsModel.menu.GenerateMenu()
 }
