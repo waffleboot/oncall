@@ -107,6 +107,9 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case []model.Item:
 		m.items = msg
 		m.resetAllItemsMenu()
+		if len(m.items) == 0 {
+			m.allItemsMenu.JumpToGroup("new")
+		}
 	case itemCreatedMsg:
 		m.items = append(m.items, msg.item)
 		m.resetAllItemsMenu()
@@ -123,9 +126,6 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.getItems
 	case itemDeletedMsg:
 		m.currentScreen = screenAllItems
-		if len(m.items) == 0 {
-			m.allItemsMenu.JumpToGroup("new")
-		}
 		return m, m.getItems
 	case tea.KeyMsg:
 		switch msg.String() {
