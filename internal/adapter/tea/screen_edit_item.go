@@ -19,6 +19,13 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "esc", "q":
 			m.currentScreen = screenAllItems
 			return m, nil
+		case "enter", " ":
+			switch g, _ := m.editItemMenu.GetGroup(); g {
+			case "exit":
+				m.currentScreen = screenAllItems
+				return m, nil
+			}
+
 		}
 	}
 
