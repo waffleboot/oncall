@@ -61,14 +61,14 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 					if err := m.itemService.AwakeItem(item); err != nil {
 						return fmt.Errorf("awake: %w", err)
 					}
-					return itemUpdatedMsg{}
+					return itemUpdatedMsg{kind: "awake"}
 				}
 			} else {
 				return m, func() tea.Msg {
 					if err := m.itemService.SleepItem(item); err != nil {
-						return fmt.Errorf("awake: %w", err)
+						return fmt.Errorf("sleep: %w", err)
 					}
-					return itemUpdatedMsg{}
+					return itemUpdatedMsg{kind: "sleep"}
 				}
 			}
 		}

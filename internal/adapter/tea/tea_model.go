@@ -26,7 +26,7 @@ type (
 	itemCreatedMsg struct {
 		newItem model.Item
 	}
-	itemUpdatedMsg struct{}
+	itemUpdatedMsg struct{ kind string }
 	itemClosedMsg  struct{}
 	itemDeletedMsg struct{}
 )
@@ -91,6 +91,12 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.allItemsMenu.JumpToPos("items", len(m.items)-1)
 	case itemUpdatedMsg:
 		m.resetEditItemMenu()
+		if msg.kind == "sleep" {
+			m.editItemMenu.JumpToGroup("awake")
+		}
+		if msg.kind == "awake" {
+			m.editItemMenu.JumpToGroup("sleep")
+		}
 		return m, m.getItems
 	case itemClosedMsg:
 		m.currentScreen = screenAllItems
