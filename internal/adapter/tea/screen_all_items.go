@@ -31,6 +31,12 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return itemCreatedMsg{item: item}
 				}
 			case "close_journal":
+				return m, func() tea.Msg {
+					if err := m.journalService.CloseJournal(); err != nil {
+						return fmt.Errorf("close journal: %w", err)
+					}
+					return m.getItems()
+				}
 			case "print_journal":
 			case "items":
 				m.selectedItem = p
