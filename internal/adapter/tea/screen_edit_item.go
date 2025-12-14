@@ -28,17 +28,19 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			case "sleep":
 				return m, func() tea.Msg {
-					if err := m.itemService.SleepItem(item); err != nil {
+					if item, err := m.itemService.SleepItem(item); err != nil {
 						return fmt.Errorf("sleep item: %w", err)
+					} else {
+						return itemUpdatedMsg{item: item}
 					}
-					return itemUpdatedMsg{}
 				}
 			case "awake":
 				return m, func() tea.Msg {
-					if err := m.itemService.AwakeItem(item); err != nil {
+					if item, err := m.itemService.AwakeItem(item); err != nil {
 						return fmt.Errorf("awake item: %w", err)
+					} else {
+						return itemUpdatedMsg{item: item}
 					}
-					return itemUpdatedMsg{}
 				}
 			case "close":
 				return m, func() tea.Msg {
@@ -58,17 +60,19 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "s":
 			if item.IsSleep() {
 				return m, func() tea.Msg {
-					if err := m.itemService.AwakeItem(item); err != nil {
+					if item, err := m.itemService.AwakeItem(item); err != nil {
 						return fmt.Errorf("awake: %w", err)
+					} else {
+						return itemUpdatedMsg{item: item}
 					}
-					return itemUpdatedMsg{kind: "awake"}
 				}
 			} else {
 				return m, func() tea.Msg {
-					if err := m.itemService.SleepItem(item); err != nil {
+					if item, err := m.itemService.SleepItem(item); err != nil {
 						return fmt.Errorf("sleep: %w", err)
+					} else {
+						return itemUpdatedMsg{item: item}
 					}
-					return itemUpdatedMsg{kind: "sleep"}
 				}
 			}
 		}

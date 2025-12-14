@@ -28,7 +28,7 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 						return fmt.Errorf("create item: %w", err)
 					}
 
-					return itemCreatedMsg{newItem: item}
+					return itemCreatedMsg{item: item}
 				}
 			case "close_journal":
 			case "print_journal":

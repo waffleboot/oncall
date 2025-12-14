@@ -35,20 +35,20 @@ func (s *ItemService) GetItems() ([]model.Item, error) {
 	return s.storage.GetItems()
 }
 
-func (s *ItemService) SleepItem(item model.Item) error {
+func (s *ItemService) SleepItem(item model.Item) (model.Item, error) {
 	item.Sleep(time.Now())
 	if err := s.storage.UpdateItem(item); err != nil {
-		return fmt.Errorf("update item: %w", err)
+		return model.Item{}, fmt.Errorf("update item: %w", err)
 	}
-	return nil
+	return item, nil
 }
 
-func (s *ItemService) AwakeItem(item model.Item) error {
+func (s *ItemService) AwakeItem(item model.Item) (model.Item, error) {
 	item.Awake()
 	if err := s.storage.UpdateItem(item); err != nil {
-		return fmt.Errorf("update item: %w", err)
+		return model.Item{}, fmt.Errorf("update item: %w", err)
 	}
-	return nil
+	return item, nil
 }
 
 func (s *ItemService) CloseItem(item model.Item) error {

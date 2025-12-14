@@ -25,9 +25,11 @@ type (
 		editItemMenu   *Menu
 	}
 	itemCreatedMsg struct {
-		newItem model.Item
+		item model.Item
 	}
-	itemUpdatedMsg struct{ kind string }
+	itemUpdatedMsg struct {
+		item model.Item
+	}
 	itemClosedMsg  struct{}
 	itemDeletedMsg struct{}
 )
@@ -87,18 +89,13 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.items = msg
 		m.resetAllItemsMenu()
 	case itemCreatedMsg:
-		m.items = append(m.items, msg.newItem)
+		m.items = append(m.items, msg.item)
 		m.resetAllItemsMenu()
 		m.allItemsMenu.JumpToPos("items", len(m.items)-1)
 	case itemUpdatedMsg:
+		m.items[m.selectedItem] = msg.item
 		m.resetEditItemMenu()
-		if msg.kind == "sleep" {
-			m.editItemMenu.JumpToGroup("awake")
-		}
-		if msg.kind == "awake" {
-			m.editItemMenu.JumpToGroup("sleep")
-		}
-		return m, m.getItems
+		return m, nil
 	case itemClosedMsg:
 		m.currentScreen = screenAllItems
 		return m, m.getItems

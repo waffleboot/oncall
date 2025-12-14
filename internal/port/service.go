@@ -7,8 +7,8 @@ type ItemService interface {
 	CreateItem() model.Item
 	UpdateItem(model.Item) error
 	CloseItem(model.Item) error
-	SleepItem(model.Item) error
-	AwakeItem(model.Item) error
+	SleepItem(model.Item) (model.Item, error)
+	AwakeItem(model.Item) (model.Item, error)
 	DeleteItem(model.Item) error
 }
 
