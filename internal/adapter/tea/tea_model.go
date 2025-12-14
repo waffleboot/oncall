@@ -114,6 +114,9 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case itemUpdatedMsg:
 		m.items[m.selectedItem] = msg.item
 		m.resetEditItemMenu()
+		if m.currentScreen == screenEditItemType {
+			m.currentScreen = screenEditItem
+		}
 		return m, nil
 	case itemClosedMsg:
 		m.currentScreen = screenAllItems

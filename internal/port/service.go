@@ -10,6 +10,7 @@ type ItemService interface {
 	SleepItem(model.Item) (model.Item, error)
 	AwakeItem(model.Item) (model.Item, error)
 	DeleteItem(model.Item) error
+	SetItemType(model.Item, model.ItemType) (model.Item, error)
 }
 
 type JournalService interface {

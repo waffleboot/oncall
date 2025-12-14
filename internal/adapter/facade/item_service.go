@@ -65,3 +65,11 @@ func (s *ItemService) DeleteItem(item model.Item) error {
 	}
 	return nil
 }
+
+func (s *ItemService) SetItemType(item model.Item, itemType model.ItemType) (model.Item, error) {
+	item.Type = itemType
+	if err := s.storage.UpdateItem(item); err != nil {
+		return model.Item{}, fmt.Errorf("update item: %w", err)
+	}
+	return item, nil
+}

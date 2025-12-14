@@ -24,7 +24,7 @@ func (m *TeaModel) updateEditItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter", " ":
 			g, _ := m.editItemTypeMenu.GetGroup()
 			return m, func() tea.Msg {
-				if item, err := m.itemService.SetItemType(m.item, model.ItemType(g), model.ItemType(g)); err != nil {
+				if item, err := m.itemService.SetItemType(item, model.ItemType(g)); err != nil {
 					return fmt.Errorf("set item type: %w", err)
 				} else {
 					return itemUpdatedMsg{item: item}
