@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	screenAllItems screen = "all_items"
-	screenEditItem screen = "edit_item"
+	screenAllItems     screen = "all_items"
+	screenEditItem     screen = "edit_item"
+	screenEditItemType screen = "edit_item_type"
 )
 
 type (
@@ -67,7 +68,7 @@ func (m *TeaModel) Init() tea.Cmd {
 			return "Закрыть"
 		case group == "delete":
 			return "Удалить"
-		case group == "edit_type":
+		case group == "edit_item_type":
 			return fmt.Sprintf("Тип обращения: (%s)...", m.items[m.selectedItem].Type)
 		case group == "notes":
 			return "Заметки..."
@@ -117,6 +118,8 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateAllItems(msg)
 	case screenEditItem:
 		return m.updateEditItem(msg)
+	case screenEditItemType:
+		return m.updateEditItemType(msg)
 	}
 	return m, nil
 }
@@ -127,6 +130,8 @@ func (m *TeaModel) View() string {
 		return m.viewAllItems()
 	case screenEditItem:
 		return m.viewEditItem()
+	case screenEditItemType:
+		return m.viewEditItemType()
 	}
 	return ""
 }

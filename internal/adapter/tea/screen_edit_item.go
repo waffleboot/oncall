@@ -56,6 +56,9 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 					}
 					return itemDeletedMsg{}
 				}
+			case "edit_item_type":
+				m.currentScreen = screenEditItemType
+				return m, nil
 			}
 		case "s":
 			if item.IsSleep() {
@@ -113,7 +116,7 @@ func (m *TeaModel) resetEditItemMenu() {
 	m.editItemMenu.AddGroup("exit")
 
 	if !item.IsClosed() {
-		m.editItemMenu.AddGroup("edit_type")
+		m.editItemMenu.AddGroup("edit_item_type")
 	}
 
 	m.editItemMenu.AddGroup("nodes")
