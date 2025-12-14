@@ -1,6 +1,8 @@
 package tea
 
 import (
+	"fmt"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
 )
@@ -32,6 +34,13 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "exit":
 				return m, tea.Quit
 			case "new":
+				return m, func() tea.Msg {
+					item := m.config.ItemService.CreateItem()
+					if err := m.config.ItemService.UpdateItem(item); err != nil {
+						return fmt.Errorf("create item: %w", err)
+					}
+					return m.getItems()
+				}
 			case "close_journal":
 			case "print_journal":
 			case "items":
