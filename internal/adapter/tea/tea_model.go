@@ -122,7 +122,3 @@ func (m *TeaModel) View() string {
 	}
 	return ""
 }
-
-func (m *TeaModel) itemLabel(item model.Item) string {
-	return fmt.Sprintf("  #%d - %s", item.ID, item.Type)
-}
