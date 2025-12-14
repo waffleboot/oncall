@@ -36,8 +36,8 @@ func WithSelection(selected, notSelected string) MenuOption {
 	}
 }
 
-func NewMenu(labelGen func(group string, pos int) string, opts ...MenuOption) *Menu {
-	m := &Menu{labelGen: labelGen}
+func NewMenu(labelGen func(group string, pos int) string, opts ...MenuOption) Menu {
+	m := Menu{labelGen: labelGen}
 	m.log = zap.NewNop()
 	m.selected = ">"
 	m.notSelected = " "
