@@ -120,12 +120,7 @@ func (m *TeaModel) viewEditItem() string {
 	return s.String()
 }
 
-func (m *TeaModel) resetEditItemMenu() {
-	item, found := m.getSelectedItem()
-	if !found {
-		return
-	}
-
+func (m *TeaModel) resetEditItemMenu(item model.Item) {
 	m.editItemMenu.ResetMenu()
 
 	m.editItemMenu.AddGroup("exit")

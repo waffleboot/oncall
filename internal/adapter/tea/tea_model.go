@@ -123,13 +123,7 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.resetAllItemsMenu()
 		m.allItemsMenu.JumpToPos("items", len(m.items)-1)
 	case itemUpdatedMsg:
-		for i := range m.items {
-			if m.items[i].ID == msg.item.ID {
-				m.items[i] = msg.item
-				break
-			}
-		}
-		m.resetEditItemMenu()
+		m.resetEditItemMenu(msg.item)
 		if m.currentScreen == screenItemType {
 			m.currentScreen = screenEditItem
 		}
