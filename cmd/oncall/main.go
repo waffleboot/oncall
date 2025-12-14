@@ -6,8 +6,9 @@ import (
 
 	"go.uber.org/zap"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/adapter/facade"
-	"github.com/waffleboot/oncall/internal/adapter/tea"
+	teaAdapter "github.com/waffleboot/oncall/internal/adapter/tea"
 )
 
 func main() {
@@ -20,11 +21,12 @@ func main() {
 func run() (err error) {
 	itemService := facade.NewItemService()
 
-	teaModel := tea.NewTeaModel(tea.TeaModelConfig{
+	teaModel := teaAdapter.NewTeaModel(tea.TeaModelConfig{
 		ItemService: itemService,
 	})
 
-	p := tea.NewController(tea.WithService(itemService, journalService, log))
+	p := tea.NewProgram(teaModel)
+
 	if err := p.Run(); err != nil {
 		return fmt.Errorf("tea run: %w", err)
 	}
