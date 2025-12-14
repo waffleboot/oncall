@@ -28,13 +28,15 @@ func (m *TeaModel) viewEditItem() string {
 }
 
 func (m *TeaModel) resetEditItemMenu() {
+	item := m.items[m.selectedItem]
+
 	m.editItemMenu.ResetMenu()
 
 	m.editItemMenu.AddGroup("exit")
 
-	// if !m.item.IsClosed() {
-	// 	m.editItemMenu.AddGroup("edit_type")
-	// }
+	if !item.IsClosed() {
+		m.editItemMenu.AddGroup("edit_type")
+	}
 
 	m.editItemMenu.AddGroup("nodes")
 	m.editItemMenu.AddGroup("vms")
@@ -42,17 +44,17 @@ func (m *TeaModel) resetEditItemMenu() {
 	m.editItemMenu.AddGroup("links")
 	m.editItemMenu.AddDelimiter()
 
-	// if m.IsActive() {
-	// 	m.editItemMenu.AddGroup("sleep")
-	// }
+	if item.IsActive() {
+		m.editItemMenu.AddGroup("sleep")
+	}
 
-	// if m.item.IsSleep() {
-	// 	m.editItemMenu.AddGroup("awake")
-	// }
+	if item.IsSleep() {
+		m.editItemMenu.AddGroup("awake")
+	}
 
-	// if !m.item.IsClosed() {
-	// 	m.editItemMenu.AddGroup("close")
-	// }
+	if !item.IsClosed() {
+		m.editItemMenu.AddGroup("close")
+	}
 
 	m.editItemMenu.AddDelimiter()
 	m.editItemMenu.AddGroup("delete")
