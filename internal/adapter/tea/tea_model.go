@@ -17,13 +17,14 @@ const (
 type (
 	screen   string
 	TeaModel struct {
-		itemService    port.ItemService
-		journalService port.JournalService
-		currentScreen  screen
-		items          []model.Item
-		selectedItem   int
-		allItemsMenu   *Menu
-		editItemMenu   *Menu
+		itemService      port.ItemService
+		journalService   port.JournalService
+		currentScreen    screen
+		items            []model.Item
+		selectedItem     int
+		allItemsMenu     *Menu
+		editItemMenu     *Menu
+		editItemTypeMenu *Menu
 	}
 	itemCreatedMsg struct {
 		item model.Item
@@ -81,6 +82,23 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return ""
 	})
+	m.editItemTypeMenu = NewMenu(func(group string, pos int) string {
+		switch model.ItemType(group) {
+		case model.ItemTypeInc:
+			return "Инцидент"
+		case model.ItemTypeAdhoc:
+			return "Adhoc"
+		case model.ItemTypeAsk:
+			return "Обращение"
+		case model.ItemTypeAlert:
+			return "Alert"
+		}
+		return ""
+	})
+	m.editItemTypeMenu.AddGroup(string(model.ItemTypeInc))
+	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAdhoc))
+	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAsk))
+	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAlert))
 	return m.getItems
 }
 
