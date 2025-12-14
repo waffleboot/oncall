@@ -7,18 +7,12 @@ import (
 	"github.com/waffleboot/oncall/internal/model"
 )
 
-type (
-	allItemsModel struct {
-		menu *Menu
-	}
-	newItemCreatedMsg struct {
-		items   []model.Item
-		newItem model.Item
-	}
-)
+type newItemCreatedMsg struct {
+	newItem model.Item
+}
 
 func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if m.allItemsModel.menu.ProcessMsg(msg) {
+	if m.allItemsMenu.ProcessMsg(msg) {
 		return m, nil
 	}
 
@@ -28,28 +22,24 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "esc", "q":
 			return m, tea.Quit
 		case "enter", " ":
-			switch g, p := m.allItemsModel.menu.GetGroup(); g {
+			switch g, p := m.allItemsMenu.GetGroup(); g {
 			case "exit":
 				return m, tea.Quit
 			case "new":
 				return m, func() tea.Msg {
-					item := m.config.ItemService.CreateItem()
-					if err := m.config.ItemService.UpdateItem(item); err != nil {
+					item := m.itemService.CreateItem()
+					if err := m.itemService.UpdateItem(item); err != nil {
 						return fmt.Errorf("create item: %w", err)
 					}
 
-					items, err := m.config.ItemService.GetItems()
-					if err != nil {
-						return fmt.Errorf("get items: %w", err)
-					}
-
-					return newItemCreatedMsg{items: items, newItem: item}
+					return newItemCreatedMsg{newItem: item}
 				}
 			case "close_journal":
 			case "print_journal":
 			case "items":
-				m.selectedItem = m.items[p]
-				m.screenPush(screenEditItem)
+				m.selectedItem = p
+				m.currentScreen = screenEditItem
+				m.resetEditItemMenu()
 			}
 		}
 	}
@@ -57,5 +47,5 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TeaModel) viewAllItems() string {
-	return m.allItemsModel.menu.GenerateMenu()
+	return m.allItemsMenu.GenerateMenu()
 }

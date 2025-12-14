@@ -14,27 +14,24 @@ const (
 )
 
 type (
-	TeaModelConfig struct {
-		ItemService port.ItemService
-	}
+	screen   string
 	TeaModel struct {
-		config        TeaModelConfig
-		screens       []screen
+		itemService   port.ItemService
+		currentScreen screen
 		items         []model.Item
-		selectedItem  model.Item
-		allItemsModel allItemsModel
-		editItemModel editItemModel
+		selectedItem  int
+		allItemsMenu  *Menu
+		editItemMenu  *Menu
 	}
-	editItemModel struct{}
 )
 
-func NewTeaModel(config TeaModelConfig) *TeaModel {
-	return &TeaModel{config: config}
+func NewTeaModel(itemService port.ItemService) *TeaModel {
+	return &TeaModel{itemService: itemService}
 }
 
 func (m *TeaModel) Init() tea.Cmd {
-	m.screenPush(screenAllItems)
-	m.allItemsModel.menu = NewMenu(func(group string, pos int) string {
+	m.currentScreen = screenAllItems
+	m.allItemsMenu = NewMenu(func(group string, pos int) string {
 		switch {
 		case group == "exit":
 			return "Exit"
@@ -49,30 +46,60 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return ""
 	})
-	return m.getInitialItems
+	m.editItemMenu = NewMenu(func(group string, pos int) string {
+		switch {
+		case group == "exit":
+			return "Exit"
+		case group == "sleep":
+			return "В ожидание"
+		case group == "awake":
+			return "Из ожидания"
+		case group == "close":
+			return "Закрыть"
+		case group == "delete":
+			return "Удалить"
+		case group == "edit_type":
+			return fmt.Sprintf("Тип обращения: (%s)...", m.items[m.selectedItem].Type)
+		case group == "notes":
+			return "Заметки..."
+		case group == "links":
+			return "Ссылки..."
+		case group == "nodes":
+			return "Хосты, узлы..."
+		case group == "vms":
+			return "ВМ-ки..."
+		}
+		return ""
+	})
+	return func() tea.Msg {
+		items, err := m.itemService.GetItems()
+		if err != nil {
+			return fmt.Errorf("get items: %w", err)
+		}
+		return items
+	}
 }
 
 func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case []model.Item:
 		m.items = msg
-		m.allItemsModel.menu.AddGroup("exit")
-		m.allItemsModel.menu.AddGroup("new")
-		m.allItemsModel.menu.AddGroup("close_journal")
-		m.allItemsModel.menu.AddGroup("print_journal")
-		m.allItemsModel.menu.AddGroupWithItems("items", len(m.items))
+		m.allItemsMenu.ResetMenu()
+		m.allItemsMenu.AddGroup("exit")
+		m.allItemsMenu.AddGroup("new")
+		m.allItemsMenu.AddGroup("close_journal")
+		m.allItemsMenu.AddGroup("print_journal")
+		m.allItemsMenu.AddGroupWithItems("items", len(m.items))
 	case newItemCreatedMsg:
-		m.items = msg.items
-		m.selectedItem = msg.newItem
-		m.allItemsModel.menu.ResetMenu()
-		m.allItemsModel.menu.AddGroup("exit")
-		m.allItemsModel.menu.AddGroup("new")
-		m.allItemsModel.menu.AddGroup("close_journal")
-		m.allItemsModel.menu.AddGroup("print_journal")
-		m.allItemsModel.menu.AddGroupWithItems("items", len(m.items))
-		m.allItemsModel.menu.JumpToItem("items", func(pos int) (found bool) {
-			return m.items[pos].ID == m.selectedItem.ID
-		})
+		m.items = append(m.items, msg.newItem)
+		m.selectedItem = len(m.items) - 1
+		m.allItemsMenu.ResetMenu()
+		m.allItemsMenu.AddGroup("exit")
+		m.allItemsMenu.AddGroup("new")
+		m.allItemsMenu.AddGroup("close_journal")
+		m.allItemsMenu.AddGroup("print_journal")
+		m.allItemsMenu.AddGroupWithItems("items", len(m.items))
+		m.allItemsMenu.JumpToPos("items", len(m.items)-1)
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
@@ -80,7 +107,7 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	switch m.currentScreen() {
+	switch m.currentScreen {
 	case screenAllItems:
 		return m.updateAllItems(msg)
 	case screenEditItem:
@@ -90,21 +117,13 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TeaModel) View() string {
-	switch m.currentScreen() {
+	switch m.currentScreen {
 	case screenAllItems:
 		return m.viewAllItems()
 	case screenEditItem:
 		return m.viewEditItem()
 	}
 	return ""
-}
-
-func (m TeaModel) getInitialItems() tea.Msg {
-	items, err := m.config.ItemService.GetItems()
-	if err != nil {
-		return fmt.Errorf("get items: %w", err)
-	}
-	return items
 }
 
 func (m *TeaModel) itemLabel(item model.Item) string {

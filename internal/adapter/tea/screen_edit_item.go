@@ -7,22 +7,53 @@ import (
 )
 
 func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if m.editItemMenu.ProcessMsg(msg) {
+		return m, nil
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
-			m.screenPop()
+			m.currentScreen = screenAllItems
 			return m, nil
 		}
 	}
+
 	return m, nil
 }
 
 func (m *TeaModel) viewEditItem() string {
-	for i := range m.items {
-		if m.items[i].ID == m.selectedItem.ID {
-			return fmt.Sprintf("#%d\n", m.items[i].ID)
-		}
-	}
-	return ""
+	return fmt.Sprintf("#%d\n", m.items[m.selectedItem].ID)
+}
+
+func (m *TeaModel) resetEditItemMenu() {
+	m.editItemMenu.ResetMenu()
+
+	m.editItemMenu.AddGroup("exit")
+
+	// if !m.item.IsClosed() {
+	// 	m.editItemMenu.AddGroup("edit_type")
+	// }
+
+	m.editItemMenu.AddGroup("nodes")
+	m.editItemMenu.AddGroup("vms")
+	m.editItemMenu.AddGroup("notes")
+	m.editItemMenu.AddGroup("links")
+	m.editItemMenu.AddDelimiter()
+
+	// if m.IsActive() {
+	// 	m.editItemMenu.AddGroup("sleep")
+	// }
+
+	// if m.item.IsSleep() {
+	// 	m.editItemMenu.AddGroup("awake")
+	// }
+
+	// if !m.item.IsClosed() {
+	// 	m.editItemMenu.AddGroup("close")
+	// }
+
+	m.editItemMenu.AddDelimiter()
+	m.editItemMenu.AddGroup("delete")
 }

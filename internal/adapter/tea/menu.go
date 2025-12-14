@@ -162,6 +162,24 @@ func (m *Menu) JumpToItem(group string, f func(pos int) (found bool)) {
 	})
 }
 
+func (m *Menu) JumpToPos(toGroup string, pos int) {
+	var cursor int
+	for i, group := range m.groupNames {
+		if group == menuDelimiter {
+			continue
+		}
+		if group != toGroup {
+			cursor += m.groupSizes[i]
+			continue
+		}
+		if pos < m.groupSizes[i] {
+			m.cursor = cursor + pos
+		} else {
+			return
+		}
+	}
+}
+
 func (m *Menu) JumpToGroup(group string) {
 	m.jumpTo(group, func(_ int) bool {
 		return true
@@ -223,8 +241,6 @@ func (m *Menu) jumpTo(toGroup string, find func(pos int) bool) {
 			cursor++
 		}
 	}
-
-	m.cursor = 0
 }
 
 func (m *Menu) ProcessMsg(msg tea.Msg) bool {

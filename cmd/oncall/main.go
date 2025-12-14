@@ -19,9 +19,7 @@ func main() {
 func run() error {
 	itemService := facade.NewItemService()
 
-	teaModel := teaAdapter.NewTeaModel(teaAdapter.TeaModelConfig{
-		ItemService: itemService,
-	})
+	teaModel := teaAdapter.NewTeaModel(itemService)
 
 	if _, err := tea.NewProgram(teaModel).Run(); err != nil {
 		return fmt.Errorf("tea run: %w", err)
