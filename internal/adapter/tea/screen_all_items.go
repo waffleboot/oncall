@@ -7,9 +7,15 @@ import (
 	"github.com/waffleboot/oncall/internal/model"
 )
 
-type allItemsModel struct {
-	menu *Menu
-}
+type (
+	allItemsModel struct {
+		menu *Menu
+	}
+	newItemCreateMsg struct {
+		items     []model.Item
+		newItemID int
+	}
+)
 
 func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.allItemsModel.menu.ProcessMsg(msg) {
@@ -17,17 +23,6 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	switch msg := msg.(type) {
-	case []model.Item:
-		m.allItemsModel.menu.ResetMenu()
-		m.allItemsModel.menu.AddGroup("exit")
-		m.allItemsModel.menu.AddGroup("new")
-		m.allItemsModel.menu.AddGroup("close_journal")
-		m.allItemsModel.menu.AddGroup("print_journal")
-		m.allItemsModel.menu.AddGroupWithItems("items", len(m.items))
-		m.allItemsModel.menu.AdjustCursor()
-		m.allItemsModel.menu.JumpToItem("items", func(pos int) (found bool) {
-			return m.items[pos].ID == m.selectedItemID
-		})
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
@@ -42,8 +37,13 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 					if err := m.config.ItemService.UpdateItem(item); err != nil {
 						return fmt.Errorf("create item: %w", err)
 					}
-					m.selectedItemID = item.ID
-					return m.getItems()
+
+					items, err := m.config.ItemService.GetItems()
+					if err != nil {
+						return fmt.Errorf("get items: %w", err)
+					}
+
+					return newItemCreateMsg{items: items, newItemID: item.ID}
 				}
 			case "close_journal":
 			case "print_journal":

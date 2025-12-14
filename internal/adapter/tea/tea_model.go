@@ -49,13 +49,29 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return ""
 	})
-	return m.getItems
+	return m.getInitialItems
 }
 
 func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case []model.Item:
 		m.items = msg
+		m.allItemsModel.menu.AddGroup("exit")
+		m.allItemsModel.menu.AddGroup("new")
+		m.allItemsModel.menu.AddGroup("close_journal")
+		m.allItemsModel.menu.AddGroup("print_journal")
+		m.allItemsModel.menu.AddGroupWithItems("items", len(m.items))
+	case newItemCreateMsg:
+		m.items = msg.items
+		m.allItemsModel.menu.ResetMenu()
+		m.allItemsModel.menu.AddGroup("exit")
+		m.allItemsModel.menu.AddGroup("new")
+		m.allItemsModel.menu.AddGroup("close_journal")
+		m.allItemsModel.menu.AddGroup("print_journal")
+		m.allItemsModel.menu.AddGroupWithItems("items", len(m.items))
+		m.allItemsModel.menu.JumpToItem("items", func(pos int) (found bool) {
+			return m.items[pos].ID == msg.newItemID
+		})
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
@@ -82,7 +98,7 @@ func (m *TeaModel) View() string {
 	return ""
 }
 
-func (m TeaModel) getItems() tea.Msg {
+func (m TeaModel) getInitialItems() tea.Msg {
 	items, err := m.config.ItemService.GetItems()
 	if err != nil {
 		return fmt.Errorf("get items: %w", err)
