@@ -2,7 +2,6 @@ package tea
 
 import (
 	"fmt"
-	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
@@ -41,6 +40,24 @@ func (m *TeaModel) Init() tea.Cmd {
 
 func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case []model.Item:
+		m.items = msg
+		m.allItemsModel.menu = NewMenu(func(group string, pos int) string {
+			switch {
+			case group == startNew:
+				return "Новое обращение"
+			case group == startItems:
+				return m.itemLabel(m.items[pos])
+			case group == startClose:
+				return "Закрыть журнал"
+			case group == startPrint:
+				return "Распечатать журнал"
+			case group == startExit:
+				return "Exit"
+			}
+			return ""
+		})
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
