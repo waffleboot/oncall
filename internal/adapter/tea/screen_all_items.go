@@ -38,32 +38,23 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case "print_journal":
 			case "items":
-				m.selectItem(m.items[p])
+				m.resetEditItem(m.items[p])
 				m.currentScreen = screenEditItem
 				m.editItemMenu.JumpToGroup("exit")
 			}
 		case "s":
 			if g, p := m.allItemsMenu.GetGroup(); g == "items" {
-				m.selectedItem = m.items[p]
-				return m.toggleSleep()
+				return m.toggleSleep(m.items[p])
 			}
 		}
+	case []model.Item:
+		m.resetAllItems(msg)
 	case itemCreatedMsg:
-		m.selectItem(msg.item)
-		m.editItemTypeMenu.JumpToGroup(string(model.ItemTypeInc))
+		m.resetEditItem(msg.item)
 		m.currentScreen = screenItemType
+		m.editItemTypeMenu.JumpToGroup(string(model.ItemTypeInc))
 		return m, nil
 	case itemUpdatedMsg:
-		m.selectItem(msg.item)
-		if m.currentScreen == screenItemType {
-			m.currentScreen = screenEditItem
-		}
-		return m, m.getItems
-	case itemClosedMsg:
-		m.currentScreen = screenAllItems
-		return m, m.getItems
-	case itemDeletedMsg:
-		m.currentScreen = screenAllItems
 		return m, m.getItems
 	}
 	return m, nil
@@ -73,7 +64,8 @@ func (m *TeaModel) viewAllItems() string {
 	return m.allItemsMenu.GenerateMenu()
 }
 
-func (m *TeaModel) resetAllItemsMenu() {
+func (m *TeaModel) resetAllItems(items []model.Item) {
+	m.items = items
 	m.allItemsMenu.ResetMenu()
 	m.allItemsMenu.AddGroup("exit")
 	m.allItemsMenu.AddGroup("new")
@@ -82,9 +74,6 @@ func (m *TeaModel) resetAllItemsMenu() {
 	m.allItemsMenu.AddGroupWithItems("items", len(m.items))
 	if len(m.items) > 0 {
 		m.allItemsMenu.AdjustCursor()
-		m.allItemsMenu.JumpToItem("items", func(pos int) (found bool) {
-			return m.items[pos].ID == m.selectedItem.ID
-		})
 	} else {
 		m.allItemsMenu.JumpToGroup("new")
 	}

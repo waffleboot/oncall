@@ -146,9 +146,6 @@ func (m *TeaModel) Init() tea.Cmd {
 
 func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case []model.Item:
-		m.items = msg
-		m.resetAllItemsMenu()
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
@@ -205,9 +202,4 @@ func (m *TeaModel) getItems() tea.Msg {
 		return fmt.Errorf("get items: %w", err)
 	}
 	return items
-}
-
-func (m *TeaModel) selectItem(item model.Item) {
-	m.selectedItem = item
-	m.resetEditItemMenu()
 }

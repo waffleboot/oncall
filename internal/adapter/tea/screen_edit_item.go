@@ -68,10 +68,17 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.currentScreen = screenItemVMs
 			}
 		case "s":
-			return m.toggleSleep()
+			return m.toggleSleep(m.selectedItem)
 		}
+	case itemUpdatedMsg:
+		m.resetEditItem(msg.item)
+	case itemClosedMsg:
+		m.currentScreen = screenAllItems
+		return m, m.getItems
+	case itemDeletedMsg:
+		m.currentScreen = screenAllItems
+		return m, m.getItems
 	}
-
 	return m, nil
 }
 
@@ -97,12 +104,14 @@ func (m *TeaModel) viewEditItem() string {
 	return s.String()
 }
 
-func (m *TeaModel) resetEditItemMenu() {
+func (m *TeaModel) resetEditItem(item model.Item) {
+	m.selectedItem = item
+
 	m.editItemMenu.ResetMenu()
 
 	m.editItemMenu.AddGroup("exit")
 
-	if !m.selectedItem.IsClosed() {
+	if !item.IsClosed() {
 		m.editItemMenu.AddGroup("item_type")
 	}
 
@@ -112,15 +121,15 @@ func (m *TeaModel) resetEditItemMenu() {
 	m.editItemMenu.AddGroup("item_links")
 	m.editItemMenu.AddDelimiter()
 
-	if m.selectedItem.IsActive() {
+	if item.IsActive() {
 		m.editItemMenu.AddGroup("sleep")
 	}
 
-	if m.selectedItem.IsSleep() {
+	if item.IsSleep() {
 		m.editItemMenu.AddGroup("awake")
 	}
 
-	if !m.selectedItem.IsClosed() {
+	if !item.IsClosed() {
 		m.editItemMenu.AddGroup("close")
 	}
 
@@ -132,10 +141,10 @@ func (m *TeaModel) resetEditItemMenu() {
 	}
 }
 
-func (m *TeaModel) toggleSleep() (tea.Model, tea.Cmd) {
-	if m.selectedItem.IsSleep() {
+func (m *TeaModel) toggleSleep(item model.Item) (tea.Model, tea.Cmd) {
+	if item.IsSleep() {
 		return m, func() tea.Msg {
-			if item, err := m.itemService.AwakeItem(m.selectedItem); err != nil {
+			if item, err := m.itemService.AwakeItem(item); err != nil {
 				return fmt.Errorf("awake: %w", err)
 			} else {
 				return itemUpdatedMsg{item: item}
@@ -143,7 +152,7 @@ func (m *TeaModel) toggleSleep() (tea.Model, tea.Cmd) {
 		}
 	} else {
 		return m, func() tea.Msg {
-			if item, err := m.itemService.SleepItem(m.selectedItem); err != nil {
+			if item, err := m.itemService.SleepItem(item); err != nil {
 				return fmt.Errorf("sleep: %w", err)
 			} else {
 				return itemUpdatedMsg{item: item}

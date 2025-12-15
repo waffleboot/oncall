@@ -28,6 +28,9 @@ func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		}
+	case itemUpdatedMsg:
+		m.currentScreen = screenEditItem
+		m.resetEditItem(msg.item)
 	}
 	return m, nil
 }
