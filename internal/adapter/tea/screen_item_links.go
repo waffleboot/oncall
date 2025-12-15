@@ -70,7 +70,6 @@ func (m *TeaModel) resetItemLinks(toGroup string) {
 	m.editItemLinksMenu.AddGroup("exit")
 	m.editItemLinksMenu.AddGroup("new")
 	m.editItemLinksMenu.AddGroupWithItems("links", len(m.links))
-	m.editItemLinksMenu.AdjustCursor()
 	if toGroup != "" {
 		m.editItemLinksMenu.JumpToGroup(toGroup)
 	} else {

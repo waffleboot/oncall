@@ -73,12 +73,9 @@ func (m *TeaModel) resetAllItems(items []model.Item) {
 	m.allItemsMenu.AddGroup("close_journal")
 	m.allItemsMenu.AddGroup("print_journal")
 	m.allItemsMenu.AddGroupWithItems("items", len(m.items))
-	// if g, _ := m.allItemsMenu.GetGroup(); g == "" {
 	if len(m.items) == 0 {
 		m.allItemsMenu.JumpToGroup("new")
 	} else {
 		m.allItemsMenu.AdjustCursor()
 	}
-	// } else {
-	// }
 }
