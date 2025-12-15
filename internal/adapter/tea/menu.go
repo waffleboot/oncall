@@ -12,7 +12,6 @@ const menuDelimiter = "---"
 type (
 	Menu struct {
 		labelGen    func(group string, pos int) string
-		disable     func(group string, pos int) bool
 		groupNames  []string
 		groupSizes  []int
 		cursor      int
