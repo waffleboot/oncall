@@ -3,6 +3,8 @@ package model
 import (
 	"cmp"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -18,7 +20,8 @@ type (
 	}
 	ItemType string
 	Item     struct {
-		ID       int
+		ID       uuid.UUID
+		Num      int
 		SleepAt  time.Time
 		ClosedAt time.Time
 		Type     ItemType

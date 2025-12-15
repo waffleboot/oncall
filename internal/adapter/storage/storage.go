@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/waffleboot/oncall/internal/model"
 )
 
@@ -16,16 +17,17 @@ type (
 		Filename string
 	}
 	Storage struct {
-		config Config
-		lastID int
-		items  []storedItem
+		config  Config
+		lastNum int
+		items   []storedItem
 	}
 	storedData struct {
-		LastID int          `json:"last_id,omitempty"`
-		Items  []storedItem `json:"items,omitempty"`
+		LastNum int          `json:"last_num,omitempty"`
+		Items   []storedItem `json:"items,omitempty"`
 	}
 	storedItem struct {
-		ID        int       `json:"id"`
+		ID        uuid.UUID `json:"id"`
+		Num       int       `json:"num"`
 		SleepAt   time.Time `json:"sleepAt,omitempty"`
 		ClosedAt  time.Time `json:"closedAt,omitempty"`
 		DeletedAt time.Time `json:"deletedAt,omitempty"`
@@ -41,12 +43,12 @@ func NewStorage(config Config) (*Storage, error) {
 	return s, nil
 }
 
-func (s *Storage) GenerateID() int {
-	s.lastID++
-	return s.lastID
+func (s *Storage) GenerateNum() int {
+	s.lastNum++
+	return s.lastNum
 }
 
-func (s *Storage) GetItem(itemID int) (model.Item, error) {
+func (s *Storage) GetItem(itemID uuid.UUID) (model.Item, error) {
 	for i := range s.items {
 		if s.items[i].ID == itemID {
 			return s.items[i].toDomain(), nil
@@ -79,7 +81,7 @@ func (s *Storage) UpdateItem(item model.Item) error {
 	return nil
 }
 
-func (s *Storage) DeleteItem(itemID int) error {
+func (s *Storage) DeleteItem(itemID uuid.UUID) error {
 	var found bool
 
 	for i := range s.items {
@@ -113,7 +115,7 @@ func (s *Storage) GetItems() ([]model.Item, error) {
 }
 
 func (s *Storage) CloseJournal() error {
-	s.lastID = 0
+	s.lastNum = 0
 	s.items = nil
 	return s.saveData()
 }
@@ -136,7 +138,7 @@ func (s *Storage) loadData() error {
 		return fmt.Errorf("json decode: %w", err)
 	}
 
-	s.lastID = data.LastID
+	s.lastNum = data.LastNum
 	s.items = data.Items
 
 	return nil
@@ -155,8 +157,8 @@ func (s *Storage) saveData() error {
 	enc.SetIndent("", " ")
 
 	if err := enc.Encode(storedData{
-		LastID: s.lastID,
-		Items:  s.items,
+		LastNum: s.lastNum,
+		Items:   s.items,
 	}); err != nil {
 		return fmt.Errorf("json encode: %w", err)
 	}
@@ -170,6 +172,7 @@ func (s *Storage) saveData() error {
 
 func (s *storedItem) fromDomain(item model.Item) {
 	s.ID = item.ID
+	s.Num = item.Num
 	s.SleepAt = item.SleepAt.UTC()
 	s.ClosedAt = item.ClosedAt.UTC()
 	s.Type = string(item.Type)
@@ -178,6 +181,7 @@ func (s *storedItem) fromDomain(item model.Item) {
 func (s *storedItem) toDomain() model.Item {
 	return model.Item{
 		ID:       s.ID,
+		Num:      s.Num,
 		SleepAt:  s.SleepAt,
 		ClosedAt: s.ClosedAt,
 		Type:     model.ItemType(s.Type),

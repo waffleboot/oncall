@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/waffleboot/oncall/internal/model"
 )
 
 func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -70,16 +69,5 @@ func (m *TeaModel) resetAllItemsMenu() {
 		})
 	} else {
 		m.allItemsMenu.JumpToGroup("new")
-	}
-}
-
-func (m *TeaModel) itemLabel(item model.Item) string {
-	switch {
-	case item.IsSleep():
-		return fmt.Sprintf("? #%d - %s", item.ID, item.Type)
-	case item.IsClosed():
-		return fmt.Sprintf("x #%d - %s", item.ID, item.Type)
-	default:
-		return fmt.Sprintf("  #%d - %s", item.ID, item.Type)
 	}
 }

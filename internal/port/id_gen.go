@@ -1,5 +1,5 @@
 package port
 
-type IDGenerator interface {
-	GenerateID() int
+type NumGenerator interface {
+	GenerateNum() int
 }

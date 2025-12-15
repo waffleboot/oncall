@@ -89,7 +89,7 @@ func (m *TeaModel) viewEditItem() string {
 	}
 
 	var s strings.Builder
-	s.WriteString(fmt.Sprintf("  #%d %s%s\n\n", m.selectedItem.ID, m.selectedItem.Type, state))
+	s.WriteString(fmt.Sprintf("  #%d %s%s\n\n", m.selectedItem.Num, m.selectedItem.Type, state))
 	s.WriteString(m.editItemMenu.GenerateMenu())
 
 	return s.String()

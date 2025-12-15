@@ -4,22 +4,24 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
 )
 
 type ItemService struct {
 	storage port.Storage
-	idGen   port.IDGenerator
+	numGen  port.NumGenerator
 }
 
-func NewItemService(storage port.Storage, idGen port.IDGenerator) *ItemService {
-	return &ItemService{storage: storage, idGen: idGen}
+func NewItemService(storage port.Storage, numGen port.NumGenerator) *ItemService {
+	return &ItemService{storage: storage, numGen: numGen}
 }
 
 func (s *ItemService) CreateItem() model.Item {
 	return model.Item{
-		ID:   s.idGen.GenerateID(),
+		ID:   uuid.New(),
+		Num:  s.numGen.GenerateNum(),
 		Type: model.ItemTypeAsk,
 	}
 }

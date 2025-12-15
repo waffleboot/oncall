@@ -60,7 +60,15 @@ func (m *TeaModel) Init() tea.Cmd {
 		case group == "print_journal":
 			return "Распечатать журнал"
 		case group == "items":
-			return m.itemLabel(m.items[pos])
+			item := m.items[pos]
+			switch {
+			case item.IsSleep():
+				return fmt.Sprintf("? #%d - %s", item.Num, item.Type)
+			case item.IsClosed():
+				return fmt.Sprintf("x #%d - %s", item.Num, item.Type)
+			default:
+				return fmt.Sprintf("  #%d - %s", item.Num, item.Type)
+			}
 		}
 		return group
 	})
