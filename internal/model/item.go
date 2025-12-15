@@ -60,13 +60,39 @@ func (t ItemType) String() string {
 	return "Unknown"
 }
 
-var itemTypePriorities = map[ItemType]int{
-	ItemTypeInc:   1,
-	ItemTypeAsk:   2,
-	ItemTypeAlert: 3,
-	ItemTypeAdhoc: 4,
+func (t ItemType) Compare(o ItemType) int {
+	pri := func(t ItemType) int {
+		switch t {
+		case ItemTypeInc:
+			return 1
+		case ItemTypeAsk:
+			return 2
+		case ItemTypeAlert:
+			return 3
+		case ItemTypeAdhoc:
+			return 4
+		default:
+			return 5
+		}
+	}
+	return cmp.Compare(pri(t), pri(o))
 }
 
-func (t ItemType) Compare(o ItemType) int {
-	return cmp.Compare(itemTypePriorities[t], itemTypePriorities[o])
+func (t Item) Compare(o Item) int {
+	pri := func(t Item) int {
+		switch {
+		case t.IsActive():
+			return 1
+		case t.IsSleep():
+			return 2
+		case t.IsClosed():
+			return 3
+		default:
+			return 4
+		}
+	}
+	if c := cmp.Compare(pri(t), pri(o)); c != 0 {
+		return c
+	}
+	return t.Type.Compare(o.Type)
 }

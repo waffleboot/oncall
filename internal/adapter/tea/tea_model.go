@@ -1,9 +1,7 @@
 package tea
 
 import (
-	"cmp"
 	"fmt"
-	"slices"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
@@ -113,12 +111,9 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case []model.Item:
 		m.items = msg
 
-		slices.SortFunc(m.items, func(a, b model.Item) int {
-			if c := a.Type.Compare(b.Type); c != 0 {
-				return c
-			}
-			return cmp.Compare(a.ID, b.ID)
-		})
+		// slices.SortFunc(m.items, func(a, b model.Item) int {
+		// 	return a.Compare(b)
+		// })
 
 		m.resetAllItemsMenu()
 	case itemCreatedMsg:
