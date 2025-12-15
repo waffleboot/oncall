@@ -17,37 +17,50 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 			switch m.textInput {
 			case "address":
 				m.textInput = "description"
-				m.linkAddress.Blur()
-				m.linkDescription.Focus()
+				m.textinputLinkAddress.Blur()
+				m.textinputLinkDescription.Focus()
 			case "description":
 				m.textInput = "submit"
-				m.linkDescription.Blur()
+				m.textinputLinkDescription.Blur()
 			case "submit":
 				m.textInput = "address"
-				m.linkAddress.Focus()
+				m.textinputLinkAddress.Focus()
 			}
 			return m, nil
 		case "up":
 			switch m.textInput {
 			case "address":
 				m.textInput = "submit"
-				m.linkAddress.Blur()
+				m.textinputLinkAddress.Blur()
 				return m, nil
+			case "description":
+				if len(m.textinputLinkDescription.Value()) == 0 {
+					m.textInput = "address"
+					m.textinputLinkAddress.Focus()
+					m.textinputLinkDescription.Blur()
+					return m, nil
+				}
 			case "submit":
 				m.textInput = "description"
-				m.linkDescription.Focus()
+				m.textinputLinkDescription.Focus()
 				return m, nil
 			}
 		case "down":
 			switch m.textInput {
 			case "address":
 				m.textInput = "description"
-				m.linkAddress.Blur()
-				m.linkDescription.Focus()
+				m.textinputLinkAddress.Blur()
+				m.textinputLinkDescription.Focus()
 				return m, nil
+			case "description":
+				if len(m.textinputLinkDescription.Value()) == 0 {
+					m.textInput = "submit"
+					m.textinputLinkDescription.Blur()
+					return m, nil
+				}
 			case "submit":
 				m.textInput = "address"
-				m.linkAddress.Focus()
+				m.textinputLinkAddress.Focus()
 				return m, nil
 			}
 		case "esc":
@@ -60,19 +73,19 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 			switch m.textInput {
 			case "address":
 				m.textInput = "description"
-				m.linkAddress.Blur()
-				m.linkDescription.Focus()
+				m.textinputLinkAddress.Blur()
+				m.textinputLinkDescription.Focus()
 				return m, nil
 			case "description":
-				if len(m.linkDescription.Value()) == 0 {
+				if len(m.textinputLinkDescription.Value()) == 0 {
 					m.textInput = "submit"
-					m.linkDescription.Blur()
+					m.textinputLinkDescription.Blur()
 					return m, nil
 				}
 			case "submit":
 				return m, func() tea.Msg {
-					m.selectedLink.Address = m.linkAddress.Value()
-					m.selectedLink.Description = m.linkDescription.Value()
+					m.selectedLink.Address = m.textinputLinkAddress.Value()
+					m.selectedLink.Description = m.textinputLinkDescription.Value()
 					m.selectedItem.UpdateItemLink(m.selectedLink)
 					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
@@ -91,10 +104,10 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 
 	switch m.textInput {
 	case "address":
-		m.linkAddress, cmd = m.linkAddress.Update(msg)
+		m.textinputLinkAddress, cmd = m.textinputLinkAddress.Update(msg)
 		return m, cmd
 	case "description":
-		m.linkDescription, cmd = m.linkDescription.Update(msg)
+		m.textinputLinkDescription, cmd = m.textinputLinkDescription.Update(msg)
 		return m, cmd
 	}
 
@@ -106,10 +119,10 @@ func (m *TeaModel) viewItemLink() string {
 
 	s.WriteString(fmt.Sprintf("ID: %d\n", m.selectedLink.ID))
 	s.WriteString("Address:\n  ")
-	s.WriteString(m.linkAddress.View())
+	s.WriteString(m.textinputLinkAddress.View())
 	s.WriteString("\n")
 	s.WriteString("Description:\n")
-	s.WriteString(m.linkDescription.View())
+	s.WriteString(m.textinputLinkDescription.View())
 	s.WriteString("\n")
 
 	if m.textInput == "submit" {
@@ -124,21 +137,21 @@ func (m *TeaModel) viewItemLink() string {
 func (m *TeaModel) resetItemLink() {
 	m.textInput = "address"
 
-	m.linkAddress = textinput.New()
-	m.linkAddress.Placeholder = "link"
-	m.linkAddress.Prompt = ""
-	m.linkAddress.Focus()
-	m.linkAddress.Width = 80
-	m.linkAddress.CharLimit = 1000
-	m.linkAddress.SetValue(m.selectedLink.Address)
+	m.textinputLinkAddress = textinput.New()
+	m.textinputLinkAddress.Placeholder = "link"
+	m.textinputLinkAddress.Prompt = ""
+	m.textinputLinkAddress.Focus()
+	m.textinputLinkAddress.Width = 80
+	m.textinputLinkAddress.CharLimit = 1000
+	m.textinputLinkAddress.SetValue(m.selectedLink.Address)
 
-	m.linkDescription = textarea.New()
-	m.linkDescription.Placeholder = "link description"
-	m.linkDescription.Blur()
-	m.linkDescription.Prompt = "  "
-	m.linkDescription.ShowLineNumbers = false
-	m.linkDescription.SetHeight(4)
-	m.linkDescription.SetWidth(80)
-	m.linkDescription.CharLimit = 1000
-	m.linkDescription.SetValue(m.selectedLink.Description)
+	m.textinputLinkDescription = textarea.New()
+	m.textinputLinkDescription.Placeholder = "link description"
+	m.textinputLinkDescription.Blur()
+	m.textinputLinkDescription.Prompt = "  "
+	m.textinputLinkDescription.ShowLineNumbers = false
+	m.textinputLinkDescription.SetHeight(4)
+	m.textinputLinkDescription.SetWidth(80)
+	m.textinputLinkDescription.CharLimit = 1000
+	m.textinputLinkDescription.SetValue(m.selectedLink.Description)
 }

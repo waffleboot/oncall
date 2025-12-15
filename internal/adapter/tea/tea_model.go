@@ -26,23 +26,23 @@ const (
 type (
 	screen   string
 	TeaModel struct {
-		itemService       port.ItemService
-		journalService    port.JournalService
-		currentScreen     screen
-		items             []model.Item
-		links             []model.ItemLink
-		selectedItem      model.Item
-		selectedLink      model.ItemLink
-		allItemsMenu      *Menu
-		editItemMenu      *Menu
-		editItemTypeMenu  *Menu
-		editItemLinksMenu *Menu
-		linkAddress       textinput.Model
-		linkDescription   textarea.Model
-		itemTitle         textinput.Model
-		itemDescription   textarea.Model
-		textInput         string
-		printJournal      bool
+		itemService              port.ItemService
+		journalService           port.JournalService
+		currentScreen            screen
+		items                    []model.Item
+		links                    []model.ItemLink
+		selectedItem             model.Item
+		selectedLink             model.ItemLink
+		allItemsMenu             *Menu
+		editItemMenu             *Menu
+		editItemTypeMenu         *Menu
+		editItemLinksMenu        *Menu
+		textinputLinkAddress     textinput.Model
+		textinputLinkDescription textarea.Model
+		textinputItemTitle       textinput.Model
+		textinputItemDescription textarea.Model
+		textInput                string
+		printJournal             bool
 	}
 	itemCreatedMsg struct {
 		item model.Item

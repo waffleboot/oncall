@@ -73,7 +73,6 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 			}
 
 			if links := item.PrintedLinks(); len(links) > 0 {
-				_, _ = fmt.Fprintln(w)
 				for _, link := range links {
 					_, _ = fmt.Fprintln(w)
 					_, _ = fmt.Fprintln(w, link.Address)
