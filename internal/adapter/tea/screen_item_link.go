@@ -71,7 +71,7 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 				}
 			case "submit":
 				return m, func() tea.Msg {
-					m.selectedLink.Link = m.linkAddress.Value()
+					m.selectedLink.Address = m.linkAddress.Value()
 					m.selectedLink.Description.SetValue(m.linkDescription.Value())
 					m.selectedItem.UpdateItemLink(m.selectedLink)
 					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
@@ -130,7 +130,7 @@ func (m *TeaModel) resetItemLink() {
 	m.linkAddress.Focus()
 	m.linkAddress.Width = 80
 	m.linkAddress.CharLimit = 1000
-	m.linkAddress.SetValue(m.selectedLink.Link)
+	m.linkAddress.SetValue(m.selectedLink.Address)
 
 	m.linkDescription = textarea.New()
 	m.linkDescription.Placeholder = "link description"

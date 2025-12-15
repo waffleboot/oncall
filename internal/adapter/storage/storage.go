@@ -207,7 +207,7 @@ func (s *storedItem) toDomain() model.Item {
 
 func (s *storedLink) fromDomain(link model.ItemLink) {
 	s.ID = link.ID
-	s.Link = link.Link
+	s.Link = link.Address
 	s.Public = link.Public
 	s.DeletedAt = link.DeletedAt
 	s.Descriptions = link.Description.Versions()
@@ -216,7 +216,7 @@ func (s *storedLink) fromDomain(link model.ItemLink) {
 func (s *storedLink) toDomain() model.ItemLink {
 	return model.ItemLink{
 		ID:          s.ID,
-		Link:        s.Link,
+		Address:     s.Link,
 		Public:      s.Public,
 		DeletedAt:   s.DeletedAt,
 		Description: model.NewVersionedObj(s.Descriptions),

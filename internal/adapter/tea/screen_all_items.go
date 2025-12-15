@@ -37,6 +37,12 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m.getItems()
 				}
 			case "print_journal":
+				return m, func() tea.Msg {
+					if err := m.journalService.PrintJournal(); err != nil {
+						return fmt.Errorf("print journal: %w", err)
+					}
+					return nil
+				}
 			case "items":
 				m.selectedItem = m.items[p]
 				m.resetEditItem("exit")

@@ -29,8 +29,8 @@ type (
 	}
 	ItemLink struct {
 		ID          int
-		Link        string
 		Public      bool
+		Address     string
 		DeletedAt   time.Time
 		Description VersionedObj[string]
 	}
@@ -113,9 +113,19 @@ func (t Item) Compare(o Item) int {
 
 func (s *Item) ActiveLinks() []ItemLink {
 	links := make([]ItemLink, 0, len(s.Links))
-	for i := range s.Links {
-		if !s.Links[i].IsDeleted() {
-			links = append(links, s.Links[i])
+	for _, link := range s.Links {
+		if !link.IsDeleted() {
+			links = append(links, link)
+		}
+	}
+	return links
+}
+
+func (s *Item) PrintedLinks() []ItemLink {
+	links := make([]ItemLink, 0, len(s.Links))
+	for _, link := range s.Links {
+		if !link.IsDeleted() && link.Public {
+			links = append(links, link)
 		}
 	}
 	return links

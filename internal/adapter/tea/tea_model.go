@@ -134,10 +134,10 @@ func (m *TeaModel) Init() tea.Cmd {
 
 			var s strings.Builder
 			s.WriteString(fmt.Sprintf("#%d - ", link.ID))
-			if link.Link == "" {
+			if link.Address == "" {
 				s.WriteString("empty")
 			} else {
-				s.WriteString(link.Link)
+				s.WriteString(link.Address)
 			}
 			if link.Public {
 				s.WriteString(" - public")
