@@ -111,10 +111,10 @@ func (t Item) Compare(o Item) int {
 	return t.Type.Compare(o.Type)
 }
 
-func (s *Item) LiveLinks() []ItemLink {
+func (s *Item) ActiveLinks() []ItemLink {
 	links := make([]ItemLink, 0, len(s.Links))
 	for i := range s.Links {
-		if s.Links[i].Public {
+		if !s.Links[i].IsDeleted() {
 			links = append(links, s.Links[i])
 		}
 	}
@@ -132,6 +132,14 @@ func (s *Item) CreateItemLink() ItemLink {
 	return ItemLink{ID: id + 1, Public: true}
 }
 
+func (s *ItemLink) IsDeleted() bool {
+	return s.DeletedAt.IsZero()
+}
+
+func NewVersionedObj[T any](versions []T) VersionedObj[T] {
+	return VersionedObj[T]{versions: versions}
+}
+
 func (v *VersionedObj[T]) Value() T {
 	var zero T
 	if len(v.versions) == 0 {
@@ -142,4 +150,8 @@ func (v *VersionedObj[T]) Value() T {
 
 func (v *VersionedObj[T]) SetValue(value T) {
 	v.versions = append(v.versions, value)
+}
+
+func (v *VersionedObj[T]) Versions() []T {
+	return v.versions
 }

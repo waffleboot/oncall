@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
@@ -27,12 +28,14 @@ type (
 		journalService    port.JournalService
 		currentScreen     screen
 		items             []model.Item
+		links             []model.ItemLink
 		selectedItem      model.Item
 		selectedLink      model.ItemLink
 		allItemsMenu      *Menu
 		editItemMenu      *Menu
 		editItemTypeMenu  *Menu
 		editItemLinksMenu *Menu
+		linkInput         textinput.Model
 	}
 	itemCreatedMsg struct {
 		item model.Item
@@ -123,7 +126,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		case "new":
 			return "Добавить ссылку..."
 		case "link":
-			link := m.selectedItem.LiveLinks()[pos]
+			link := m.links[pos]
 
 			var s strings.Builder
 			s.WriteString(link.Link)
@@ -137,6 +140,7 @@ func (m *TeaModel) Init() tea.Cmd {
 			return group
 		}
 	})
+	m.linkInput = textinput.New()
 	return m.getItems
 }
 

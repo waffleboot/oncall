@@ -1,10 +1,12 @@
 package tea
 
 import (
+	"fmt"
+
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func (m *TeaModel) updateItemLink(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -12,9 +14,10 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.currentScreen = screenItemLinks
 		}
 	}
+
 	return m, nil
 }
 
 func (m *TeaModel) viewItemLink() string {
-	return "hi"
+	return fmt.Sprintf("%d\n", m.selectedLink.ID)
 }

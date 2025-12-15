@@ -81,6 +81,7 @@ func (s *ItemService) UpdateItemLink(item model.Item, link model.ItemLink) error
 	for i := range item.Links {
 		if item.Links[i].ID == link.ID {
 			item.Links[i] = link
+			found = true
 			break
 		}
 	}

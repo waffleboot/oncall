@@ -26,12 +26,20 @@ type (
 		Items   []storedItem `json:"items,omitempty"`
 	}
 	storedItem struct {
-		ID        uuid.UUID `json:"id"`
-		Num       int       `json:"num"`
-		SleepAt   time.Time `json:"sleepAt,omitempty"`
-		ClosedAt  time.Time `json:"closedAt,omitempty"`
-		DeletedAt time.Time `json:"deletedAt,omitempty"`
-		Type      string    `json:"type,omitempty"`
+		ID        uuid.UUID    `json:"id"`
+		Num       int          `json:"num"`
+		SleepAt   time.Time    `json:"sleepAt,omitempty"`
+		ClosedAt  time.Time    `json:"closedAt,omitempty"`
+		DeletedAt time.Time    `json:"deletedAt,omitempty"`
+		Links     []storedLink `json:"links,omitempty"`
+		Type      string       `json:"type,omitempty"`
+	}
+	storedLink struct {
+		ID           int       `json:"id"`
+		Link         string    `json:"link,omitempty"`
+		Public       bool      `json:"public"`
+		DeletedAt    time.Time `json:"deleted_at,omitempty"`
+		Descriptions []string  `json:"descriptions,omitempty"`
 	}
 )
 
@@ -176,14 +184,40 @@ func (s *storedItem) fromDomain(item model.Item) {
 	s.SleepAt = item.SleepAt.UTC()
 	s.ClosedAt = item.ClosedAt.UTC()
 	s.Type = string(item.Type)
+	s.Links = make([]storedLink, len(item.Links))
+	for i := range item.Links {
+		s.Links[i].fromDomain(item.Links[i])
+	}
 }
 
 func (s *storedItem) toDomain() model.Item {
+	links := make([]model.ItemLink, len(s.Links))
+	for i := range s.Links {
+		links[i] = s.Links[i].toDomain()
+	}
 	return model.Item{
 		ID:       s.ID,
 		Num:      s.Num,
 		SleepAt:  s.SleepAt,
 		ClosedAt: s.ClosedAt,
 		Type:     model.ItemType(s.Type),
+		Links:    links,
+	}
+}
+
+func (s *storedLink) fromDomain(link model.ItemLink) {
+	s.ID = link.ID
+	s.Link = link.Link
+	s.DeletedAt = link.DeletedAt
+	s.Descriptions = link.Description.Versions()
+}
+
+func (s *storedLink) toDomain() model.ItemLink {
+	return model.ItemLink{
+		ID:          s.ID,
+		Link:        s.Link,
+		Public:      s.Public,
+		DeletedAt:   s.DeletedAt,
+		Description: model.NewVersionedObj(s.Descriptions),
 	}
 }

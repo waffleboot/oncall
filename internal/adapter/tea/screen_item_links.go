@@ -41,8 +41,8 @@ func (m *TeaModel) viewItemLinks() string {
 }
 
 func (m *TeaModel) resetItemLinksMenu() {
-	links := m.selectedItem.LiveLinks()
+	m.links = m.selectedItem.ActiveLinks()
 	m.editItemLinksMenu.ResetMenu()
 	m.editItemLinksMenu.AddGroup("new")
-	m.editItemLinksMenu.AddGroupWithItems("links", len(links))
+	m.editItemLinksMenu.AddGroupWithItems("links", len(m.links))
 }

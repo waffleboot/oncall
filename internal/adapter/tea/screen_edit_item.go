@@ -18,10 +18,12 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "esc", "q":
 			m.currentScreen = screenAllItems
+			return m, m.getItems
 		case "enter", " ":
 			switch g, _ := m.editItemMenu.GetGroup(); g {
 			case "exit":
 				m.currentScreen = screenAllItems
+				return m, m.getItems
 			case "sleep":
 				return m, func() tea.Msg {
 					if item, err := m.itemService.SleepItem(m.selectedItem); err != nil {
