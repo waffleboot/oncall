@@ -125,6 +125,13 @@ func (s *Storage) GetItems() ([]model.Item, error) {
 }
 
 func (s *Storage) CloseJournal() error {
+	ts := time.Now().Format("2006-01-02-15-04-05")
+	to := fmt.Sprintf("%s.%s", s.config.Filename, ts)
+
+	if err := os.Rename(s.config.Filename, to); err != nil {
+		return fmt.Errorf("rename: %w", err)
+	}
+
 	s.lastNum = 0
 	s.items = nil
 	return s.saveData()
