@@ -17,6 +17,5 @@ type ItemService interface {
 }
 
 type JournalService interface {
-	PrintJournal() error
 	CloseJournal() error
 }

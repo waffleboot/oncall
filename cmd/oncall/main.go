@@ -39,12 +39,15 @@ func run() error {
 
 	teaModel := teaAdapter.NewTeaModel(itemService, journalService)
 
-	p := tea.NewProgram(teaModel)
-
-	teaModel.InitWithTea(p)
-
-	if _, err := p.Run(); err != nil {
+	if _, err := tea.NewProgram(teaModel).Run(); err != nil {
 		return fmt.Errorf("tea run: %w", err)
+	}
+
+	if teaModel.PrintJournal() {
+		fmt.Println("----------")
+		if err := journalService.PrintJournal(os.Stdout); err != nil {
+			return fmt.Errorf("print journal: %w", err)
+		}
 	}
 
 	return nil

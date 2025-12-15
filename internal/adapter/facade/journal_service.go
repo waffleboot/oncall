@@ -1,9 +1,8 @@
 package facade
 
 import (
-	"errors"
 	"fmt"
-	"os"
+	"io"
 
 	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
@@ -17,15 +16,7 @@ func NewJournalService(storage port.Storage) *JournalService {
 	return &JournalService{storage: storage}
 }
 
-func (s *JournalService) PrintJournal() (err error) {
-	f, err := os.Create("journal.txt")
-	if err != nil {
-		return fmt.Errorf("create: %w", err)
-	}
-	defer func() {
-		err = errors.Join(err, f.Close())
-	}()
-
+func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 	items, err := s.storage.GetItems()
 	if err != nil {
 		return fmt.Errorf("get items: %w", err)
@@ -37,8 +28,8 @@ func (s *JournalService) PrintJournal() (err error) {
 		m[item.Type] = append(m[item.Type], item)
 	}
 
-	_, _ = fmt.Fprintln(f, "date")
-	_, _ = fmt.Fprintln(f)
+	_, _ = fmt.Fprintln(w)
+	_, _ = fmt.Fprintln(w, "date")
 
 	for _, itemType := range []model.ItemType{
 		model.ItemTypeInc,
@@ -51,13 +42,25 @@ func (s *JournalService) PrintJournal() (err error) {
 			continue
 		}
 
-		_, _ = fmt.Fprintln(f, itemType.String())
+		_, _ = fmt.Fprintln(w)
 
-		for _, item := range items {
+		switch itemType {
+		case model.ItemTypeInc:
+			_, _ = fmt.Fprintln(w, "# Инциденты")
+		case model.ItemTypeAdhoc:
+			_, _ = fmt.Fprintln(w, "# ADHOC")
+		case model.ItemTypeAsk:
+			_, _ = fmt.Fprintln(w, "# Обращения")
+		case model.ItemTypeAlert:
+			_, _ = fmt.Fprintln(w, "# Алерты")
+		}
+
+		for i, item := range items {
+			_, _ = fmt.Fprintf(w, "\n%d) \n", i+1)
 			if links := item.PrintedLinks(); len(links) > 0 {
 				for _, link := range links {
-					_, _ = fmt.Fprintln(f)
-					_, _ = fmt.Fprintln(f, link.Address)
+					_, _ = fmt.Fprintln(w)
+					_, _ = fmt.Fprintln(w, link.Address)
 				}
 			}
 		}

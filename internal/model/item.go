@@ -2,6 +2,7 @@ package model
 
 import (
 	"cmp"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -124,7 +125,7 @@ func (s *Item) ActiveLinks() []ItemLink {
 func (s *Item) PrintedLinks() []ItemLink {
 	links := make([]ItemLink, 0, len(s.Links))
 	for _, link := range s.Links {
-		if !link.IsDeleted() && link.Public {
+		if !link.IsDeleted() && link.Public && strings.TrimSpace(link.Address) != "" {
 			links = append(links, link)
 		}
 	}
