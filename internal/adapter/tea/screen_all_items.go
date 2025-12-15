@@ -39,9 +39,8 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "print_journal":
 			case "items":
 				m.selectedItem = m.items[p]
-				m.resetEditItem()
+				m.resetEditItem("exit")
 				m.currentScreen = screenEditItem
-				m.editItemMenu.JumpToGroup("exit")
 			}
 		case "s":
 			if g, p := m.allItemsMenu.GetGroup(); g == "items" {
@@ -54,9 +53,9 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.getItems
 	case itemCreatedMsg:
 		m.selectedItem = msg.item
-		m.resetEditItem()
+		m.resetEditItem("exit")
 		m.currentScreen = screenItemType
-		m.editItemTypeMenu.JumpToGroup(string(model.ItemTypeInc))
+		m.editItemTypeMenu.JumpToGroup(string(m.selectedItem.Type))
 		return m, nil
 	}
 	return m, nil
@@ -74,9 +73,12 @@ func (m *TeaModel) resetAllItems(items []model.Item) {
 	m.allItemsMenu.AddGroup("close_journal")
 	m.allItemsMenu.AddGroup("print_journal")
 	m.allItemsMenu.AddGroupWithItems("items", len(m.items))
-	if len(m.items) > 0 {
-		m.allItemsMenu.AdjustCursor()
-	} else {
+	// if g, _ := m.allItemsMenu.GetGroup(); g == "" {
+	if len(m.items) == 0 {
 		m.allItemsMenu.JumpToGroup("new")
+	} else {
+		m.allItemsMenu.AdjustCursor()
 	}
+	// } else {
+	// }
 }

@@ -15,7 +15,7 @@ const (
 )
 
 type (
-	VersionedObj[T any] struct {
+	VersionedObj[T comparable] struct {
 		versions []T
 	}
 	ItemType string
@@ -77,9 +77,9 @@ func (t ItemType) String() string {
 func (t ItemType) Compare(o ItemType) int {
 	pri := func(t ItemType) int {
 		switch t {
-		case ItemTypeInc:
-			return 1
 		case ItemTypeAsk:
+			return 1
+		case ItemTypeInc:
 			return 2
 		case ItemTypeAlert:
 			return 3
@@ -129,7 +129,9 @@ func (s *Item) CreateItemLink() ItemLink {
 			maxID = link.ID
 		}
 	}
-	return ItemLink{ID: maxID + 1, Public: true}
+	link := ItemLink{ID: maxID + 1, Public: true}
+	s.Links = append(s.Links, link)
+	return link
 }
 
 func (s *Item) UpdateItemLink(link ItemLink) {
@@ -154,7 +156,7 @@ func (s *ItemLink) IsDeleted() bool {
 	return !s.DeletedAt.IsZero()
 }
 
-func NewVersionedObj[T any](versions []T) VersionedObj[T] {
+func NewVersionedObj[T comparable](versions []T) VersionedObj[T] {
 	return VersionedObj[T]{versions: versions}
 }
 
@@ -167,7 +169,9 @@ func (v *VersionedObj[T]) Value() T {
 }
 
 func (v *VersionedObj[T]) SetValue(value T) {
-	v.versions = append(v.versions, value)
+	if value != v.Value() {
+		v.versions = append(v.versions, value)
+	}
 }
 
 func (v *VersionedObj[T]) Versions() []T {

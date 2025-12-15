@@ -31,10 +31,13 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "enter", " ":
 			switch g, p := m.editItemLinksMenu.GetGroup(); g {
+			case "exit":
+				m.currentScreen = screenEditItem
+				return m, m.getItem
 			case "new":
 				return m, func() tea.Msg {
 					link := m.selectedItem.CreateItemLink()
-					if err := m.itemService.UpdateItemLink(m.selectedItem, link); err != nil {
+					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item link: %w", err)
 					}
 					return itemLinkCreatedMsg{link: link}
@@ -51,7 +54,7 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.resetItemLink()
 	case model.Item:
 		m.selectedItem = msg
-		m.resetItemLinks()
+		m.resetItemLinks("")
 	}
 
 	return m, nil
@@ -61,10 +64,16 @@ func (m *TeaModel) viewItemLinks() string {
 	return m.editItemLinksMenu.GenerateMenu()
 }
 
-func (m *TeaModel) resetItemLinks() {
+func (m *TeaModel) resetItemLinks(toGroup string) {
 	m.links = m.selectedItem.ActiveLinks()
 	m.editItemLinksMenu.ResetMenu()
+	m.editItemLinksMenu.AddGroup("exit")
 	m.editItemLinksMenu.AddGroup("new")
 	m.editItemLinksMenu.AddGroupWithItems("links", len(m.links))
 	m.editItemLinksMenu.AdjustCursor()
+	if toGroup != "" {
+		m.editItemLinksMenu.JumpToGroup(toGroup)
+	} else {
+		m.editItemLinksMenu.AdjustCursor()
+	}
 }

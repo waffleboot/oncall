@@ -62,8 +62,8 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "item_notes":
 				m.currentScreen = screenItemNotes
 			case "item_links":
-				m.resetItemLinks()
 				m.currentScreen = screenItemLinks
+				m.resetItemLinks("new")
 			case "item_vms":
 				m.currentScreen = screenItemVMs
 			}
@@ -78,7 +78,7 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.getItems
 	case model.Item:
 		m.selectedItem = msg
-		m.resetEditItem()
+		m.resetEditItem("")
 	}
 	return m, nil
 }
@@ -105,7 +105,7 @@ func (m *TeaModel) viewEditItem() string {
 	return s.String()
 }
 
-func (m *TeaModel) resetEditItem() {
+func (m *TeaModel) resetEditItem(toGroup string) {
 	m.editItemMenu.ResetMenu()
 
 	m.editItemMenu.AddGroup("exit")
@@ -135,8 +135,8 @@ func (m *TeaModel) resetEditItem() {
 	m.editItemMenu.AddDelimiter()
 	m.editItemMenu.AddGroup("delete")
 
-	if g, _ := m.editItemMenu.GetGroup(); g == "" {
-		m.editItemMenu.JumpToGroup("exit")
+	if toGroup != "" {
+		m.editItemMenu.JumpToGroup(toGroup)
 	}
 }
 

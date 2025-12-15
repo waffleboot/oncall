@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
@@ -35,7 +36,9 @@ type (
 		editItemMenu      *Menu
 		editItemTypeMenu  *Menu
 		editItemLinksMenu *Menu
-		linkInput         textinput.Model
+		linkAddress       textinput.Model
+		linkDescription   textarea.Model
+		linkInput         string
 	}
 	itemCreatedMsg struct {
 		item model.Item
@@ -77,6 +80,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return group
 	})
+	m.resetAllItems(nil)
 	m.editItemMenu = NewMenu(func(group string, pos int) string {
 		switch {
 		case group == "exit":
@@ -115,12 +119,14 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return group
 	})
-	m.editItemTypeMenu.AddGroup(string(model.ItemTypeInc))
 	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAsk))
+	m.editItemTypeMenu.AddGroup(string(model.ItemTypeInc))
 	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAlert))
 	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAdhoc))
 	m.editItemLinksMenu = NewMenu(func(group string, pos int) string {
 		switch group {
+		case "exit":
+			return "Exit"
 		case "new":
 			return "Добавить ссылку..."
 		case "links":
