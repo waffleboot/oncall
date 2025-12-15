@@ -14,58 +14,58 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "tab":
-			switch m.linkInput {
+			switch m.textInput {
 			case "address":
-				m.linkInput = "description"
+				m.textInput = "description"
 				m.linkAddress.Blur()
 				m.linkDescription.Focus()
 			case "description":
-				m.linkInput = "submit"
+				m.textInput = "submit"
 				m.linkDescription.Blur()
 			case "submit":
-				m.linkInput = "address"
+				m.textInput = "address"
 				m.linkAddress.Focus()
 			}
 			return m, nil
 		case "up":
-			switch m.linkInput {
+			switch m.textInput {
 			case "address":
-				m.linkInput = "submit"
+				m.textInput = "submit"
 				m.linkAddress.Blur()
 				return m, nil
 			case "submit":
-				m.linkInput = "description"
+				m.textInput = "description"
 				m.linkDescription.Focus()
 				return m, nil
 			}
 		case "down":
-			switch m.linkInput {
+			switch m.textInput {
 			case "address":
-				m.linkInput = "description"
+				m.textInput = "description"
 				m.linkAddress.Blur()
 				m.linkDescription.Focus()
 				return m, nil
 			case "submit":
-				m.linkInput = "address"
+				m.textInput = "address"
 				m.linkAddress.Focus()
 				return m, nil
 			}
 		case "esc":
 			return m, func() tea.Msg { return "exit" }
 		case "q":
-			if m.linkInput == "submit" {
+			if m.textInput == "submit" {
 				return m, func() tea.Msg { return "exit" }
 			}
 		case "enter":
-			switch m.linkInput {
+			switch m.textInput {
 			case "address":
-				m.linkInput = "description"
+				m.textInput = "description"
 				m.linkAddress.Blur()
 				m.linkDescription.Focus()
 				return m, nil
 			case "description":
 				if len(m.linkDescription.Value()) == 0 {
-					m.linkInput = "submit"
+					m.textInput = "submit"
 					m.linkDescription.Blur()
 					return m, nil
 				}
@@ -89,7 +89,7 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 		}
 	}
 
-	switch m.linkInput {
+	switch m.textInput {
 	case "address":
 		m.linkAddress, cmd = m.linkAddress.Update(msg)
 		return m, cmd
@@ -112,7 +112,7 @@ func (m *TeaModel) viewItemLink() string {
 	s.WriteString(m.linkDescription.View())
 	s.WriteString("\n")
 
-	if m.linkInput == "submit" {
+	if m.textInput == "submit" {
 		s.WriteString("[[ Submit ]]\n")
 	} else {
 		s.WriteString("[ Submit ]\n")
@@ -122,7 +122,7 @@ func (m *TeaModel) viewItemLink() string {
 }
 
 func (m *TeaModel) resetItemLink() {
-	m.linkInput = "address"
+	m.textInput = "address"
 
 	m.linkAddress = textinput.New()
 	m.linkAddress.Placeholder = "link"

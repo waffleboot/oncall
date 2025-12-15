@@ -21,13 +21,14 @@ type (
 	}
 	ItemType string
 	Item     struct {
-		ID       uuid.UUID
-		Num      int
-		SleepAt  time.Time
-		ClosedAt time.Time
-		Type     ItemType
-		Links    []ItemLink
-		Title    string
+		ID          uuid.UUID
+		Num         int
+		SleepAt     time.Time
+		ClosedAt    time.Time
+		Type        ItemType
+		Links       []ItemLink
+		Title       string
+		Description string
 	}
 	ItemLink struct {
 		ID          int

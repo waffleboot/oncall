@@ -38,7 +38,9 @@ type (
 		editItemLinksMenu *Menu
 		linkAddress       textinput.Model
 		linkDescription   textarea.Model
-		linkInput         string
+		itemTitle         textinput.Model
+		itemDescription   textarea.Model
+		textInput         string
 		printJournal      bool
 	}
 	itemCreatedMsg struct {
