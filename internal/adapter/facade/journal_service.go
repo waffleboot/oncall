@@ -56,7 +56,7 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 		}
 
 		for i, item := range items {
-			_, _ = fmt.Fprintf(w, "\n%d) \n", i+1)
+			_, _ = fmt.Fprintf(w, "\n%d) %s\n", i+1, item.Title)
 			if links := item.PrintedLinks(); len(links) > 0 {
 				for _, link := range links {
 					_, _ = fmt.Fprintln(w)

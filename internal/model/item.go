@@ -27,6 +27,7 @@ type (
 		ClosedAt time.Time
 		Type     ItemType
 		Links    []ItemLink
+		Title    string
 	}
 	ItemLink struct {
 		ID          int

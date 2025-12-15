@@ -33,6 +33,7 @@ type (
 		DeletedAt time.Time    `json:"deletedAt,omitempty"`
 		Links     []storedLink `json:"links,omitempty"`
 		Type      string       `json:"type,omitempty"`
+		Title     string       `json:"title,omitempty"`
 	}
 	storedLink struct {
 		ID           int       `json:"id"`
@@ -184,6 +185,7 @@ func (s *storedItem) fromDomain(item model.Item) {
 	s.SleepAt = item.SleepAt.UTC()
 	s.ClosedAt = item.ClosedAt.UTC()
 	s.Type = string(item.Type)
+	s.Title = item.Title
 	s.Links = make([]storedLink, len(item.Links))
 	for i := range item.Links {
 		s.Links[i].fromDomain(item.Links[i])
@@ -201,6 +203,7 @@ func (s *storedItem) toDomain() model.Item {
 		SleepAt:  s.SleepAt,
 		ClosedAt: s.ClosedAt,
 		Type:     model.ItemType(s.Type),
+		Title:    s.Title,
 		Links:    links,
 	}
 }
