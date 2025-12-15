@@ -2,6 +2,7 @@ package tea
 
 import (
 	"fmt"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
@@ -18,6 +19,16 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "esc", "q":
 			m.currentScreen = screenEditItem
 			return m, m.getItem
+		case "d":
+			if g, p := m.editItemLinksMenu.GetGroup(); g == "links" {
+				return m, func() tea.Msg {
+					m.selectedItem.DeleteItemLink(m.links[p], time.Now())
+					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+						return fmt.Errorf("update item link: %w", err)
+					}
+					return m.getItem()
+				}
+			}
 		case "enter", " ":
 			switch g, p := m.editItemLinksMenu.GetGroup(); g {
 			case "new":
@@ -55,4 +66,5 @@ func (m *TeaModel) resetItemLinks() {
 	m.editItemLinksMenu.ResetMenu()
 	m.editItemLinksMenu.AddGroup("new")
 	m.editItemLinksMenu.AddGroupWithItems("links", len(m.links))
+	m.editItemLinksMenu.AdjustCursor()
 }

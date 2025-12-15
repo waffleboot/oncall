@@ -132,6 +132,15 @@ func (s *Item) CreateItemLink() ItemLink {
 	return ItemLink{ID: maxID + 1, Public: true}
 }
 
+func (s *Item) DeleteItemLink(link ItemLink, at time.Time) {
+	for i := range s.Links {
+		if s.Links[i].ID == link.ID {
+			s.Links[i].DeletedAt = at
+			break
+		}
+	}
+}
+
 func (s *ItemLink) IsDeleted() bool {
 	return !s.DeletedAt.IsZero()
 }
