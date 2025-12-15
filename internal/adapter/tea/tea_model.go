@@ -39,6 +39,8 @@ type (
 		linkAddress       textinput.Model
 		linkDescription   textarea.Model
 		linkInput         string
+		printJournalStep  int
+		msgSender         msgSender
 	}
 	itemCreatedMsg struct {
 		item model.Item
@@ -49,10 +51,20 @@ type (
 	itemLinkCreatedMsg struct {
 		link model.ItemLink
 	}
+	printJournalMsg struct {
+		step int
+	}
+	msgSender interface {
+		Send(tea.Msg)
+	}
 )
 
 func NewTeaModel(itemService port.ItemService, journalService port.JournalService) *TeaModel {
 	return &TeaModel{itemService: itemService, journalService: journalService}
+}
+
+func (m *TeaModel) InitWithTea(msgSender msgSender) {
+	m.msgSender = msgSender
 }
 
 func (m *TeaModel) Init() tea.Cmd {
@@ -66,7 +78,11 @@ func (m *TeaModel) Init() tea.Cmd {
 		case group == "close_journal":
 			return "Закрыть журнал"
 		case group == "print_journal":
-			return "Распечатать журнал"
+			if m.printJournalStep > 0 {
+				return fmt.Sprintf("Распечатать журнал ... %d", m.printJournalStep)
+			} else {
+				return "Распечатать журнал"
+			}
 		case group == "items":
 			item := m.items[pos]
 			switch {
@@ -159,6 +175,8 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c":
 			return m, tea.Quit
 		}
+	case printJournalMsg:
+		m.printJournalStep = msg.step
 	}
 
 	switch m.currentScreen {

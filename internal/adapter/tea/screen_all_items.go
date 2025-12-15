@@ -2,6 +2,7 @@ package tea
 
 import (
 	"fmt"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
@@ -41,6 +42,13 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 					if err := m.journalService.PrintJournal(); err != nil {
 						return fmt.Errorf("print journal: %w", err)
 					}
+					go func() {
+						const seconds = 3
+						for i := 0; i < seconds+1; i++ {
+							m.msgSender.Send(printJournalMsg{step: seconds - i})
+							time.Sleep(time.Second)
+						}
+					}()
 					return nil
 				}
 			case "items":
