@@ -60,6 +60,7 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "item_notes":
 				m.currentScreen = screenItemNotes
 			case "item_links":
+				m.resetItemLinksMenu()
 				m.currentScreen = screenItemLinks
 			case "item_vms":
 				m.currentScreen = screenItemVMs

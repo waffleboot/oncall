@@ -211,5 +211,4 @@ func (m *TeaModel) getItems() tea.Msg {
 func (m *TeaModel) selectItem(item model.Item) {
 	m.selectedItem = item
 	m.resetEditItemMenu()
-	m.resetItemLinksMenu()
 }
