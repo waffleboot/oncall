@@ -17,5 +17,12 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TeaModel) viewItemLinks() string {
-	return "links\n"
+	return m.editItemLinksMenu.GenerateMenu()
+}
+
+func (m *TeaModel) resetItemLinksMenu() {
+	links := m.selectedItem.LiveLinks()
+	m.editItemLinksMenu.ResetMenu()
+	m.editItemLinksMenu.AddGroup("new")
+	m.editItemLinksMenu.AddGroupWithItems("links", len(links))
 }

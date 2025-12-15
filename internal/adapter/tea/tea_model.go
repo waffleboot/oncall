@@ -2,6 +2,7 @@ package tea
 
 import (
 	"fmt"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
@@ -21,14 +22,15 @@ const (
 type (
 	screen   string
 	TeaModel struct {
-		itemService      port.ItemService
-		journalService   port.JournalService
-		currentScreen    screen
-		items            []model.Item
-		selectedItem     model.Item
-		allItemsMenu     *Menu
-		editItemMenu     *Menu
-		editItemTypeMenu *Menu
+		itemService       port.ItemService
+		journalService    port.JournalService
+		currentScreen     screen
+		items             []model.Item
+		selectedItem      model.Item
+		allItemsMenu      *Menu
+		editItemMenu      *Menu
+		editItemTypeMenu  *Menu
+		editItemLinksMenu *Menu
 	}
 	itemCreatedMsg struct {
 		item model.Item
@@ -59,7 +61,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		case group == "items":
 			return m.itemLabel(m.items[pos])
 		}
-		return ""
+		return group
 	})
 	m.editItemMenu = NewMenu(func(group string, pos int) string {
 		switch {
@@ -84,7 +86,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		case group == "item_vms":
 			return "ВМ-ки..."
 		}
-		return ""
+		return group
 	})
 	m.editItemTypeMenu = NewMenu(func(group string, pos int) string {
 		switch model.ItemType(group) {
@@ -97,12 +99,31 @@ func (m *TeaModel) Init() tea.Cmd {
 		case model.ItemTypeAlert:
 			return "Alert"
 		}
-		return ""
+		return group
 	})
 	m.editItemTypeMenu.AddGroup(string(model.ItemTypeInc))
 	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAsk))
 	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAlert))
 	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAdhoc))
+	m.editItemLinksMenu = NewMenu(func(group string, pos int) string {
+		switch group {
+		case "new":
+			return "Добавить ссылку..."
+		case "link":
+			link := m.selectedItem.LiveLinks()[pos]
+
+			var s strings.Builder
+			s.WriteString(link.Link)
+			if link.Public {
+				s.WriteString(" - public")
+			} else {
+				s.WriteString(" - private")
+			}
+			return s.String()
+		default:
+			return group
+		}
+	})
 	return m.getItems
 }
 
@@ -117,14 +138,12 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.resetAllItemsMenu()
 	case itemCreatedMsg:
-		m.selectedItem = msg.item
-		m.resetEditItemMenu()
+		m.selectItem(msg.item)
 		m.editItemTypeMenu.JumpToGroup(string(model.ItemTypeInc))
 		m.currentScreen = screenItemType
 		return m, nil
 	case itemUpdatedMsg:
-		m.selectedItem = msg.item
-		m.resetEditItemMenu()
+		m.selectItem(msg.item)
 		if m.currentScreen == screenItemType {
 			m.currentScreen = screenEditItem
 		}
@@ -187,4 +206,10 @@ func (m *TeaModel) getItems() tea.Msg {
 		return fmt.Errorf("get items: %w", err)
 	}
 	return items
+}
+
+func (m *TeaModel) selectItem(item model.Item) {
+	m.selectedItem = item
+	m.resetEditItemMenu()
+	m.resetItemLinksMenu()
 }

@@ -13,12 +13,22 @@ const (
 )
 
 type (
+	VersionedObj[T any] struct {
+		versions []T
+	}
 	ItemType string
 	Item     struct {
 		ID       int
 		SleepAt  time.Time
 		ClosedAt time.Time
 		Type     ItemType
+		Links    []ItemLink
+	}
+	ItemLink struct {
+		Link        string
+		Public      bool
+		DeletedAt   time.Time
+		Description VersionedObj[string]
 	}
 )
 
@@ -95,4 +105,26 @@ func (t Item) Compare(o Item) int {
 		return c
 	}
 	return t.Type.Compare(o.Type)
+}
+
+func (s *Item) LiveLinks() []ItemLink {
+	links := make([]ItemLink, 0, len(s.Links))
+	for i := range s.Links {
+		if s.Links[i].Public {
+			links = append(links, s.Links[i])
+		}
+	}
+	return links
+}
+
+func (v *VersionedObj[T]) Value() T {
+	var zero T
+	if len(v.versions) == 0 {
+		return zero
+	}
+	return v.versions[len(v.versions)-1]
+}
+
+func (v *VersionedObj[T]) SetValue(value T) {
+	v.versions = append(v.versions, value)
 }
