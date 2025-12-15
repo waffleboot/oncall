@@ -43,6 +43,11 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.resetEditItemMenu()
 				m.currentScreen = screenEditItem
 			}
+		case "s":
+			if g, p := m.allItemsMenu.GetGroup(); g == "items" {
+				m.selectedItem = m.items[p]
+				return m.toggleSleep()
+			}
 		}
 	}
 	return m, nil

@@ -64,23 +64,7 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.currentScreen = screenItemVMs
 			}
 		case "s":
-			if m.selectedItem.IsSleep() {
-				return m, func() tea.Msg {
-					if item, err := m.itemService.AwakeItem(m.selectedItem); err != nil {
-						return fmt.Errorf("awake: %w", err)
-					} else {
-						return itemUpdatedMsg{item: item}
-					}
-				}
-			} else {
-				return m, func() tea.Msg {
-					if item, err := m.itemService.SleepItem(m.selectedItem); err != nil {
-						return fmt.Errorf("sleep: %w", err)
-					} else {
-						return itemUpdatedMsg{item: item}
-					}
-				}
-			}
+			return m.toggleSleep()
 		}
 	}
 
@@ -141,5 +125,25 @@ func (m *TeaModel) resetEditItemMenu() {
 
 	if g, _ := m.editItemMenu.GetGroup(); g == "" {
 		m.editItemMenu.JumpToGroup("exit")
+	}
+}
+
+func (m *TeaModel) toggleSleep() (tea.Model, tea.Cmd) {
+	if m.selectedItem.IsSleep() {
+		return m, func() tea.Msg {
+			if item, err := m.itemService.AwakeItem(m.selectedItem); err != nil {
+				return fmt.Errorf("awake: %w", err)
+			} else {
+				return itemUpdatedMsg{item: item}
+			}
+		}
+	} else {
+		return m, func() tea.Msg {
+			if item, err := m.itemService.SleepItem(m.selectedItem); err != nil {
+				return fmt.Errorf("sleep: %w", err)
+			} else {
+				return itemUpdatedMsg{item: item}
+			}
+		}
 	}
 }
