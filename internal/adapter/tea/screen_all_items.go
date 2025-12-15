@@ -23,11 +23,11 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Quit
 			case "new":
 				return m, func() tea.Msg {
-					item := m.itemService.CreateItem()
-					if err := m.itemService.UpdateItem(item); err != nil {
+					if item, err := m.itemService.CreateItem(); err != nil {
 						return fmt.Errorf("create item: %w", err)
+					} else {
+						return itemCreatedMsg{item: item}
 					}
-					return itemCreatedMsg{item: item}
 				}
 			case "close_journal":
 				return m, func() tea.Msg {
@@ -38,7 +38,8 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case "print_journal":
 			case "items":
-				m.resetEditItem(m.items[p])
+				m.selectedItem = m.items[p]
+				m.resetEditItem()
 				m.currentScreen = screenEditItem
 				m.editItemMenu.JumpToGroup("exit")
 			}
@@ -49,13 +50,14 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case []model.Item:
 		m.resetAllItems(msg)
+	case model.Item:
+		return m, m.getItems
 	case itemCreatedMsg:
-		m.resetEditItem(msg.item)
+		m.selectedItem = msg.item
+		m.resetEditItem()
 		m.currentScreen = screenItemType
 		m.editItemTypeMenu.JumpToGroup(string(model.ItemTypeInc))
 		return m, nil
-	case itemUpdatedMsg:
-		return m, m.getItems
 	}
 	return m, nil
 }

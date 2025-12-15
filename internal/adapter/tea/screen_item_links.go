@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/waffleboot/oncall/internal/model"
 )
 
 func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -16,11 +17,9 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "esc", "q":
 			m.currentScreen = screenEditItem
-			return m, func() tea.Msg {
-				return itemUpdatedMsg{item: m.selectedItem}
-			}
+			return m, m.getItem
 		case "enter", " ":
-			switch g, _ := m.editItemLinksMenu.GetGroup(); g {
+			switch g, p := m.editItemLinksMenu.GetGroup(); g {
 			case "new":
 				return m, func() tea.Msg {
 					link := m.selectedItem.CreateItemLink()
@@ -29,11 +28,19 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 					}
 					return itemLinkCreatedMsg{link: link}
 				}
+			case "links":
+				m.selectedLink = m.links[p]
+				m.currentScreen = screenItemLink
+				m.resetItemLink()
 			}
 		}
 	case itemLinkCreatedMsg:
+		m.selectedLink = msg.link
 		m.currentScreen = screenItemLink
-		m.resetItemLink(msg.link)
+		m.resetItemLink()
+	case model.Item:
+		m.selectedItem = msg
+		m.resetItemLinks()
 	}
 
 	return m, nil
@@ -43,7 +50,7 @@ func (m *TeaModel) viewItemLinks() string {
 	return m.editItemLinksMenu.GenerateMenu()
 }
 
-func (m *TeaModel) resetItemLinksMenu() {
+func (m *TeaModel) resetItemLinks() {
 	m.links = m.selectedItem.ActiveLinks()
 	m.editItemLinksMenu.ResetMenu()
 	m.editItemLinksMenu.AddGroup("new")

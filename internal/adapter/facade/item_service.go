@@ -9,6 +9,8 @@ import (
 	"github.com/waffleboot/oncall/internal/port"
 )
 
+var _ port.ItemService = (*ItemService)(nil)
+
 type ItemService struct {
 	storage port.Storage
 	numGen  port.NumGenerator
@@ -18,19 +20,24 @@ func NewItemService(storage port.Storage, numGen port.NumGenerator) *ItemService
 	return &ItemService{storage: storage, numGen: numGen}
 }
 
-func (s *ItemService) CreateItem() model.Item {
-	return model.Item{
+func (s *ItemService) CreateItem() (model.Item, error) {
+	item := model.Item{
 		ID:   uuid.New(),
 		Num:  s.numGen.GenerateNum(),
 		Type: model.ItemTypeAsk,
 	}
+	if err := s.updateItem(item); err != nil {
+		return model.Item{}, err
+	}
+	return item, nil
 }
 
 func (s *ItemService) UpdateItem(item model.Item) error {
-	if err := s.storage.UpdateItem(item); err != nil {
-		return fmt.Errorf("update item: %w", err)
-	}
-	return nil
+	return s.updateItem(item)
+}
+
+func (s *ItemService) GetItem(id uuid.UUID) (model.Item, error) {
+	return s.storage.GetItem(id)
 }
 
 func (s *ItemService) GetItems() ([]model.Item, error) {
@@ -68,12 +75,11 @@ func (s *ItemService) DeleteItem(item model.Item) error {
 	return nil
 }
 
-func (s *ItemService) SetItemType(item model.Item, itemType model.ItemType) (model.Item, error) {
-	item.Type = itemType
+func (s *ItemService) updateItem(item model.Item) error {
 	if err := s.storage.UpdateItem(item); err != nil {
-		return model.Item{}, fmt.Errorf("update item: %w", err)
+		return fmt.Errorf("update item: %w", err)
 	}
-	return item, nil
+	return nil
 }
 
 func (s *ItemService) UpdateItemLink(item model.Item, link model.ItemLink) error {

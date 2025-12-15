@@ -40,9 +40,7 @@ type (
 	itemCreatedMsg struct {
 		item model.Item
 	}
-	itemUpdatedMsg struct {
-		item model.Item
-	}
+	itemUpdatedMsg     struct{}
 	itemClosedMsg      struct{}
 	itemDeletedMsg     struct{}
 	itemLinkCreatedMsg struct {
@@ -125,11 +123,16 @@ func (m *TeaModel) Init() tea.Cmd {
 		switch group {
 		case "new":
 			return "Добавить ссылку..."
-		case "link":
+		case "links":
 			link := m.links[pos]
 
 			var s strings.Builder
-			s.WriteString(link.Link)
+			s.WriteString(fmt.Sprintf("#%d - ", link.ID))
+			if link.Link == "" {
+				s.WriteString("empty")
+			} else {
+				s.WriteString(link.Link)
+			}
 			if link.Public {
 				s.WriteString(" - public")
 			} else {
@@ -202,4 +205,12 @@ func (m *TeaModel) getItems() tea.Msg {
 		return fmt.Errorf("get items: %w", err)
 	}
 	return items
+}
+
+func (m *TeaModel) getItem() tea.Msg {
+	item, err := m.itemService.GetItem(m.selectedItem.ID)
+	if err != nil {
+		return fmt.Errorf("get items: %w", err)
+	}
+	return item
 }

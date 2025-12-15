@@ -122,14 +122,14 @@ func (s *Item) ActiveLinks() []ItemLink {
 }
 
 func (s *Item) CreateItemLink() ItemLink {
-	var id int
+	var maxID int
 	for i := range s.Links {
 		link := s.Links[i]
-		if link.ID > id {
-			id = link.ID
+		if link.ID > maxID {
+			maxID = link.ID
 		}
 	}
-	return ItemLink{ID: id + 1, Public: true}
+	return ItemLink{ID: maxID + 1, Public: true}
 }
 
 func (s *ItemLink) IsDeleted() bool {

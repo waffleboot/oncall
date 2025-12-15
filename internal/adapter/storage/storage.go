@@ -208,6 +208,7 @@ func (s *storedItem) toDomain() model.Item {
 func (s *storedLink) fromDomain(link model.ItemLink) {
 	s.ID = link.ID
 	s.Link = link.Link
+	s.Public = link.Public
 	s.DeletedAt = link.DeletedAt
 	s.Descriptions = link.Description.Versions()
 }

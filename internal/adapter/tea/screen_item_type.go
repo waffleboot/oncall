@@ -21,16 +21,17 @@ func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter", " ":
 			g, _ := m.editItemTypeMenu.GetGroup()
 			return m, func() tea.Msg {
-				if item, err := m.itemService.SetItemType(m.selectedItem, model.ItemType(g)); err != nil {
-					return fmt.Errorf("set item type: %w", err)
+				m.selectedItem.Type = model.ItemType(g)
+				if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+					return fmt.Errorf("update item: %w", err)
 				} else {
-					return itemUpdatedMsg{item: item}
+					return itemUpdatedMsg{}
 				}
 			}
 		}
 	case itemUpdatedMsg:
 		m.currentScreen = screenEditItem
-		m.resetEditItem(msg.item)
+		return m, m.getItem
 	}
 	return m, nil
 }
