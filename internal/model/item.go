@@ -121,6 +121,17 @@ func (s *Item) LiveLinks() []ItemLink {
 	return links
 }
 
+func (s *Item) CreateItemLink() ItemLink {
+	var id int
+	for i := range s.Links {
+		link := s.Links[i]
+		if link.ID > id {
+			id = link.ID
+		}
+	}
+	return ItemLink{ID: id + 1, Public: true}
+}
+
 func (v *VersionedObj[T]) Value() T {
 	var zero T
 	if len(v.versions) == 0 {

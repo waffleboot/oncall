@@ -11,6 +11,8 @@ type ItemService interface {
 	AwakeItem(model.Item) (model.Item, error)
 	DeleteItem(model.Item) error
 	SetItemType(model.Item, model.ItemType) (model.Item, error)
+
+	UpdateItemLink(model.Item, model.ItemLink) error
 }
 
 type JournalService interface {

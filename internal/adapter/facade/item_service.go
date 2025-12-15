@@ -75,3 +75,23 @@ func (s *ItemService) SetItemType(item model.Item, itemType model.ItemType) (mod
 	}
 	return item, nil
 }
+
+func (s *ItemService) UpdateItemLink(item model.Item, link model.ItemLink) error {
+	var found bool
+	for i := range item.Links {
+		if item.Links[i].ID == link.ID {
+			item.Links[i] = link
+			break
+		}
+	}
+
+	if !found {
+		item.Links = append(item.Links, link)
+	}
+
+	if err := s.storage.UpdateItem(item); err != nil {
+		return fmt.Errorf("update item: %w", err)
+	}
+
+	return nil
+}

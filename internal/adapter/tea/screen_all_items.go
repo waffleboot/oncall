@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/waffleboot/oncall/internal/model"
 )
 
 func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -47,6 +48,23 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m.toggleSleep()
 			}
 		}
+	case itemCreatedMsg:
+		m.selectItem(msg.item)
+		m.editItemTypeMenu.JumpToGroup(string(model.ItemTypeInc))
+		m.currentScreen = screenItemType
+		return m, nil
+	case itemUpdatedMsg:
+		m.selectItem(msg.item)
+		if m.currentScreen == screenItemType {
+			m.currentScreen = screenEditItem
+		}
+		return m, m.getItems
+	case itemClosedMsg:
+		m.currentScreen = screenAllItems
+		return m, m.getItems
+	case itemDeletedMsg:
+		m.currentScreen = screenAllItems
+		return m, m.getItems
 	}
 	return m, nil
 }

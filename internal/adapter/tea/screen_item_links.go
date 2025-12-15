@@ -1,10 +1,16 @@
 package tea
 
 import (
+	"fmt"
+
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if m.editItemLinksMenu.ProcessMsg(msg) {
+		return m, nil
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -13,9 +19,18 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter", " ":
 			switch g, _ := m.editItemLinksMenu.GetGroup(); g {
 			case "new":
-
+				return m, func() tea.Msg {
+					link := m.selectedItem.CreateItemLink()
+					if err := m.itemService.UpdateItemLink(m.selectedItem, link); err != nil {
+						return fmt.Errorf("update item link: %w", err)
+					}
+					return itemLinkCreatedMsg{link: link}
+				}
 			}
 		}
+	case itemLinkCreatedMsg:
+		m.selectedLink = msg.link
+		m.currentScreen = screenItemLink
 	}
 
 	return m, nil

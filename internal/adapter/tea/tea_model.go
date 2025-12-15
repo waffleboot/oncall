@@ -28,6 +28,7 @@ type (
 		currentScreen     screen
 		items             []model.Item
 		selectedItem      model.Item
+		selectedLink      model.ItemLink
 		allItemsMenu      *Menu
 		editItemMenu      *Menu
 		editItemTypeMenu  *Menu
@@ -39,8 +40,11 @@ type (
 	itemUpdatedMsg struct {
 		item model.Item
 	}
-	itemClosedMsg  struct{}
-	itemDeletedMsg struct{}
+	itemClosedMsg      struct{}
+	itemDeletedMsg     struct{}
+	itemLinkCreatedMsg struct {
+		link model.ItemLink
+	}
 )
 
 func NewTeaModel(itemService port.ItemService, journalService port.JournalService) *TeaModel {
@@ -140,29 +144,7 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case []model.Item:
 		m.items = msg
-
-		// slices.SortFunc(m.items, func(a, b model.Item) int {
-		// 	return a.Compare(b)
-		// })
-
 		m.resetAllItemsMenu()
-	case itemCreatedMsg:
-		m.selectItem(msg.item)
-		m.editItemTypeMenu.JumpToGroup(string(model.ItemTypeInc))
-		m.currentScreen = screenItemType
-		return m, nil
-	case itemUpdatedMsg:
-		m.selectItem(msg.item)
-		if m.currentScreen == screenItemType {
-			m.currentScreen = screenEditItem
-		}
-		return m, m.getItems
-	case itemClosedMsg:
-		m.currentScreen = screenAllItems
-		return m, m.getItems
-	case itemDeletedMsg:
-		m.currentScreen = screenAllItems
-		return m, m.getItems
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
@@ -183,6 +165,8 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateItemNotes(msg)
 	case screenItemLinks:
 		return m.updateItemLinks(msg)
+	case screenItemLink:
+		return m.updateItemLink(msg)
 	case screenItemVMs:
 		return m.updateItemVMs(msg)
 	}
@@ -203,6 +187,8 @@ func (m *TeaModel) View() string {
 		return m.viewItemNotes()
 	case screenItemLinks:
 		return m.viewItemLinks()
+	case screenItemLink:
+		return m.viewItemLink()
 	case screenItemVMs:
 		return m.viewItemVMs()
 	}
