@@ -54,6 +54,9 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 					}
 					return itemDeletedMsg{}
 				}
+			case "item_title":
+				m.currentScreen = screenItemTitle
+				m.resetItemTitle()
 			case "item_type":
 				m.currentScreen = screenItemType
 				m.editItemTypeMenu.JumpToGroup(string(m.selectedItem.Type))
@@ -99,7 +102,7 @@ func (m *TeaModel) viewEditItem() string {
 	}
 
 	var s strings.Builder
-	s.WriteString(fmt.Sprintf("  #%d - %s - %s%s\n\n", m.selectedItem.Num, m.selectedItem.Type, m.selectedItem.Title, state))
+	s.WriteString(fmt.Sprintf("  #%d - %s - %s%s\n\n", m.selectedItem.Num, m.selectedItem.Type, m.selectedItem.TitleForView(), state))
 	s.WriteString(m.editItemMenu.GenerateMenu())
 
 	return s.String()
@@ -114,6 +117,7 @@ func (m *TeaModel) resetEditItem(toGroup string) {
 		m.editItemMenu.AddGroup("item_type")
 	}
 
+	m.editItemMenu.AddGroup("item_title")
 	m.editItemMenu.AddGroup("item_nodes")
 	m.editItemMenu.AddGroup("item_vms")
 	m.editItemMenu.AddGroup("item_links")

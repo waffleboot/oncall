@@ -16,9 +16,6 @@ const (
 )
 
 type (
-	VersionedObj[T comparable] struct {
-		versions []T
-	}
 	ItemType string
 	Item     struct {
 		ID          uuid.UUID
@@ -35,7 +32,7 @@ type (
 		Public      bool
 		Address     string
 		DeletedAt   time.Time
-		Description VersionedObj[string]
+		Description string
 	}
 )
 
@@ -165,28 +162,13 @@ func (s *Item) DeleteItemLink(link ItemLink, at time.Time) {
 	}
 }
 
+func (s *Item) TitleForView() string {
+	if len(s.Title) > 0 {
+		return s.Title
+	}
+	return "no title"
+}
+
 func (s *ItemLink) IsDeleted() bool {
 	return !s.DeletedAt.IsZero()
-}
-
-func NewVersionedObj[T comparable](versions []T) VersionedObj[T] {
-	return VersionedObj[T]{versions: versions}
-}
-
-func (v *VersionedObj[T]) Value() T {
-	var zero T
-	if len(v.versions) == 0 {
-		return zero
-	}
-	return v.versions[len(v.versions)-1]
-}
-
-func (v *VersionedObj[T]) SetValue(value T) {
-	if value != v.Value() {
-		v.versions = append(v.versions, value)
-	}
-}
-
-func (v *VersionedObj[T]) Versions() []T {
-	return v.versions
 }

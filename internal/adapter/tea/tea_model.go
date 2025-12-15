@@ -20,6 +20,7 @@ const (
 	screenItemNotes screen = "item_notes"
 	screenItemVMs   screen = "item_vms"
 	screenItemLink  screen = "item_link"
+	screenItemTitle screen = "item_title"
 )
 
 type (
@@ -79,7 +80,7 @@ func (m *TeaModel) Init() tea.Cmd {
 			case item.IsClosed():
 				marker = "x"
 			}
-			return fmt.Sprintf("%s #%d - %s - %s", marker, item.Num, item.Type, item.Title)
+			return fmt.Sprintf("%s #%d - %s - %s", marker, item.Num, item.Type, item.TitleForView())
 		}
 		return group
 	})
@@ -96,16 +97,18 @@ func (m *TeaModel) Init() tea.Cmd {
 			return "Закрыть"
 		case group == "delete":
 			return "Удалить"
+		case group == "item_title":
+			return "Имя и описание ..."
 		case group == "item_type":
 			return fmt.Sprintf("Тип обращения: (%s)...", m.selectedItem.Type)
 		case group == "item_notes":
-			return "Заметки..."
+			return "Заметки ..."
 		case group == "item_links":
-			return "Ссылки..."
+			return "Ссылки ..."
 		case group == "item_nodes":
-			return "Хосты, узлы..."
+			return "Хосты, узлы ..."
 		case group == "item_vms":
-			return "ВМ-ки..."
+			return "ВМ-ки ..."
 		}
 		return group
 	})
@@ -181,6 +184,8 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateItemLink(msg)
 	case screenItemVMs:
 		return m.updateItemVMs(msg)
+	case screenItemTitle:
+		return m.updateItemTitle(msg)
 	}
 	return m, nil
 }
@@ -203,6 +208,8 @@ func (m *TeaModel) View() string {
 		return m.viewItemLink()
 	case screenItemVMs:
 		return m.viewItemVMs()
+	case screenItemTitle:
+		return m.viewItemTitle()
 	}
 	return ""
 }
