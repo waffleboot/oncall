@@ -54,6 +54,7 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case "item_type":
 				m.currentScreen = screenItemType
+				m.editItemTypeMenu.JumpToGroup(string(m.selectedItem.Type))
 			case "item_nodes":
 				m.currentScreen = screenItemNodes
 			case "item_notes":

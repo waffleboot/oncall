@@ -118,7 +118,10 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.resetAllItemsMenu()
 	case itemCreatedMsg:
 		m.selectedItem = msg.item
-		return m, m.getItems
+		m.resetEditItemMenu()
+		m.editItemTypeMenu.JumpToGroup(string(model.ItemTypeInc))
+		m.currentScreen = screenItemType
+		return m, nil
 	case itemUpdatedMsg:
 		m.selectedItem = msg.item
 		m.resetEditItemMenu()
