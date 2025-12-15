@@ -3,6 +3,7 @@ package facade
 import (
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
@@ -29,7 +30,7 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 	}
 
 	_, _ = fmt.Fprintln(w)
-	_, _ = fmt.Fprintln(w, "date")
+	_, _ = fmt.Fprintln(w, time.Now().Format(time.DateOnly))
 
 	for _, itemType := range []model.ItemType{
 		model.ItemTypeInc,
