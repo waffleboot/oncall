@@ -10,6 +10,11 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "esc", "q":
 			m.currentScreen = screenEditItem
+		case "enter", " ":
+			switch g, _ := m.editItemLinksMenu.GetGroup(); g {
+			case "new":
+
+			}
 		}
 	}
 

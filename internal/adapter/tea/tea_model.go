@@ -17,6 +17,7 @@ const (
 	screenItemNodes screen = "item_nodes"
 	screenItemNotes screen = "item_notes"
 	screenItemVMs   screen = "item_vms"
+	screenItemLink  screen = "item_link"
 )
 
 type (

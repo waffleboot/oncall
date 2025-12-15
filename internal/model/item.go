@@ -25,6 +25,7 @@ type (
 		Links    []ItemLink
 	}
 	ItemLink struct {
+		ID          int
 		Link        string
 		Public      bool
 		DeletedAt   time.Time
