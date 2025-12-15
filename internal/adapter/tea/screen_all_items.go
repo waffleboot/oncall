@@ -38,11 +38,10 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case "print_journal":
 			case "items":
-				item := m.items[p]
-				m.currentScreen = screenEditItem
-				m.selectedItemID = item.ID
+				m.selectedItem = m.items[p]
 				m.editItemMenu.JumpToGroup("exit")
-				m.resetEditItemMenu(item)
+				m.resetEditItemMenu()
+				m.currentScreen = screenEditItem
 			}
 		}
 	}
@@ -62,6 +61,9 @@ func (m *TeaModel) resetAllItemsMenu() {
 	m.allItemsMenu.AddGroupWithItems("items", len(m.items))
 	if len(m.items) > 0 {
 		m.allItemsMenu.AdjustCursor()
+		m.allItemsMenu.JumpToItem("items", func(pos int) (found bool) {
+			return m.items[pos].ID == m.selectedItem.ID
+		})
 	} else {
 		m.allItemsMenu.JumpToGroup("new")
 	}

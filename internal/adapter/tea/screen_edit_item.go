@@ -13,12 +13,6 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	item, found := m.getSelectedItem()
-	if !found {
-		m.currentScreen = screenAllItems
-		return m, m.getItems
-	}
-
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -30,7 +24,7 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.currentScreen = screenAllItems
 			case "sleep":
 				return m, func() tea.Msg {
-					if item, err := m.itemService.SleepItem(item); err != nil {
+					if item, err := m.itemService.SleepItem(m.selectedItem); err != nil {
 						return fmt.Errorf("sleep item: %w", err)
 					} else {
 						return itemUpdatedMsg{item: item}
@@ -38,7 +32,7 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case "awake":
 				return m, func() tea.Msg {
-					if item, err := m.itemService.AwakeItem(item); err != nil {
+					if item, err := m.itemService.AwakeItem(m.selectedItem); err != nil {
 						return fmt.Errorf("awake item: %w", err)
 					} else {
 						return itemUpdatedMsg{item: item}
@@ -46,14 +40,14 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case "close":
 				return m, func() tea.Msg {
-					if err := m.itemService.CloseItem(item); err != nil {
+					if err := m.itemService.CloseItem(m.selectedItem); err != nil {
 						return fmt.Errorf("close item: %w", err)
 					}
 					return itemClosedMsg{}
 				}
 			case "delete":
 				return m, func() tea.Msg {
-					if err := m.itemService.DeleteItem(item); err != nil {
+					if err := m.itemService.DeleteItem(m.selectedItem); err != nil {
 						return fmt.Errorf("delete item: %w", err)
 					}
 					return itemDeletedMsg{}
@@ -70,9 +64,9 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.currentScreen = screenItemVMs
 			}
 		case "s":
-			if item.IsSleep() {
+			if m.selectedItem.IsSleep() {
 				return m, func() tea.Msg {
-					if item, err := m.itemService.AwakeItem(item); err != nil {
+					if item, err := m.itemService.AwakeItem(m.selectedItem); err != nil {
 						return fmt.Errorf("awake: %w", err)
 					} else {
 						return itemUpdatedMsg{item: item}
@@ -80,7 +74,7 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			} else {
 				return m, func() tea.Msg {
-					if item, err := m.itemService.SleepItem(item); err != nil {
+					if item, err := m.itemService.SleepItem(m.selectedItem); err != nil {
 						return fmt.Errorf("sleep: %w", err)
 					} else {
 						return itemUpdatedMsg{item: item}
@@ -96,16 +90,11 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *TeaModel) viewEditItem() string {
 	var state string
 
-	item, found := m.getSelectedItem()
-	if !found {
-		return "item not found\n"
-	}
-
 	switch {
-	case item.IsSleep():
+	case m.selectedItem.IsSleep():
 		state = " в ожидании"
-	case item.IsClosed():
-		switch item.Type {
+	case m.selectedItem.IsClosed():
+		switch m.selectedItem.Type {
 		case model.ItemTypeAsk:
 			state = " закрыто"
 		default:
@@ -114,18 +103,18 @@ func (m *TeaModel) viewEditItem() string {
 	}
 
 	var s strings.Builder
-	s.WriteString(fmt.Sprintf("  #%d %s%s\n\n", item.ID, item.Type, state))
+	s.WriteString(fmt.Sprintf("  #%d %s%s\n\n", m.selectedItem.ID, m.selectedItem.Type, state))
 	s.WriteString(m.editItemMenu.GenerateMenu())
 
 	return s.String()
 }
 
-func (m *TeaModel) resetEditItemMenu(item model.Item) {
+func (m *TeaModel) resetEditItemMenu() {
 	m.editItemMenu.ResetMenu()
 
 	m.editItemMenu.AddGroup("exit")
 
-	if !item.IsClosed() {
+	if !m.selectedItem.IsClosed() {
 		m.editItemMenu.AddGroup("item_type")
 	}
 
@@ -135,15 +124,15 @@ func (m *TeaModel) resetEditItemMenu(item model.Item) {
 	m.editItemMenu.AddGroup("item_links")
 	m.editItemMenu.AddDelimiter()
 
-	if item.IsActive() {
+	if m.selectedItem.IsActive() {
 		m.editItemMenu.AddGroup("sleep")
 	}
 
-	if item.IsSleep() {
+	if m.selectedItem.IsSleep() {
 		m.editItemMenu.AddGroup("awake")
 	}
 
-	if !item.IsClosed() {
+	if !m.selectedItem.IsClosed() {
 		m.editItemMenu.AddGroup("close")
 	}
 
@@ -153,13 +142,4 @@ func (m *TeaModel) resetEditItemMenu(item model.Item) {
 	if g, _ := m.editItemMenu.GetGroup(); g == "" {
 		m.editItemMenu.JumpToGroup("exit")
 	}
-}
-
-func (m *TeaModel) getSelectedItem() (_ model.Item, found bool) {
-	for i := range m.items {
-		if m.items[i].ID == m.selectedItemID {
-			return m.items[i], true
-		}
-	}
-	return model.Item{}, false
 }

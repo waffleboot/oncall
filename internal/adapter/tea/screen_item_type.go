@@ -13,12 +13,6 @@ func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	item, found := m.getSelectedItem()
-	if !found {
-		m.currentScreen = screenAllItems
-		return m, m.getItems
-	}
-
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -27,7 +21,7 @@ func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter", " ":
 			g, _ := m.editItemTypeMenu.GetGroup()
 			return m, func() tea.Msg {
-				if item, err := m.itemService.SetItemType(item, model.ItemType(g)); err != nil {
+				if item, err := m.itemService.SetItemType(m.selectedItem, model.ItemType(g)); err != nil {
 					return fmt.Errorf("set item type: %w", err)
 				} else {
 					return itemUpdatedMsg{item: item}
