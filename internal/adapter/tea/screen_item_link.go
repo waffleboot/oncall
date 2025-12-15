@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/waffleboot/oncall/internal/model"
 )
 
 func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
@@ -20,4 +21,8 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 
 func (m *TeaModel) viewItemLink() string {
 	return fmt.Sprintf("%d\n", m.selectedLink.ID)
+}
+
+func (m *TeaModel) resetItemLink(link model.ItemLink) {
+	m.selectedLink = link
 }

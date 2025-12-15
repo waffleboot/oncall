@@ -133,7 +133,7 @@ func (s *Item) CreateItemLink() ItemLink {
 }
 
 func (s *ItemLink) IsDeleted() bool {
-	return s.DeletedAt.IsZero()
+	return !s.DeletedAt.IsZero()
 }
 
 func NewVersionedObj[T any](versions []T) VersionedObj[T] {
