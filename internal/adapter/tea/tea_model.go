@@ -1,7 +1,9 @@
 package tea
 
 import (
+	"cmp"
 	"fmt"
+	"slices"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
@@ -99,9 +101,9 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return ""
 	})
+	m.editItemTypeMenu.AddGroup(string(model.ItemTypeInc))
 	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAsk))
 	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAlert))
-	m.editItemTypeMenu.AddGroup(string(model.ItemTypeInc))
 	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAdhoc))
 	return m.getItems
 }
@@ -110,6 +112,14 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case []model.Item:
 		m.items = msg
+
+		slices.SortFunc(m.items, func(a, b model.Item) int {
+			if c := a.Type.Compare(b.Type); c != 0 {
+				return c
+			}
+			return cmp.Compare(a.ID, b.ID)
+		})
+
 		m.resetAllItemsMenu()
 	case itemCreatedMsg:
 		m.selectedItem = msg.item

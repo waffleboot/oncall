@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"cmp"
+	"time"
+)
 
 const (
 	ItemTypeInc   ItemType = "inc"
@@ -55,4 +58,15 @@ func (t ItemType) String() string {
 		return "Alert"
 	}
 	return "Unknown"
+}
+
+var itemTypePriorities = map[ItemType]int{
+	ItemTypeInc:   1,
+	ItemTypeAsk:   2,
+	ItemTypeAlert: 3,
+	ItemTypeAdhoc: 4,
+}
+
+func (t ItemType) Compare(o ItemType) int {
+	return cmp.Compare(itemTypePriorities[t], itemTypePriorities[o])
 }
