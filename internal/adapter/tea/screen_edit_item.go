@@ -88,18 +88,18 @@ func (m *TeaModel) viewEditItem() string {
 
 	switch {
 	case m.selectedItem.IsSleep():
-		state = " в ожидании"
+		state = " - в ожидании"
 	case m.selectedItem.IsClosed():
 		switch m.selectedItem.Type {
 		case model.ItemTypeAsk:
-			state = " закрыто"
+			state = " - закрыто"
 		default:
-			state = " закрыт"
+			state = " - закрыт"
 		}
 	}
 
 	var s strings.Builder
-	s.WriteString(fmt.Sprintf("  #%d %s%s\n\n", m.selectedItem.Num, m.selectedItem.Type, state))
+	s.WriteString(fmt.Sprintf("  #%d - %s - %s%s\n\n", m.selectedItem.Num, m.selectedItem.Type, m.selectedItem.Title, state))
 	s.WriteString(m.editItemMenu.GenerateMenu())
 
 	return s.String()
@@ -116,8 +116,8 @@ func (m *TeaModel) resetEditItem(toGroup string) {
 
 	m.editItemMenu.AddGroup("item_nodes")
 	m.editItemMenu.AddGroup("item_vms")
-	m.editItemMenu.AddGroup("item_notes")
 	m.editItemMenu.AddGroup("item_links")
+	m.editItemMenu.AddGroup("item_notes")
 	m.editItemMenu.AddDelimiter()
 
 	if m.selectedItem.IsActive() {
