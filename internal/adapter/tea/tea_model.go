@@ -143,7 +143,6 @@ func (m *TeaModel) Init() tea.Cmd {
 			return group
 		}
 	})
-	m.linkInput = textinput.New()
 	return m.getItems
 }
 

@@ -132,6 +132,15 @@ func (s *Item) CreateItemLink() ItemLink {
 	return ItemLink{ID: maxID + 1, Public: true}
 }
 
+func (s *Item) UpdateItemLink(link ItemLink) {
+	for i := range s.Links {
+		if s.Links[i].ID == link.ID {
+			s.Links[i] = link
+			break
+		}
+	}
+}
+
 func (s *Item) DeleteItemLink(link ItemLink, at time.Time) {
 	for i := range s.Links {
 		if s.Links[i].ID == link.ID {
