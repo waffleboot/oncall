@@ -18,7 +18,8 @@ const (
 	screenItemLinks screen = "item_links"
 	screenItemNodes screen = "item_nodes"
 	screenItemNotes screen = "item_notes"
-	screenItemVMs   screen = "item_vms"
+	screenVMs       screen = "vms"
+	screenVM        screen = "vm"
 	screenItemLink  screen = "item_link"
 	screenItemTitle screen = "item_title"
 )
@@ -30,17 +31,22 @@ type (
 		journalService           port.JournalService
 		currentScreen            screen
 		items                    []model.Item
+		vms                      []model.VM
 		links                    []model.ItemLink
 		selectedItem             model.Item
 		selectedLink             model.ItemLink
+		selectedVM               model.VM
 		allItemsMenu             *Menu
 		editItemMenu             *Menu
 		editItemTypeMenu         *Menu
 		editItemLinksMenu        *Menu
+		menuVMs                  *Menu
 		textinputLinkAddress     textinput.Model
 		textinputLinkDescription textarea.Model
 		textinputItemTitle       textinput.Model
 		textinputItemDescription textarea.Model
+		textinputVmName          textinput.Model
+		textinputVmDescription   textarea.Model
 		textInput                string
 		printJournal             bool
 	}
@@ -182,7 +188,7 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateItemLinks(msg)
 	case screenItemLink:
 		return m.updateItemLink(msg)
-	case screenItemVMs:
+	case screenVMs:
 		return m.updateItemVMs(msg)
 	case screenItemTitle:
 		return m.updateItemTitle(msg)
@@ -206,7 +212,7 @@ func (m *TeaModel) View() string {
 		return m.viewItemLinks()
 	case screenItemLink:
 		return m.viewItemLink()
-	case screenItemVMs:
+	case screenVMs:
 		return m.viewItemVMs()
 	case screenItemTitle:
 		return m.viewItemTitle()

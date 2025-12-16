@@ -68,7 +68,7 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.currentScreen = screenItemLinks
 				m.resetItemLinks("new")
 			case "item_vms":
-				m.currentScreen = screenItemVMs
+				m.currentScreen = screenVMs
 			}
 		case "t":
 			m.editItemMenu.JumpToGroup("item_title")
