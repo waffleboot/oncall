@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
+	"go.uber.org/zap"
 )
 
 const (
@@ -60,6 +61,7 @@ type (
 		textinputNote            textarea.Model
 		textInput                string
 		printJournal             bool
+		log                      *zap.Logger
 	}
 	itemCreatedMsg struct {
 		item model.Item
@@ -72,8 +74,8 @@ type (
 	}
 )
 
-func NewTeaModel(itemService port.ItemService, journalService port.JournalService) *TeaModel {
-	return &TeaModel{itemService: itemService, journalService: journalService}
+func NewTeaModel(itemService port.ItemService, journalService port.JournalService, log *zap.Logger) *TeaModel {
+	return &TeaModel{itemService: itemService, journalService: journalService, log: log}
 }
 
 func (m *TeaModel) Init() tea.Cmd {

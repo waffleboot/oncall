@@ -37,7 +37,7 @@ func run() error {
 
 	journalService := facade.NewJournalService(storage)
 
-	teaModel := teaAdapter.NewTeaModel(itemService, journalService)
+	teaModel := teaAdapter.NewTeaModel(itemService, journalService, log)
 
 	if _, err := tea.NewProgram(teaModel).Run(); err != nil {
 		return fmt.Errorf("tea run: %w", err)

@@ -97,7 +97,7 @@ func (m *TeaModel) updateLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 				return m, func() tea.Msg {
 					m.selectedLink.Address = m.textinputLinkAddress.Value()
 					m.selectedLink.Description = m.textinputLinkDescription.Value()
-					m.selectedItem.UpdateItemLink(m.selectedLink)
+					m.selectedItem.UpdateLink(m.selectedLink)
 					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
 					}
@@ -106,7 +106,7 @@ func (m *TeaModel) updateLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 			case "public":
 				return m, func() tea.Msg {
 					m.selectedLink.Public = !m.selectedLink.Public
-					m.selectedItem.UpdateItemLink(m.selectedLink)
+					m.selectedItem.UpdateLink(m.selectedLink)
 					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
 					}

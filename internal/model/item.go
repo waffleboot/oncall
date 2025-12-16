@@ -134,7 +134,7 @@ func (s *Item) PrintedLinks() []Link {
 	return links
 }
 
-func (s *Item) CreateItemLink() Link {
+func (s *Item) CreateLink() Link {
 	var maxID int
 	for i := range s.Links {
 		link := s.Links[i]
@@ -147,7 +147,7 @@ func (s *Item) CreateItemLink() Link {
 	return link
 }
 
-func (s *Item) UpdateItemLink(link Link) {
+func (s *Item) UpdateLink(link Link) {
 	for i := range s.Links {
 		if s.Links[i].ID == link.ID {
 			s.Links[i] = link
@@ -156,7 +156,7 @@ func (s *Item) UpdateItemLink(link Link) {
 	}
 }
 
-func (s *Item) DeleteItemLink(link Link, at time.Time) {
+func (s *Item) DeleteLink(link Link, at time.Time) {
 	for i := range s.Links {
 		if s.Links[i].ID == link.ID {
 			s.Links[i].DeletedAt = at
