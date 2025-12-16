@@ -83,7 +83,7 @@ func (m *TeaModel) updateItemTitle(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	case string:
 		switch msg {
 		case "exit":
-			m.currentScreen = screenEditItem
+			m.currentScreen = screenItem
 			return m, m.getItem
 		}
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/waffleboot/oncall/internal/model"
 )
 
-func (m *TeaModel) updateItemVM(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
+func (m *TeaModel) updateVM(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -89,7 +89,7 @@ func (m *TeaModel) updateItemVM(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 				return m, func() tea.Msg {
 					m.selectedVM.Name = m.textinputVmName.Value()
 					m.selectedVM.Description = m.textinputVmDescription.Value()
-					m.selectedItem.UpdateItemVM(m.selectedVM)
+					m.selectedItem.UpdateVM(m.selectedVM)
 					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
 					}
@@ -114,7 +114,7 @@ func (m *TeaModel) updateItemVM(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	return m, nil
 }
 
-func (m *TeaModel) viewItemVM() string {
+func (m *TeaModel) viewVM() string {
 	var s strings.Builder
 
 	s.WriteString(fmt.Sprintf("ID: %d\n", m.selectedVM.ID))
@@ -134,7 +134,7 @@ func (m *TeaModel) viewItemVM() string {
 	return s.String()
 }
 
-func (m *TeaModel) resetItemVM() {
+func (m *TeaModel) resetVM() {
 	m.textInput = "name"
 
 	m.textinputVmName = textinput.New()

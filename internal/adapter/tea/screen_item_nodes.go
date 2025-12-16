@@ -7,7 +7,7 @@ func (m *TeaModel) updateItemNodes(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
-			m.currentScreen = screenEditItem
+			m.currentScreen = screenItem
 		}
 	}
 

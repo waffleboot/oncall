@@ -44,7 +44,7 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "items":
 				m.selectedItem = m.items[p]
 				m.resetEditItem("exit")
-				m.currentScreen = screenEditItem
+				m.currentScreen = screenItem
 			}
 		case "n":
 			return m, newItem

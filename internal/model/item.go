@@ -35,12 +35,6 @@ type (
 		DeletedAt   time.Time
 		Description string
 	}
-	VM struct {
-		ID          int
-		Name        string
-		DeletedAt   time.Time
-		Description string
-	}
 )
 
 func (i *Item) IsActive() bool {
@@ -138,16 +132,6 @@ func (s *Item) PrintedLinks() []ItemLink {
 	return links
 }
 
-func (s *Item) ActiveVMs() []VM {
-	vms := make([]VM, 0, len(s.VMs))
-	for _, vm := range s.VMs {
-		if !vm.IsDeleted() {
-			vms = append(vms, vm)
-		}
-	}
-	return vms
-}
-
 func (s *Item) CreateItemLink() ItemLink {
 	var maxID int
 	for i := range s.Links {
@@ -165,28 +149,6 @@ func (s *Item) UpdateItemLink(link ItemLink) {
 	for i := range s.Links {
 		if s.Links[i].ID == link.ID {
 			s.Links[i] = link
-			break
-		}
-	}
-}
-
-func (s *Item) CreateVM() VM {
-	var maxID int
-	for i := range s.VMs {
-		vm := s.VMs[i]
-		if vm.ID > maxID {
-			maxID = vm.ID
-		}
-	}
-	vm := VM{ID: maxID + 1}
-	s.VMs = append(s.VMs, vm)
-	return vm
-}
-
-func (s *Item) UpdateItemVM(vm VM) {
-	for i := range s.VMs {
-		if s.VMs[i].ID == vm.ID {
-			s.VMs[i] = vm
 			break
 		}
 	}

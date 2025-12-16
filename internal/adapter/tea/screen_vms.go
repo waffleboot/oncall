@@ -25,7 +25,7 @@ func (m *TeaModel) updateVMs(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
-			m.currentScreen = screenEditItem
+			m.currentScreen = screenItem
 			return m, m.getItem
 		case "d":
 			if g, p := m.menuVMs.GetGroup(); g == "vms" {
@@ -42,7 +42,7 @@ func (m *TeaModel) updateVMs(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter", " ":
 			switch g, p := m.menuVMs.GetGroup(); g {
 			case "exit":
-				m.currentScreen = screenEditItem
+				m.currentScreen = screenItem
 				return m, m.getItem
 			case "new":
 				return m, newVM
@@ -62,11 +62,11 @@ func (m *TeaModel) updateVMs(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *TeaModel) viewItemVMs() string {
+func (m *TeaModel) viewVMs() string {
 	return m.menuVMs.GenerateMenu()
 }
 
-func (m *TeaModel) resetItemVMs(toGroup string) {
+func (m *TeaModel) resetVMs(toGroup string) {
 	m.vms = m.selectedItem.ActiveVMs()
 	m.menuVMs.ResetMenu()
 	m.menuVMs.AddGroup("exit")

@@ -25,7 +25,7 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
-			m.currentScreen = screenEditItem
+			m.currentScreen = screenItem
 			return m, m.getItem
 		case "d":
 			if g, p := m.editItemLinksMenu.GetGroup(); g == "links" {
@@ -42,7 +42,7 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter", " ":
 			switch g, p := m.editItemLinksMenu.GetGroup(); g {
 			case "exit":
-				m.currentScreen = screenEditItem
+				m.currentScreen = screenItem
 				return m, m.getItem
 			case "new":
 				return m, newLink

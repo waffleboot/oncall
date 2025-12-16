@@ -17,7 +17,7 @@ func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
-			m.currentScreen = screenEditItem
+			m.currentScreen = screenItem
 		case "enter", " ":
 			g, _ := m.editItemTypeMenu.GetGroup()
 			return m, func() tea.Msg {
@@ -30,7 +30,7 @@ func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	case itemUpdatedMsg:
-		m.currentScreen = screenEditItem
+		m.currentScreen = screenItem
 		return m, m.getItem
 	}
 	return m, nil

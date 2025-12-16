@@ -13,7 +13,7 @@ import (
 
 const (
 	screenAllItems  screen = "all_items"
-	screenEditItem  screen = "edit_item"
+	screenItem      screen = "edit_item"
 	screenItemType  screen = "item_type"
 	screenItemLinks screen = "item_links"
 	screenItemNodes screen = "item_nodes"
@@ -161,6 +161,27 @@ func (m *TeaModel) Init() tea.Cmd {
 			return group
 		}
 	})
+	m.menuVMs = NewMenu(func(group string, pos int) string {
+		switch group {
+		case "exit":
+			return "Exit"
+		case "new":
+			return "Добавить ВМ ..."
+		case "vms":
+			vm := m.vms[pos]
+
+			var s strings.Builder
+			s.WriteString(fmt.Sprintf("#%d - ", vm.ID))
+			if vm.Name == "" {
+				s.WriteString("empty")
+			} else {
+				s.WriteString(vm.Name)
+			}
+			return s.String()
+		default:
+			return group
+		}
+	})
 	return m.getItems
 }
 
@@ -176,7 +197,7 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch m.currentScreen {
 	case screenAllItems:
 		return m.updateAllItems(msg)
-	case screenEditItem:
+	case screenItem:
 		return m.updateEditItem(msg)
 	case screenItemType:
 		return m.updateItemType(msg)
@@ -189,7 +210,9 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case screenItemLink:
 		return m.updateItemLink(msg)
 	case screenVMs:
-		return m.updateItemVMs(msg)
+		return m.updateVMs(msg)
+	case screenVM:
+		return m.updateVM(msg)
 	case screenItemTitle:
 		return m.updateItemTitle(msg)
 	}
@@ -200,7 +223,7 @@ func (m *TeaModel) View() string {
 	switch m.currentScreen {
 	case screenAllItems:
 		return m.viewAllItems()
-	case screenEditItem:
+	case screenItem:
 		return m.viewEditItem()
 	case screenItemType:
 		return m.viewItemType()
@@ -213,7 +236,9 @@ func (m *TeaModel) View() string {
 	case screenItemLink:
 		return m.viewItemLink()
 	case screenVMs:
-		return m.viewItemVMs()
+		return m.viewVMs()
+	case screenVM:
+		return m.viewVM()
 	case screenItemTitle:
 		return m.viewItemTitle()
 	}

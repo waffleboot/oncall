@@ -69,6 +69,7 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.resetItemLinks("new")
 			case "item_vms":
 				m.currentScreen = screenVMs
+				m.resetVMs("new")
 			}
 		case "t":
 			m.editItemMenu.JumpToGroup("item_title")
@@ -78,6 +79,10 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.editItemMenu.JumpToGroup("item_links")
 			m.currentScreen = screenItemLinks
 			m.resetItemLinks("new")
+		case "v":
+			m.editItemMenu.JumpToGroup("vms")
+			m.currentScreen = screenVMs
+			m.resetVMs("new")
 		case "s":
 			return m.toggleSleep(m.selectedItem)
 		}
