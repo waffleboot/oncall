@@ -120,7 +120,7 @@ func (m *TeaModel) viewTitle() string {
 	return s.String()
 }
 
-func (m *TeaModel) resetItemTitle() {
+func (m *TeaModel) resetTitle() {
 	m.textInput = "title"
 
 	m.textinputItemTitle = textinput.New()

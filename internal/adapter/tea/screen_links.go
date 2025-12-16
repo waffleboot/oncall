@@ -58,7 +58,7 @@ func (m *TeaModel) updateLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.resetItemLink()
 	case model.Item:
 		m.selectedItem = msg
-		m.resetItemLinks("")
+		m.resetLinks("")
 	}
 
 	return m, nil
@@ -68,7 +68,7 @@ func (m *TeaModel) viewLinks() string {
 	return m.linksMenu.GenerateMenu()
 }
 
-func (m *TeaModel) resetItemLinks(toGroup string) {
+func (m *TeaModel) resetLinks(toGroup string) {
 	m.links = m.selectedItem.ActiveLinks()
 	m.linksMenu.ResetMenu()
 	m.linksMenu.AddGroup("exit")

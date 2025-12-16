@@ -275,6 +275,7 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case screenTitle:
 		return m.updateItemTitle(msg)
 	}
+	m.log.Error("no suck screen", zap.String("screen", string(m.currentScreen)))
 	return m, nil
 }
 
@@ -305,6 +306,7 @@ func (m *TeaModel) View() string {
 	case screenTitle:
 		return m.viewTitle()
 	}
+	m.log.Error("no suck screen", zap.String("screen", string(m.currentScreen)))
 	return ""
 }
 

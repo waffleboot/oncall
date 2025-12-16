@@ -56,17 +56,19 @@ func (m *TeaModel) updateItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case string(screenTitle):
 				m.currentScreen = screenTitle
-				m.resetItemTitle()
+				m.resetTitle()
 			case string(screenItemType):
 				m.currentScreen = screenItemType
 				m.menuItemType.JumpToGroup(string(m.selectedItem.Type))
 			case string(screenNodes):
 				m.currentScreen = screenNodes
+				m.resetNodes("new")
 			case string(screenNotes):
 				m.currentScreen = screenNotes
+				m.resetNotes("new")
 			case string(screenLinks):
 				m.currentScreen = screenLinks
-				m.resetItemLinks("new")
+				m.resetLinks("new")
 			case string(screenVMs):
 				m.currentScreen = screenVMs
 				m.resetVMs("new")
@@ -74,11 +76,11 @@ func (m *TeaModel) updateItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "t":
 			m.menuItem.JumpToGroup(string(screenTitle))
 			m.currentScreen = screenTitle
-			m.resetItemTitle()
+			m.resetTitle()
 		case "l":
 			m.menuItem.JumpToGroup(string(screenLinks))
 			m.currentScreen = screenLinks
-			m.resetItemLinks("new")
+			m.resetLinks("new")
 		case "v":
 			m.menuItem.JumpToGroup(string(screenVMs))
 			m.currentScreen = screenVMs
