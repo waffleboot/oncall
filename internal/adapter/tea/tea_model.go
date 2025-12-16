@@ -43,7 +43,7 @@ type (
 		selectedNode             model.Node
 		selectedNote             model.Note
 		menuAllItems             *Menu
-		menuEditItem             *Menu
+		menuItem                 *Menu
 		menuItemType             *Menu
 		linksMenu                *Menu
 		menuVMs                  *Menu
@@ -102,7 +102,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		return group
 	})
 	m.resetItems(nil)
-	m.menuEditItem = NewMenu(func(group string, pos int) string {
+	m.menuItem = NewMenu(func(group string, pos int) string {
 		switch {
 		case group == "exit":
 			return "Exit"
@@ -114,17 +114,17 @@ func (m *TeaModel) Init() tea.Cmd {
 			return "Закрыть"
 		case group == "delete":
 			return "Удалить"
-		case group == "item_title":
+		case group == string(screenTitle):
 			return "Имя и описание ..."
-		case group == "item_type":
+		case group == string(screenItemType):
 			return fmt.Sprintf("Тип обращения: (%s) ...", m.selectedItem.Type)
-		case group == "item_notes":
+		case group == string(screenNotes):
 			return "Заметки ..."
-		case group == "item_links":
+		case group == string(screenLinks):
 			return "Ссылки ..."
-		case group == "item_nodes":
+		case group == string(screenNodes):
 			return "Хосты, узлы ..."
-		case group == "item_vms":
+		case group == string(screenVMs):
 			return "ВМ-ки ..."
 		}
 		return group

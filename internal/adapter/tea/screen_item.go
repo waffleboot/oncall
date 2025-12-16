@@ -9,7 +9,7 @@ import (
 )
 
 func (m *TeaModel) updateItem(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if m.menuEditItem.ProcessMsg(msg) {
+	if m.menuItem.ProcessMsg(msg) {
 		return m, nil
 	}
 
@@ -20,7 +20,7 @@ func (m *TeaModel) updateItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.currentScreen = screenItems
 			return m, m.getItems
 		case "enter", " ":
-			switch g, _ := m.menuEditItem.GetGroup(); g {
+			switch g, _ := m.menuItem.GetGroup(); g {
 			case "exit":
 				m.currentScreen = screenItems
 				return m, m.getItems
@@ -54,33 +54,33 @@ func (m *TeaModel) updateItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 					}
 					return itemDeletedMsg{}
 				}
-			case "item_title":
+			case string(screenTitle):
 				m.currentScreen = screenTitle
 				m.resetItemTitle()
-			case "item_type":
+			case string(screenItemType):
 				m.currentScreen = screenItemType
 				m.menuItemType.JumpToGroup(string(m.selectedItem.Type))
-			case "item_nodes":
+			case string(screenNodes):
 				m.currentScreen = screenNodes
-			case "item_notes":
+			case string(screenNotes):
 				m.currentScreen = screenNotes
-			case "item_links":
+			case string(screenLinks):
 				m.currentScreen = screenLinks
 				m.resetItemLinks("new")
-			case "item_vms":
+			case string(screenVMs):
 				m.currentScreen = screenVMs
 				m.resetVMs("new")
 			}
 		case "t":
-			m.menuEditItem.JumpToGroup("item_title")
+			m.menuItem.JumpToGroup(string(screenTitle))
 			m.currentScreen = screenTitle
 			m.resetItemTitle()
 		case "l":
-			m.menuEditItem.JumpToGroup("item_links")
+			m.menuItem.JumpToGroup(string(screenLinks))
 			m.currentScreen = screenLinks
 			m.resetItemLinks("new")
 		case "v":
-			m.menuEditItem.JumpToGroup("vms")
+			m.menuItem.JumpToGroup(string(screenVMs))
 			m.currentScreen = screenVMs
 			m.resetVMs("new")
 		case "s":
@@ -116,44 +116,44 @@ func (m *TeaModel) viewItem() string {
 
 	var s strings.Builder
 	s.WriteString(fmt.Sprintf("  #%d - %s - %s%s\n\n", m.selectedItem.Num, m.selectedItem.Type, m.selectedItem.TitleForView(), state))
-	s.WriteString(m.menuEditItem.GenerateMenu())
+	s.WriteString(m.menuItem.GenerateMenu())
 
 	return s.String()
 }
 
 func (m *TeaModel) resetEditItem(toGroup string) {
-	m.menuEditItem.ResetMenu()
+	m.menuItem.ResetMenu()
 
-	m.menuEditItem.AddGroup("exit")
+	m.menuItem.AddGroup("exit")
 
 	if !m.selectedItem.IsClosed() {
-		m.menuEditItem.AddGroup("item_type")
+		m.menuItem.AddGroup(string(screenItemType))
 	}
 
-	m.menuEditItem.AddGroup("item_title")
-	m.menuEditItem.AddGroup("item_nodes")
-	m.menuEditItem.AddGroup("item_vms")
-	m.menuEditItem.AddGroup("item_links")
-	m.menuEditItem.AddGroup("item_notes")
-	m.menuEditItem.AddDelimiter()
+	m.menuItem.AddGroup(string(screenTitle))
+	m.menuItem.AddGroup(string(screenNodes))
+	m.menuItem.AddGroup(string(screenVMs))
+	m.menuItem.AddGroup(string(screenLinks))
+	m.menuItem.AddGroup(string(screenNotes))
+	m.menuItem.AddDelimiter()
 
 	if m.selectedItem.IsActive() {
-		m.menuEditItem.AddGroup("sleep")
+		m.menuItem.AddGroup("sleep")
 	}
 
 	if m.selectedItem.IsSleep() {
-		m.menuEditItem.AddGroup("awake")
+		m.menuItem.AddGroup("awake")
 	}
 
 	if !m.selectedItem.IsClosed() {
-		m.menuEditItem.AddGroup("close")
+		m.menuItem.AddGroup("close")
 	}
 
-	m.menuEditItem.AddDelimiter()
-	m.menuEditItem.AddGroup("delete")
+	m.menuItem.AddDelimiter()
+	m.menuItem.AddGroup("delete")
 
 	if toGroup != "" {
-		m.menuEditItem.JumpToGroup(toGroup)
+		m.menuItem.JumpToGroup(toGroup)
 	}
 }
 
