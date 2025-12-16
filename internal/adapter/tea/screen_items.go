@@ -48,6 +48,9 @@ func (m *TeaModel) updateItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "n":
 			return m, newItem
+		case "p":
+			m.printJournal = true
+			return m, tea.Quit
 		case "s":
 			if g, p := m.menuAllItems.GetGroup(); g == "items" {
 				return m.toggleSleep(m.items[p])
