@@ -7,3 +7,39 @@ type Note struct {
 	Text      string
 	DeletedAt time.Time
 }
+
+func (s *Note) IsDeleted() bool {
+	return !s.DeletedAt.IsZero()
+}
+
+func (s *Item) CreateNote() Note {
+	var maxID int
+	for i := range s.Notes {
+		note := s.Notes[i]
+		if note.ID > maxID {
+			maxID = note.ID
+		}
+	}
+	note := Note{ID: maxID + 1}
+	s.Notes = append(s.Notes, note)
+	return note
+}
+
+func (s *Item) DeleteNote(note Note, at time.Time) {
+	for i := range s.Notes {
+		if s.Notes[i].ID == note.ID {
+			s.Notes[i].DeletedAt = at
+			break
+		}
+	}
+}
+
+func (s *Item) ActiveNotes() []Note {
+	notes := make([]Note, 0, len(s.Notes))
+	for _, note := range s.Notes {
+		if !note.IsDeleted() {
+			notes = append(notes, note)
+		}
+	}
+	return notes
+}

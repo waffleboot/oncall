@@ -83,6 +83,14 @@ func (m *TeaModel) updateItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.menuItem.JumpToGroup(string(screenVMs))
 			m.currentScreen = screenVMs
 			m.resetVMs("new")
+		case "h":
+			m.menuItem.JumpToGroup(string(screenNodes))
+			m.currentScreen = screenNodes
+			m.resetNodes("new")
+		case "n":
+			m.menuItem.JumpToGroup(string(screenNotes))
+			m.currentScreen = screenNotes
+			m.resetNotes("new")
 		case "s":
 			return m.toggleSleep(m.selectedItem)
 		}
