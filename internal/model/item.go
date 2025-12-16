@@ -207,3 +207,7 @@ func (s *Link) MenuItem() string {
 	}
 	return sb.String()
 }
+
+func (s *Link) ToPublish() string {
+	return s.Address
+}
