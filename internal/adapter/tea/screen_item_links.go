@@ -13,6 +13,14 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
+	newLink := func() tea.Msg {
+		link := m.selectedItem.CreateItemLink()
+		if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+			return fmt.Errorf("update item link: %w", err)
+		}
+		return itemLinkCreatedMsg{link: link}
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -29,19 +37,15 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m.getItem()
 				}
 			}
+		case "n":
+			return m, newLink
 		case "enter", " ":
 			switch g, p := m.editItemLinksMenu.GetGroup(); g {
 			case "exit":
 				m.currentScreen = screenEditItem
 				return m, m.getItem
 			case "new":
-				return m, func() tea.Msg {
-					link := m.selectedItem.CreateItemLink()
-					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
-						return fmt.Errorf("update item link: %w", err)
-					}
-					return itemLinkCreatedMsg{link: link}
-				}
+				return m, newLink
 			case "links":
 				m.selectedLink = m.links[p]
 				m.currentScreen = screenItemLink

@@ -12,6 +12,14 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
+	newItem := func() tea.Msg {
+		if item, err := m.itemService.CreateItem(); err != nil {
+			return fmt.Errorf("create item: %w", err)
+		} else {
+			return itemCreatedMsg{item: item}
+		}
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -22,13 +30,7 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "exit":
 				return m, tea.Quit
 			case "new":
-				return m, func() tea.Msg {
-					if item, err := m.itemService.CreateItem(); err != nil {
-						return fmt.Errorf("create item: %w", err)
-					} else {
-						return itemCreatedMsg{item: item}
-					}
-				}
+				return m, newItem
 			case "close_journal":
 				return m, func() tea.Msg {
 					if err := m.journalService.CloseJournal(); err != nil {
@@ -44,6 +46,8 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.resetEditItem("exit")
 				m.currentScreen = screenEditItem
 			}
+		case "n":
+			return m, newItem
 		case "s":
 			if g, p := m.allItemsMenu.GetGroup(); g == "items" {
 				return m.toggleSleep(m.items[p])
