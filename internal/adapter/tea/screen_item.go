@@ -8,7 +8,7 @@ import (
 	"github.com/waffleboot/oncall/internal/model"
 )
 
-func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *TeaModel) updateItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.menuEditItem.ProcessMsg(msg) {
 		return m, nil
 	}
@@ -17,12 +17,12 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q":
-			m.currentScreen = screenAllItems
+			m.currentScreen = screenItems
 			return m, m.getItems
 		case "enter", " ":
 			switch g, _ := m.menuEditItem.GetGroup(); g {
 			case "exit":
-				m.currentScreen = screenAllItems
+				m.currentScreen = screenItems
 				return m, m.getItems
 			case "sleep":
 				return m, func() tea.Msg {
@@ -87,10 +87,10 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.toggleSleep(m.selectedItem)
 		}
 	case itemClosedMsg:
-		m.currentScreen = screenAllItems
+		m.currentScreen = screenItems
 		return m, m.getItems
 	case itemDeletedMsg:
-		m.currentScreen = screenAllItems
+		m.currentScreen = screenItems
 		return m, m.getItems
 	case model.Item:
 		m.selectedItem = msg
@@ -99,7 +99,7 @@ func (m *TeaModel) updateEditItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *TeaModel) viewEditItem() string {
+func (m *TeaModel) viewItem() string {
 	var state string
 
 	switch {

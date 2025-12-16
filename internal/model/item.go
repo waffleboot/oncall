@@ -23,9 +23,9 @@ type (
 		SleepAt     time.Time
 		ClosedAt    time.Time
 		Type        ItemType
-		Links       []Link
 		Notes       []Note
 		Nodes       []Node
+		Links       []Link
 		VMs         []VM
 		Title       string
 		Description string
@@ -173,9 +173,5 @@ func (s *Item) TitleForView() string {
 }
 
 func (s *Link) IsDeleted() bool {
-	return !s.DeletedAt.IsZero()
-}
-
-func (s *VM) IsDeleted() bool {
 	return !s.DeletedAt.IsZero()
 }

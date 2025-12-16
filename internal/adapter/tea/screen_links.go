@@ -8,7 +8,7 @@ import (
 	"github.com/waffleboot/oncall/internal/model"
 )
 
-func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *TeaModel) updateLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.linksMenu.ProcessMsg(msg) {
 		return m, nil
 	}
@@ -64,7 +64,7 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *TeaModel) viewItemLinks() string {
+func (m *TeaModel) viewLinks() string {
 	return m.linksMenu.GenerateMenu()
 }
 

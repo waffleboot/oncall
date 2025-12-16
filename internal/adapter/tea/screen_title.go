@@ -100,7 +100,7 @@ func (m *TeaModel) updateItemTitle(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	return m, nil
 }
 
-func (m *TeaModel) viewItemTitle() string {
+func (m *TeaModel) viewTitle() string {
 	var s strings.Builder
 
 	s.WriteString(fmt.Sprintf("#%d - %s\n", m.selectedItem.Num, m.selectedItem.Type.String()))

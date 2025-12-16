@@ -9,7 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
+func (m *TeaModel) updateLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -134,7 +134,7 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	return m, nil
 }
 
-func (m *TeaModel) viewItemLink() string {
+func (m *TeaModel) viewLink() string {
 	var s strings.Builder
 
 	s.WriteString(fmt.Sprintf("ID: %d\n", m.selectedLink.ID))

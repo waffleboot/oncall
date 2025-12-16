@@ -11,8 +11,8 @@ func (s *item) fromDomain(item model.Item) {
 	s.Title = item.Title
 	s.Description = item.Description
 
-	s.VMs = make([]vm, len(item.VMs))
-	for i := range item.VMs {
+	s.VMs = make([]vm, len(item.Nodes))
+	for i := range item.Nodes {
 		s.VMs[i].fromDomain(item.VMs[i])
 	}
 
@@ -62,8 +62,8 @@ func (s *item) toDomain() model.Item {
 		Title:       s.Title,
 		Description: s.Description,
 		Links:       links,
-		Notes:       notes,
 		Nodes:       nodes,
+		Notes:       notes,
 		VMs:         vms,
 	}
 }

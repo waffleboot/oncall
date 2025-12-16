@@ -12,6 +12,10 @@ type VM struct {
 	Description string
 }
 
+func (s *VM) IsDeleted() bool {
+	return !s.DeletedAt.IsZero()
+}
+
 func (s *Item) ActiveVMs() []VM {
 	vms := make([]VM, 0, len(s.VMs))
 	for _, vm := range s.VMs {

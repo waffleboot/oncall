@@ -2,7 +2,7 @@ package tea
 
 import tea "github.com/charmbracelet/bubbletea"
 
-func (m *TeaModel) updateItemNotes(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *TeaModel) updateNotes(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -14,6 +14,6 @@ func (m *TeaModel) updateItemNotes(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *TeaModel) viewItemNotes() string {
+func (m *TeaModel) viewNotes() string {
 	return "notes\n"
 }

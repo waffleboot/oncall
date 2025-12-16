@@ -7,7 +7,7 @@ import (
 	"github.com/waffleboot/oncall/internal/model"
 )
 
-func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *TeaModel) updateItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.menuAllItems.ProcessMsg(msg) {
 		return m, nil
 	}
@@ -54,7 +54,7 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	case []model.Item:
-		m.resetAllItems(msg)
+		m.resetItems(msg)
 	case model.Item:
 		return m, m.getItems
 	case itemCreatedMsg:
@@ -67,11 +67,11 @@ func (m *TeaModel) updateAllItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *TeaModel) viewAllItems() string {
+func (m *TeaModel) viewItems() string {
 	return m.menuAllItems.GenerateMenu()
 }
 
-func (m *TeaModel) resetAllItems(items []model.Item) {
+func (m *TeaModel) resetItems(items []model.Item) {
 	m.items = items
 	m.menuAllItems.ResetMenu()
 	m.menuAllItems.AddGroup("exit")

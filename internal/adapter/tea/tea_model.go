@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	screenAllItems screen = "all_items"
-	screenItem     screen = "edit_item"
+	screenItems    screen = "items"
+	screenItem     screen = "item"
 	screenItemType screen = "item_type"
 	screenLinks    screen = "links"
 	screenLink     screen = "link"
@@ -77,7 +77,7 @@ func NewTeaModel(itemService port.ItemService, journalService port.JournalServic
 }
 
 func (m *TeaModel) Init() tea.Cmd {
-	m.currentScreen = screenAllItems
+	m.currentScreen = screenItems
 	m.menuAllItems = NewMenu(func(group string, pos int) string {
 		switch {
 		case group == "exit":
@@ -101,7 +101,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return group
 	})
-	m.resetAllItems(nil)
+	m.resetItems(nil)
 	m.menuEditItem = NewMenu(func(group string, pos int) string {
 		switch {
 		case group == "exit":
@@ -248,20 +248,24 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	switch m.currentScreen {
-	case screenAllItems:
-		return m.updateAllItems(msg)
+	case screenItems:
+		return m.updateItems(msg)
 	case screenItem:
-		return m.updateEditItem(msg)
+		return m.updateItem(msg)
 	case screenItemType:
 		return m.updateItemType(msg)
 	case screenNodes:
-		return m.updateItemNodes(msg)
+		return m.updateNodes(msg)
+	// case screenNode:
+	// 	return m.updateNode(msg)
 	case screenNotes:
-		return m.updateItemNotes(msg)
+		return m.updateNotes(msg)
+	// case screenNote:
+	// 	return m.updateNote(msg)
 	case screenLinks:
-		return m.updateItemLinks(msg)
+		return m.updateLinks(msg)
 	case screenLink:
-		return m.updateItemLink(msg)
+		return m.updateLink(msg)
 	case screenVMs:
 		return m.updateVMs(msg)
 	case screenVM:
@@ -274,26 +278,30 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *TeaModel) View() string {
 	switch m.currentScreen {
-	case screenAllItems:
-		return m.viewAllItems()
+	case screenItems:
+		return m.viewItems()
 	case screenItem:
-		return m.viewEditItem()
+		return m.viewItem()
 	case screenItemType:
 		return m.viewItemType()
 	case screenNodes:
-		return m.viewItemNodes()
+		return m.viewNodes()
+	// case screenNode:
+	// 	return m.viewNode()
 	case screenNotes:
-		return m.viewItemNotes()
+		return m.viewNotes()
+	// case screenNote:
+	// 	return m.viewNote()
 	case screenLinks:
-		return m.viewItemLinks()
+		return m.viewLinks()
 	case screenLink:
-		return m.viewItemLink()
+		return m.viewLink()
 	case screenVMs:
 		return m.viewVMs()
 	case screenVM:
 		return m.viewVM()
 	case screenTitle:
-		return m.viewItemTitle()
+		return m.viewTitle()
 	}
 	return ""
 }
