@@ -57,15 +57,7 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 		}
 
 		for i, item := range items {
-
-			_, _ = fmt.Fprintf(w, "\n%d) %s #%d", i+1, item.MenuItem(), item.Num)
-
-			switch {
-			case item.IsActive():
-				_, _ = fmt.Fprintf(w, " (in progress)\n")
-			case item.IsSleep():
-				_, _ = fmt.Fprintf(w, " (in progress, in waiting)\n")
-			}
+			_, _ = fmt.Fprintf(w, "\n%d) %s\n", i+1, item.ToPublish())
 
 			if len(item.Description) > 0 {
 				_, _ = fmt.Fprintln(w)

@@ -2,6 +2,7 @@ package model
 
 import (
 	"cmp"
+	"fmt"
 	"strings"
 	"time"
 
@@ -170,6 +171,22 @@ func (s *Item) MenuItem() string {
 		return s.Title
 	}
 	return "no title"
+}
+
+func (s *Item) ToPublish() string {
+	var sb strings.Builder
+
+	sb.WriteString(s.MenuItem())
+	sb.WriteString(fmt.Sprintf(" #%d", s.Num))
+
+	switch {
+	case s.IsActive():
+		sb.WriteString(" (in progress)")
+	case s.IsSleep():
+		sb.WriteString(" (in progress, in waiting)")
+	}
+
+	return sb.String()
 }
 
 func (s *Link) IsDeleted() bool {
