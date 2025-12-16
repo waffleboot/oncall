@@ -103,7 +103,7 @@ func (m *TeaModel) updateItemTitle(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 func (m *TeaModel) viewItemTitle() string {
 	var s strings.Builder
 
-	s.WriteString(fmt.Sprintf("#%d - %s\n", m.selectedItem.ID, m.selectedItem.Type.String()))
+	s.WriteString(fmt.Sprintf("#%d - %s\n", m.selectedItem.Num, m.selectedItem.Type.String()))
 	s.WriteString("Title:\n  ")
 	s.WriteString(m.textinputItemTitle.View())
 	s.WriteString("\n")
