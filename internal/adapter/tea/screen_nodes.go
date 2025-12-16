@@ -56,7 +56,7 @@ func (m *TeaModel) updateNodes(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case model.Node:
 		m.selectedNode = msg
 		m.currentScreen = screenNode
-		// m.resetNode()
+		m.resetNode()
 	}
 
 	return m, nil

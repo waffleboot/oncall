@@ -201,7 +201,7 @@ func (m *TeaModel) Init() tea.Cmd {
 			return "Exit"
 		case "new":
 			return "Добавить узел ..."
-		case "vms":
+		case "nodes":
 			node := m.nodes[pos]
 
 			var s strings.Builder
@@ -222,7 +222,7 @@ func (m *TeaModel) Init() tea.Cmd {
 			return "Exit"
 		case "new":
 			return "Добавить заметку ..."
-		case "vms":
+		case "notes":
 			note := m.notes[pos]
 
 			var s strings.Builder
@@ -258,8 +258,8 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateItemType(msg)
 	case screenNodes:
 		return m.updateNodes(msg)
-	// case screenNode:
-	// 	return m.updateNode(msg)
+	case screenNode:
+		return m.updateNode(msg)
 	case screenNotes:
 		return m.updateNotes(msg)
 	// case screenNote:
@@ -275,7 +275,7 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case screenTitle:
 		return m.updateItemTitle(msg)
 	}
-	m.log.Error("no suck screen", zap.String("screen", string(m.currentScreen)))
+	m.log.Error("no screen", zap.String("screen", string(m.currentScreen)))
 	return m, nil
 }
 
@@ -289,8 +289,8 @@ func (m *TeaModel) View() string {
 		return m.viewItemType()
 	case screenNodes:
 		return m.viewNodes()
-	// case screenNode:
-	// 	return m.viewNode()
+	case screenNode:
+		return m.viewNode()
 	case screenNotes:
 		return m.viewNotes()
 	// case screenNote:
@@ -306,7 +306,7 @@ func (m *TeaModel) View() string {
 	case screenTitle:
 		return m.viewTitle()
 	}
-	m.log.Error("no suck screen", zap.String("screen", string(m.currentScreen)))
+	m.log.Error("no screen", zap.String("screen", string(m.currentScreen)))
 	return ""
 }
 
