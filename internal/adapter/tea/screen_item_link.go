@@ -13,6 +13,15 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "left", "right":
+			switch m.textInput {
+			case "submit":
+				m.textInput = "public"
+				return m, nil
+			case "public":
+				m.textInput = "submit"
+				return m, nil
+			}
 		case "tab":
 			switch m.textInput {
 			case "address":
@@ -23,6 +32,8 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 				m.textInput = "submit"
 				m.textinputLinkDescription.Blur()
 			case "submit":
+				m.textInput = "public"
+			case "public":
 				m.textInput = "address"
 				m.textinputLinkAddress.Focus()
 			}
@@ -66,7 +77,7 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 		case "esc":
 			return m, func() tea.Msg { return "exit" }
 		case "q":
-			if m.textInput == "submit" {
+			if m.textInput != "address" && m.textInput != "description" {
 				return m, func() tea.Msg { return "exit" }
 			}
 		case "enter":
@@ -86,6 +97,15 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 				return m, func() tea.Msg {
 					m.selectedLink.Address = m.textinputLinkAddress.Value()
 					m.selectedLink.Description = m.textinputLinkDescription.Value()
+					m.selectedItem.UpdateItemLink(m.selectedLink)
+					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+						return fmt.Errorf("update item: %w", err)
+					}
+					return "exit"
+				}
+			case "public":
+				return m, func() tea.Msg {
+					m.selectedLink.Public = !m.selectedLink.Public
 					m.selectedItem.UpdateItemLink(m.selectedLink)
 					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
@@ -126,9 +146,23 @@ func (m *TeaModel) viewItemLink() string {
 	s.WriteString("\n")
 
 	if m.textInput == "submit" {
-		s.WriteString("[[ Submit ]]\n")
+		s.WriteString("[[ SUBMIT ]] ")
 	} else {
-		s.WriteString("[ Submit ]\n")
+		s.WriteString("[ submit ] ")
+	}
+
+	if m.textInput == "public" {
+		if m.selectedLink.Public {
+			s.WriteString("[[ SUBMIT AS PRIVATE ]]\n")
+		} else {
+			s.WriteString("[[ SUBMIT AS PUBLIC ]]\n")
+		}
+	} else {
+		if m.selectedLink.Public {
+			s.WriteString("[ submit as private ]\n")
+		} else {
+			s.WriteString("[ submit as public ]\n")
+		}
 	}
 
 	return s.String()

@@ -64,13 +64,13 @@ func (m *TeaModel) Init() tea.Cmd {
 	m.allItemsMenu = NewMenu(func(group string, pos int) string {
 		switch {
 		case group == "exit":
-			return "Exit (q)"
+			return "Exit"
 		case group == "new":
-			return "Новое обращение (n)"
+			return "Новое обращение"
 		case group == "close_journal":
 			return "Закрыть журнал"
 		case group == "print_journal":
-			return "Распечатать журнал (p)"
+			return "Распечатать журнал"
 		case group == "items":
 			marker := " "
 			item := m.items[pos]
@@ -88,7 +88,7 @@ func (m *TeaModel) Init() tea.Cmd {
 	m.editItemMenu = NewMenu(func(group string, pos int) string {
 		switch {
 		case group == "exit":
-			return "Exit (q)"
+			return "Exit"
 		case group == "sleep":
 			return "В ожидание"
 		case group == "awake":
@@ -98,17 +98,17 @@ func (m *TeaModel) Init() tea.Cmd {
 		case group == "delete":
 			return "Удалить"
 		case group == "item_title":
-			return "Имя и описание (t) ..."
+			return "Имя и описание ..."
 		case group == "item_type":
-			return fmt.Sprintf("Тип обращения: (%s)...", m.selectedItem.Type)
+			return fmt.Sprintf("Тип обращения: (%s) ...", m.selectedItem.Type)
 		case group == "item_notes":
-			return "Заметки (n) ..."
+			return "Заметки ..."
 		case group == "item_links":
-			return "Ссылки (l)..."
+			return "Ссылки ..."
 		case group == "item_nodes":
-			return "Хосты, узлы (h) ..."
+			return "Хосты, узлы ..."
 		case group == "item_vms":
-			return "ВМ-ки (v) ..."
+			return "ВМ-ки ..."
 		}
 		return group
 	})
@@ -132,9 +132,9 @@ func (m *TeaModel) Init() tea.Cmd {
 	m.editItemLinksMenu = NewMenu(func(group string, pos int) string {
 		switch group {
 		case "exit":
-			return "Exit (q)"
+			return "Exit"
 		case "new":
-			return "Добавить ссылку (n)..."
+			return "Добавить ссылку ..."
 		case "links":
 			link := m.links[pos]
 
