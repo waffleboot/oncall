@@ -24,6 +24,8 @@ type (
 		ClosedAt    time.Time
 		Type        ItemType
 		Links       []Link
+		Notes       []Note
+		Nodes       []Node
 		VMs         []VM
 		Title       string
 		Description string

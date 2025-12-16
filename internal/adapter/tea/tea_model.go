@@ -47,8 +47,8 @@ type (
 		menuItemType             *Menu
 		linksMenu                *Menu
 		menuVMs                  *Menu
-		notesVMs                 *Menu
-		nodesVMs                 *Menu
+		menuNotes                *Menu
+		menuNodes                *Menu
 		textinputLinkAddress     textinput.Model
 		textinputLinkDescription textarea.Model
 		textinputItemTitle       textinput.Model
@@ -187,6 +187,48 @@ func (m *TeaModel) Init() tea.Cmd {
 				s.WriteString("empty")
 			} else {
 				s.WriteString(vm.Name)
+			}
+			return s.String()
+		default:
+			return group
+		}
+	})
+	m.menuNodes = NewMenu(func(group string, pos int) string {
+		switch group {
+		case "exit":
+			return "Exit"
+		case "new":
+			return "Добавить узел ..."
+		case "vms":
+			node := m.nodes[pos]
+
+			var s strings.Builder
+			s.WriteString(fmt.Sprintf("#%d - ", node.ID))
+			if node.Name == "" {
+				s.WriteString("empty")
+			} else {
+				s.WriteString(node.Name)
+			}
+			return s.String()
+		default:
+			return group
+		}
+	})
+	m.menuNotes = NewMenu(func(group string, pos int) string {
+		switch group {
+		case "exit":
+			return "Exit"
+		case "new":
+			return "Добавить заметку ..."
+		case "vms":
+			note := m.notes[pos]
+
+			var s strings.Builder
+			s.WriteString(fmt.Sprintf("#%d - ", note.ID))
+			if note.Text == "" {
+				s.WriteString("empty")
+			} else {
+				s.WriteString(note.Text)
 			}
 			return s.String()
 		default:

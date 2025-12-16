@@ -32,6 +32,8 @@ type (
 		ClosedAt    time.Time    `json:"closedAt,omitempty"`
 		DeletedAt   time.Time    `json:"deletedAt,omitempty"`
 		Links       []storedLink `json:"links,omitempty"`
+		Notes       []note       `json:"notes,omitempty"`
+		Nodes       []node       `json:"nodes,omitempty"`
 		VMs         []vm         `json:"vms,omitempty"`
 		Type        string       `json:"type,omitempty"`
 		Title       string       `json:"title,omitempty"`
