@@ -9,7 +9,7 @@ import (
 )
 
 func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if m.editItemLinksMenu.ProcessMsg(msg) {
+	if m.linksMenu.ProcessMsg(msg) {
 		return m, nil
 	}
 
@@ -28,7 +28,7 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.currentScreen = screenItem
 			return m, m.getItem
 		case "d":
-			if g, p := m.editItemLinksMenu.GetGroup(); g == "links" {
+			if g, p := m.linksMenu.GetGroup(); g == "links" {
 				return m, func() tea.Msg {
 					m.selectedItem.DeleteItemLink(m.links[p], time.Now())
 					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
@@ -40,7 +40,7 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "n":
 			return m, newLink
 		case "enter", " ":
-			switch g, p := m.editItemLinksMenu.GetGroup(); g {
+			switch g, p := m.linksMenu.GetGroup(); g {
 			case "exit":
 				m.currentScreen = screenItem
 				return m, m.getItem
@@ -48,13 +48,13 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, newLink
 			case "links":
 				m.selectedLink = m.links[p]
-				m.currentScreen = screenItemLink
+				m.currentScreen = screenLink
 				m.resetItemLink()
 			}
 		}
 	case itemLinkCreatedMsg:
 		m.selectedLink = msg.link
-		m.currentScreen = screenItemLink
+		m.currentScreen = screenLink
 		m.resetItemLink()
 	case model.Item:
 		m.selectedItem = msg
@@ -65,18 +65,18 @@ func (m *TeaModel) updateItemLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TeaModel) viewItemLinks() string {
-	return m.editItemLinksMenu.GenerateMenu()
+	return m.linksMenu.GenerateMenu()
 }
 
 func (m *TeaModel) resetItemLinks(toGroup string) {
 	m.links = m.selectedItem.ActiveLinks()
-	m.editItemLinksMenu.ResetMenu()
-	m.editItemLinksMenu.AddGroup("exit")
-	m.editItemLinksMenu.AddGroup("new")
-	m.editItemLinksMenu.AddGroupWithItems("links", len(m.links))
+	m.linksMenu.ResetMenu()
+	m.linksMenu.AddGroup("exit")
+	m.linksMenu.AddGroup("new")
+	m.linksMenu.AddGroupWithItems("links", len(m.links))
 	if toGroup != "" {
-		m.editItemLinksMenu.JumpToGroup(toGroup)
+		m.linksMenu.JumpToGroup(toGroup)
 	} else {
-		m.editItemLinksMenu.AdjustCursor()
+		m.linksMenu.AdjustCursor()
 	}
 }

@@ -17,8 +17,12 @@ func (m *TeaModel) updateVM(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 		case "tab":
 			switch m.textInput {
 			case "name":
-				m.textInput = "description"
+				m.textInput = "node"
 				m.textinputVmName.Blur()
+				m.textinputVmNode.Focus()
+			case "node":
+				m.textInput = "description"
+				m.textinputVmNode.Blur()
 				m.textinputVmDescription.Focus()
 			case "description":
 				m.textInput = "submit"
@@ -34,10 +38,15 @@ func (m *TeaModel) updateVM(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 				m.textInput = "submit"
 				m.textinputVmName.Blur()
 				return m, nil
+			case "node":
+				m.textInput = "name"
+				m.textinputVmNode.Blur()
+				m.textinputVmName.Focus()
+				return m, nil
 			case "description":
 				if len(m.textinputVmDescription.Value()) == 0 {
-					m.textInput = "name"
-					m.textinputVmName.Focus()
+					m.textInput = "node"
+					m.textinputVmNode.Focus()
 					m.textinputVmDescription.Blur()
 					return m, nil
 				}
@@ -49,8 +58,13 @@ func (m *TeaModel) updateVM(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 		case "down":
 			switch m.textInput {
 			case "name":
-				m.textInput = "description"
+				m.textInput = "node"
 				m.textinputVmName.Blur()
+				m.textinputVmNode.Focus()
+				return m, nil
+			case "node":
+				m.textInput = "description"
+				m.textinputVmNode.Blur()
 				m.textinputVmDescription.Focus()
 				return m, nil
 			case "description":
@@ -68,15 +82,20 @@ func (m *TeaModel) updateVM(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 			m.currentScreen = screenVMs
 			return m, m.getItem
 		case "q":
-			if m.textInput != "name" && m.textInput != "description" {
+			if m.textInput != "name" && m.textInput != "node" && m.textInput != "description" {
 				m.currentScreen = screenVMs
 				return m, m.getItem
 			}
 		case "enter":
 			switch m.textInput {
 			case "name":
-				m.textInput = "description"
+				m.textInput = "node"
 				m.textinputVmName.Blur()
+				m.textinputVmNode.Focus()
+				return m, nil
+			case "node":
+				m.textInput = "description"
+				m.textinputVmNode.Blur()
 				m.textinputVmDescription.Focus()
 				return m, nil
 			case "description":
@@ -88,6 +107,7 @@ func (m *TeaModel) updateVM(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 			case "submit":
 				return m, func() tea.Msg {
 					m.selectedVM.Name = m.textinputVmName.Value()
+					m.selectedVM.Node = m.textinputVmNode.Value()
 					m.selectedVM.Description = m.textinputVmDescription.Value()
 					m.selectedItem.UpdateVM(m.selectedVM)
 					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
@@ -106,6 +126,9 @@ func (m *TeaModel) updateVM(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	case "name":
 		m.textinputVmName, cmd = m.textinputVmName.Update(msg)
 		return m, cmd
+	case "node":
+		m.textinputVmNode, cmd = m.textinputVmNode.Update(msg)
+		return m, cmd
 	case "description":
 		m.textinputVmDescription, cmd = m.textinputVmDescription.Update(msg)
 		return m, cmd
@@ -120,6 +143,8 @@ func (m *TeaModel) viewVM() string {
 	s.WriteString(fmt.Sprintf("ID: %d\n", m.selectedVM.ID))
 	s.WriteString("Name:\n  ")
 	s.WriteString(m.textinputVmName.View())
+	s.WriteString("\nNode:\n  ")
+	s.WriteString(m.textinputVmNode.View())
 	s.WriteString("\n")
 	s.WriteString("Description:\n")
 	s.WriteString(m.textinputVmDescription.View())
@@ -144,6 +169,14 @@ func (m *TeaModel) resetVM() {
 	m.textinputVmName.Width = 80
 	m.textinputVmName.CharLimit = 1000
 	m.textinputVmName.SetValue(m.selectedVM.Name)
+
+	m.textinputVmNode = textinput.New()
+	m.textinputVmNode.Placeholder = "node"
+	m.textinputVmNode.Prompt = ""
+	m.textinputVmNode.Blur()
+	m.textinputVmNode.Width = 80
+	m.textinputVmNode.CharLimit = 1000
+	m.textinputVmNode.SetValue(m.selectedVM.Node)
 
 	m.textinputVmDescription = textarea.New()
 	m.textinputVmDescription.Placeholder = "link description"

@@ -9,7 +9,7 @@ import (
 )
 
 func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if m.editItemTypeMenu.ProcessMsg(msg) {
+	if m.menuItemType.ProcessMsg(msg) {
 		return m, nil
 	}
 
@@ -19,7 +19,7 @@ func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "esc", "q":
 			m.currentScreen = screenItem
 		case "enter", " ":
-			g, _ := m.editItemTypeMenu.GetGroup()
+			g, _ := m.menuItemType.GetGroup()
 			return m, func() tea.Msg {
 				m.selectedItem.Type = model.ItemType(g)
 				if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
@@ -39,6 +39,6 @@ func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *TeaModel) viewItemType() string {
 	var s strings.Builder
 	s.WriteString("  Тип обращения:\n\n")
-	s.WriteString(m.editItemTypeMenu.GenerateMenu())
+	s.WriteString(m.menuItemType.GenerateMenu())
 	return s.String()
 }

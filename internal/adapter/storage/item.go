@@ -22,7 +22,7 @@ func (s *storedItem) fromDomain(item model.Item) {
 
 func (s *storedItem) toDomain() model.Item {
 	vms := make([]model.VM, len(s.VMs))
-	links := make([]model.ItemLink, len(s.Links))
+	links := make([]model.Link, len(s.Links))
 	for i := range s.Links {
 		links[i] = s.Links[i].toDomain()
 	}

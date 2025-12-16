@@ -82,7 +82,7 @@ func (s *ItemService) updateItem(item model.Item) error {
 	return nil
 }
 
-func (s *ItemService) UpdateItemLink(item model.Item, link model.ItemLink) error {
+func (s *ItemService) UpdateItemLink(item model.Item, link model.Link) error {
 	var found bool
 	for i := range item.Links {
 		if item.Links[i].ID == link.ID {

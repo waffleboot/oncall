@@ -23,12 +23,12 @@ type (
 		SleepAt     time.Time
 		ClosedAt    time.Time
 		Type        ItemType
-		Links       []ItemLink
+		Links       []Link
 		VMs         []VM
 		Title       string
 		Description string
 	}
-	ItemLink struct {
+	Link struct {
 		ID          int
 		Public      bool
 		Address     string
@@ -112,8 +112,8 @@ func (t Item) Compare(o Item) int {
 	return t.Type.Compare(o.Type)
 }
 
-func (s *Item) ActiveLinks() []ItemLink {
-	links := make([]ItemLink, 0, len(s.Links))
+func (s *Item) ActiveLinks() []Link {
+	links := make([]Link, 0, len(s.Links))
 	for _, link := range s.Links {
 		if !link.IsDeleted() {
 			links = append(links, link)
@@ -122,8 +122,8 @@ func (s *Item) ActiveLinks() []ItemLink {
 	return links
 }
 
-func (s *Item) PrintedLinks() []ItemLink {
-	links := make([]ItemLink, 0, len(s.Links))
+func (s *Item) PrintedLinks() []Link {
+	links := make([]Link, 0, len(s.Links))
 	for _, link := range s.Links {
 		if !link.IsDeleted() && link.Public && strings.TrimSpace(link.Address) != "" {
 			links = append(links, link)
@@ -132,7 +132,7 @@ func (s *Item) PrintedLinks() []ItemLink {
 	return links
 }
 
-func (s *Item) CreateItemLink() ItemLink {
+func (s *Item) CreateItemLink() Link {
 	var maxID int
 	for i := range s.Links {
 		link := s.Links[i]
@@ -140,12 +140,12 @@ func (s *Item) CreateItemLink() ItemLink {
 			maxID = link.ID
 		}
 	}
-	link := ItemLink{ID: maxID + 1, Public: true}
+	link := Link{ID: maxID + 1, Public: true}
 	s.Links = append(s.Links, link)
 	return link
 }
 
-func (s *Item) UpdateItemLink(link ItemLink) {
+func (s *Item) UpdateItemLink(link Link) {
 	for i := range s.Links {
 		if s.Links[i].ID == link.ID {
 			s.Links[i] = link
@@ -154,7 +154,7 @@ func (s *Item) UpdateItemLink(link ItemLink) {
 	}
 }
 
-func (s *Item) DeleteItemLink(link ItemLink, at time.Time) {
+func (s *Item) DeleteItemLink(link Link, at time.Time) {
 	for i := range s.Links {
 		if s.Links[i].ID == link.ID {
 			s.Links[i].DeletedAt = at
@@ -170,7 +170,7 @@ func (s *Item) TitleForView() string {
 	return "no title"
 }
 
-func (s *ItemLink) IsDeleted() bool {
+func (s *Link) IsDeleted() bool {
 	return !s.DeletedAt.IsZero()
 }
 

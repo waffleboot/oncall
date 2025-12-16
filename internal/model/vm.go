@@ -7,6 +7,7 @@ import (
 type VM struct {
 	ID          int
 	Name        string
+	Node        string
 	DeletedAt   time.Time
 	Description string
 }

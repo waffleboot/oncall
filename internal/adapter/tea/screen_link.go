@@ -117,7 +117,7 @@ func (m *TeaModel) updateItemLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	case string:
 		switch msg {
 		case "exit":
-			m.currentScreen = screenItemLinks
+			m.currentScreen = screenLinks
 			return m, m.getItem
 		}
 	}

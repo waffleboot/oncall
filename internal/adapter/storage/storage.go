@@ -188,7 +188,7 @@ func (s *Storage) saveData() error {
 	return nil
 }
 
-func (s *storedLink) fromDomain(link model.ItemLink) {
+func (s *storedLink) fromDomain(link model.Link) {
 	s.ID = link.ID
 	s.Link = link.Address
 	s.Public = link.Public
@@ -196,8 +196,8 @@ func (s *storedLink) fromDomain(link model.ItemLink) {
 	s.Description = link.Description
 }
 
-func (s *storedLink) toDomain() model.ItemLink {
-	return model.ItemLink{
+func (s *storedLink) toDomain() model.Link {
+	return model.Link{
 		ID:          s.ID,
 		Address:     s.Link,
 		Public:      s.Public,

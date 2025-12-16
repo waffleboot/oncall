@@ -12,16 +12,18 @@ import (
 )
 
 const (
-	screenAllItems  screen = "all_items"
-	screenItem      screen = "edit_item"
-	screenItemType  screen = "item_type"
-	screenItemLinks screen = "item_links"
-	screenItemNodes screen = "item_nodes"
-	screenItemNotes screen = "item_notes"
-	screenVMs       screen = "vms"
-	screenVM        screen = "vm"
-	screenItemLink  screen = "item_link"
-	screenItemTitle screen = "item_title"
+	screenAllItems screen = "all_items"
+	screenItem     screen = "edit_item"
+	screenItemType screen = "item_type"
+	screenLinks    screen = "links"
+	screenLink     screen = "link"
+	screenNodes    screen = "nodes"
+	screenNode     screen = "node"
+	screenNotes    screen = "notes"
+	screenNote     screen = "note"
+	screenVMs      screen = "vms"
+	screenVM       screen = "vm"
+	screenTitle    screen = "title"
 )
 
 type (
@@ -32,21 +34,30 @@ type (
 		currentScreen            screen
 		items                    []model.Item
 		vms                      []model.VM
-		links                    []model.ItemLink
+		links                    []model.Link
+		nodes                    []model.Node
+		notes                    []model.Note
 		selectedItem             model.Item
-		selectedLink             model.ItemLink
+		selectedLink             model.Link
 		selectedVM               model.VM
-		allItemsMenu             *Menu
-		editItemMenu             *Menu
-		editItemTypeMenu         *Menu
-		editItemLinksMenu        *Menu
+		selectedNode             model.Node
+		selectedNote             model.Note
+		menuAllItems             *Menu
+		menuEditItem             *Menu
+		menuItemType             *Menu
+		linksMenu                *Menu
 		menuVMs                  *Menu
+		notesVMs                 *Menu
+		nodesVMs                 *Menu
 		textinputLinkAddress     textinput.Model
 		textinputLinkDescription textarea.Model
 		textinputItemTitle       textinput.Model
 		textinputItemDescription textarea.Model
 		textinputVmName          textinput.Model
+		textinputVmNode          textinput.Model
 		textinputVmDescription   textarea.Model
+		textinputNodeName        textinput.Model
+		textinputNote            textarea.Model
 		textInput                string
 		printJournal             bool
 	}
@@ -57,7 +68,7 @@ type (
 	itemClosedMsg      struct{}
 	itemDeletedMsg     struct{}
 	itemLinkCreatedMsg struct {
-		link model.ItemLink
+		link model.Link
 	}
 )
 
@@ -67,7 +78,7 @@ func NewTeaModel(itemService port.ItemService, journalService port.JournalServic
 
 func (m *TeaModel) Init() tea.Cmd {
 	m.currentScreen = screenAllItems
-	m.allItemsMenu = NewMenu(func(group string, pos int) string {
+	m.menuAllItems = NewMenu(func(group string, pos int) string {
 		switch {
 		case group == "exit":
 			return "Exit"
@@ -91,7 +102,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		return group
 	})
 	m.resetAllItems(nil)
-	m.editItemMenu = NewMenu(func(group string, pos int) string {
+	m.menuEditItem = NewMenu(func(group string, pos int) string {
 		switch {
 		case group == "exit":
 			return "Exit"
@@ -118,7 +129,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return group
 	})
-	m.editItemTypeMenu = NewMenu(func(group string, pos int) string {
+	m.menuItemType = NewMenu(func(group string, pos int) string {
 		switch model.ItemType(group) {
 		case model.ItemTypeInc:
 			return "Инцидент"
@@ -131,11 +142,11 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return group
 	})
-	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAsk))
-	m.editItemTypeMenu.AddGroup(string(model.ItemTypeInc))
-	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAlert))
-	m.editItemTypeMenu.AddGroup(string(model.ItemTypeAdhoc))
-	m.editItemLinksMenu = NewMenu(func(group string, pos int) string {
+	m.menuItemType.AddGroup(string(model.ItemTypeAsk))
+	m.menuItemType.AddGroup(string(model.ItemTypeInc))
+	m.menuItemType.AddGroup(string(model.ItemTypeAlert))
+	m.menuItemType.AddGroup(string(model.ItemTypeAdhoc))
+	m.linksMenu = NewMenu(func(group string, pos int) string {
 		switch group {
 		case "exit":
 			return "Exit"
@@ -201,19 +212,19 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateEditItem(msg)
 	case screenItemType:
 		return m.updateItemType(msg)
-	case screenItemNodes:
+	case screenNodes:
 		return m.updateItemNodes(msg)
-	case screenItemNotes:
+	case screenNotes:
 		return m.updateItemNotes(msg)
-	case screenItemLinks:
+	case screenLinks:
 		return m.updateItemLinks(msg)
-	case screenItemLink:
+	case screenLink:
 		return m.updateItemLink(msg)
 	case screenVMs:
 		return m.updateVMs(msg)
 	case screenVM:
 		return m.updateVM(msg)
-	case screenItemTitle:
+	case screenTitle:
 		return m.updateItemTitle(msg)
 	}
 	return m, nil
@@ -227,19 +238,19 @@ func (m *TeaModel) View() string {
 		return m.viewEditItem()
 	case screenItemType:
 		return m.viewItemType()
-	case screenItemNodes:
+	case screenNodes:
 		return m.viewItemNodes()
-	case screenItemNotes:
+	case screenNotes:
 		return m.viewItemNotes()
-	case screenItemLinks:
+	case screenLinks:
 		return m.viewItemLinks()
-	case screenItemLink:
+	case screenLink:
 		return m.viewItemLink()
 	case screenVMs:
 		return m.viewVMs()
 	case screenVM:
 		return m.viewVM()
-	case screenItemTitle:
+	case screenTitle:
 		return m.viewItemTitle()
 	}
 	return ""
