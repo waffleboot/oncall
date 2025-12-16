@@ -12,6 +12,17 @@ func (s *Note) IsDeleted() bool {
 	return !s.DeletedAt.IsZero()
 }
 
+func (s *Note) MenuItem() string {
+	switch {
+	case s.Text == "":
+		return "empty"
+	case len(s.Text) < 50:
+		return s.Text
+	default:
+		return s.Text[:50] + " ..."
+	}
+}
+
 func (s *Item) CreateNote() Note {
 	var maxID int
 	for i := range s.Notes {
@@ -23,6 +34,15 @@ func (s *Item) CreateNote() Note {
 	note := Note{ID: maxID + 1}
 	s.Notes = append(s.Notes, note)
 	return note
+}
+
+func (s *Item) UpdateNote(note Note) {
+	for i := range s.Notes {
+		if s.Notes[i].ID == note.ID {
+			s.Notes[i] = note
+			break
+		}
+	}
 }
 
 func (s *Item) DeleteNote(note Note, at time.Time) {

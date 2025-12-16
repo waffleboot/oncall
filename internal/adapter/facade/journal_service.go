@@ -58,7 +58,7 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 
 		for i, item := range items {
 
-			_, _ = fmt.Fprintf(w, "\n%d) %s #%d", i+1, item.TitleForView(), item.Num)
+			_, _ = fmt.Fprintf(w, "\n%d) %s #%d", i+1, item.MenuItem(), item.Num)
 
 			switch {
 			case item.IsActive():

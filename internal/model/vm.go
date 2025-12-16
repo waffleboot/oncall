@@ -16,6 +16,13 @@ func (s *VM) IsDeleted() bool {
 	return !s.DeletedAt.IsZero()
 }
 
+func (s *VM) MenuItem() string {
+	if s.Name == "" {
+		return "empty"
+	}
+	return s.Name
+}
+
 func (s *Item) ActiveVMs() []VM {
 	vms := make([]VM, 0, len(s.VMs))
 	for _, vm := range s.VMs {

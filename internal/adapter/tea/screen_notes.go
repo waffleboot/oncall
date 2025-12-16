@@ -56,7 +56,7 @@ func (m *TeaModel) updateNotes(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case model.Note:
 		m.selectedNote = msg
 		m.currentScreen = screenNote
-		// m.resetNote()
+		m.resetNote()
 	}
 
 	return m, nil

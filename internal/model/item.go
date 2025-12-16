@@ -165,7 +165,7 @@ func (s *Item) DeleteLink(link Link, at time.Time) {
 	}
 }
 
-func (s *Item) TitleForView() string {
+func (s *Item) MenuItem() string {
 	if len(s.Title) > 0 {
 		return s.Title
 	}
@@ -174,4 +174,19 @@ func (s *Item) TitleForView() string {
 
 func (s *Link) IsDeleted() bool {
 	return !s.DeletedAt.IsZero()
+}
+
+func (s *Link) MenuItem() string {
+	var sb strings.Builder
+	if s.Address == "" {
+		sb.WriteString("empty")
+	} else {
+		sb.WriteString(s.Address)
+	}
+	if s.Public {
+		sb.WriteString(" - public")
+	} else {
+		sb.WriteString(" - private")
+	}
+	return sb.String()
 }

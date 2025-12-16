@@ -99,7 +99,7 @@ func (m *TeaModel) Init() tea.Cmd {
 			case item.IsClosed():
 				marker = "x"
 			}
-			return fmt.Sprintf("%s #%d - %s - %s", marker, item.Num, item.Type, item.TitleForView())
+			return fmt.Sprintf("%s #%d - %s - %s", marker, item.Num, item.Type, item.MenuItem())
 		}
 		return group
 	})
@@ -159,16 +159,7 @@ func (m *TeaModel) Init() tea.Cmd {
 
 			var s strings.Builder
 			s.WriteString(fmt.Sprintf("#%d - ", link.ID))
-			if link.Address == "" {
-				s.WriteString("empty")
-			} else {
-				s.WriteString(link.Address)
-			}
-			if link.Public {
-				s.WriteString(" - public")
-			} else {
-				s.WriteString(" - private")
-			}
+			s.WriteString(link.MenuItem())
 			return s.String()
 		default:
 			return group
@@ -185,11 +176,7 @@ func (m *TeaModel) Init() tea.Cmd {
 
 			var s strings.Builder
 			s.WriteString(fmt.Sprintf("#%d - ", vm.ID))
-			if vm.Name == "" {
-				s.WriteString("empty")
-			} else {
-				s.WriteString(vm.Name)
-			}
+			s.WriteString(vm.MenuItem())
 			return s.String()
 		default:
 			return group
@@ -206,11 +193,7 @@ func (m *TeaModel) Init() tea.Cmd {
 
 			var s strings.Builder
 			s.WriteString(fmt.Sprintf("#%d - ", node.ID))
-			if node.Name == "" {
-				s.WriteString("empty")
-			} else {
-				s.WriteString(node.Name)
-			}
+			s.WriteString(node.MenuItem())
 			return s.String()
 		default:
 			return group
@@ -227,11 +210,7 @@ func (m *TeaModel) Init() tea.Cmd {
 
 			var s strings.Builder
 			s.WriteString(fmt.Sprintf("#%d - ", note.ID))
-			if note.Text == "" {
-				s.WriteString("empty")
-			} else {
-				s.WriteString(note.Text)
-			}
+			s.WriteString(note.MenuItem())
 			return s.String()
 		default:
 			return group
@@ -262,8 +241,8 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateNode(msg)
 	case screenNotes:
 		return m.updateNotes(msg)
-	// case screenNote:
-	// 	return m.updateNote(msg)
+	case screenNote:
+		return m.updateNote(msg)
 	case screenLinks:
 		return m.updateLinks(msg)
 	case screenLink:
@@ -293,8 +272,8 @@ func (m *TeaModel) View() string {
 		return m.viewNode()
 	case screenNotes:
 		return m.viewNotes()
-	// case screenNote:
-	// 	return m.viewNote()
+	case screenNote:
+		return m.viewNote()
 	case screenLinks:
 		return m.viewLinks()
 	case screenLink:

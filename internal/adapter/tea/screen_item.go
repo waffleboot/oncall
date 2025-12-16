@@ -125,7 +125,7 @@ func (m *TeaModel) viewItem() string {
 	}
 
 	var s strings.Builder
-	s.WriteString(fmt.Sprintf("  #%d - %s - %s%s\n\n", m.selectedItem.Num, m.selectedItem.Type, m.selectedItem.TitleForView(), state))
+	s.WriteString(fmt.Sprintf("  #%d - %s - %s%s\n\n", m.selectedItem.Num, m.selectedItem.Type, m.selectedItem.MenuItem(), state))
 	s.WriteString(m.menuItem.GenerateMenu())
 
 	return s.String()

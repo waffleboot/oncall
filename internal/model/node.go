@@ -12,6 +12,13 @@ func (s *Node) IsDeleted() bool {
 	return !s.DeletedAt.IsZero()
 }
 
+func (s *Node) MenuItem() string {
+	if s.Name == "" {
+		return "empty"
+	}
+	return s.Name
+}
+
 func (s *Item) ActiveNodes() []Node {
 	nodes := make([]Node, 0, len(s.Nodes))
 	for _, node := range s.Nodes {
