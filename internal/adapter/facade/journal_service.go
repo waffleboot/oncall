@@ -64,12 +64,20 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 				_, _ = fmt.Fprintln(w, item.Description)
 			}
 
+			if vms := item.PrintedVMs(); len(vms) > 0 {
+				for _, vm := range vms {
+					_, _ = fmt.Fprintln(w)
+					_, _ = fmt.Fprintf(w, "vm: %s\n", vm.ToPublish())
+				}
+			}
+
 			if links := item.PrintedLinks(); len(links) > 0 {
 				for _, link := range links {
 					_, _ = fmt.Fprintln(w)
 					_, _ = fmt.Fprintln(w, link.ToPublish())
 				}
 			}
+
 		}
 	}
 

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -19,6 +20,13 @@ func (s *VM) IsDeleted() bool {
 func (s *VM) MenuItem() string {
 	if s.Name == "" {
 		return "empty"
+	}
+	return s.Name
+}
+
+func (s *VM) ToPublish() string {
+	if s.Node != "" {
+		return fmt.Sprintf("%s@%s", s.Name, s.Node)
 	}
 	return s.Name
 }

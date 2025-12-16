@@ -135,6 +135,16 @@ func (s *Item) PrintedLinks() []Link {
 	return links
 }
 
+func (s *Item) PrintedVMs() []VM {
+	vms := make([]VM, 0, len(s.VMs))
+	for _, vm := range s.VMs {
+		if !vm.IsDeleted() && strings.TrimSpace(vm.Name) != "" {
+			vms = append(vms, vm)
+		}
+	}
+	return vms
+}
+
 func (s *Item) CreateLink() Link {
 	var maxID int
 	for i := range s.Links {
