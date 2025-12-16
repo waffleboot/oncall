@@ -19,13 +19,13 @@ type (
 	Storage struct {
 		config  Config
 		lastNum int
-		items   []storedItem
+		items   []item
 	}
 	storedData struct {
-		LastNum int          `json:"last_num,omitempty"`
-		Items   []storedItem `json:"items,omitempty"`
+		LastNum int    `json:"last_num,omitempty"`
+		Items   []item `json:"items,omitempty"`
 	}
-	storedItem struct {
+	item struct {
 		ID          uuid.UUID    `json:"id"`
 		Num         int          `json:"num"`
 		SleepAt     time.Time    `json:"sleepAt,omitempty"`
@@ -71,19 +71,19 @@ func (s *Storage) GetItem(itemID uuid.UUID) (model.Item, error) {
 	return model.Item{}, errors.New("not found")
 }
 
-func (s *Storage) UpdateItem(item model.Item) error {
+func (s *Storage) UpdateItem(it model.Item) error {
 	var found bool
 
 	for i := range s.items {
-		if s.items[i].ID == item.ID {
-			s.items[i].fromDomain(item)
+		if s.items[i].ID == it.ID {
+			s.items[i].fromDomain(it)
 			found = true
 		}
 	}
 
 	if !found {
-		var st storedItem
-		st.fromDomain(item)
+		var st item
+		st.fromDomain(it)
 		s.items = append(s.items, st)
 	}
 

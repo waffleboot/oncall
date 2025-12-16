@@ -2,7 +2,7 @@ package storage
 
 import "github.com/waffleboot/oncall/internal/model"
 
-func (s *storedItem) fromDomain(item model.Item) {
+func (s *item) fromDomain(item model.Item) {
 	s.ID = item.ID
 	s.Num = item.Num
 	s.SleepAt = item.SleepAt.UTC()
@@ -32,7 +32,7 @@ func (s *storedItem) fromDomain(item model.Item) {
 	}
 }
 
-func (s *storedItem) toDomain() model.Item {
+func (s *item) toDomain() model.Item {
 	vms := make([]model.VM, len(s.VMs))
 	for i := range s.VMs {
 		vms[i] = s.VMs[i].toDomain()
