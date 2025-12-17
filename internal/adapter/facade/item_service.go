@@ -21,11 +21,7 @@ func NewItemService(storage port.Storage, numGen port.NumGenerator) *ItemService
 }
 
 func (s *ItemService) CreateItem() (model.Item, error) {
-	item := model.Item{
-		ID:   uuid.New(),
-		Num:  s.numGen.GenerateNum(),
-		Type: model.ItemTypeAsk,
-	}
+	item := model.NewItem(s.numGen.GenerateNum())
 	if err := s.updateItem(item); err != nil {
 		return model.Item{}, err
 	}
@@ -33,6 +29,7 @@ func (s *ItemService) CreateItem() (model.Item, error) {
 }
 
 func (s *ItemService) UpdateItem(item model.Item) error {
+	item.UpdatedAt = time.Now()
 	return s.updateItem(item)
 }
 

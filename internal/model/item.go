@@ -21,6 +21,8 @@ type (
 		ID          uuid.UUID
 		Num         int
 		SleepAt     time.Time
+		CreatedAt   time.Time
+		UpdatedAt   time.Time
 		ClosedAt    time.Time
 		Type        ItemType
 		Notes       []Note
@@ -31,6 +33,16 @@ type (
 		Description string
 	}
 )
+
+func NewItem(num int) Item {
+	return Item{
+		ID:        uuid.New(),
+		Num:       num,
+		Type:      ItemTypeAsk,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+}
 
 func (i *Item) IsActive() bool {
 	return !i.IsClosed() && i.SleepAt.IsZero()
