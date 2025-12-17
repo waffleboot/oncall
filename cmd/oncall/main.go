@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -19,7 +20,7 @@ func main() {
 	}
 }
 
-func run() error {
+func run() (err error) {
 	log, err := getLogger()
 	if err != nil {
 		return fmt.Errorf("get logger: %w", err)
@@ -45,9 +46,23 @@ func run() error {
 
 	if teaModel.PrintJournal() {
 		fmt.Println("----------")
-		if err := journalService.PrintJournal(os.Stdout); err != nil {
-			return fmt.Errorf("print journal: %w", err)
+
+		printJournal := func(w io.Writer) error {
+			if err := journalService.PrintJournal(w); err != nil {
+				return fmt.Errorf("print journal: %w", err)
+			}
+			return nil
 		}
+
+		f, err := os.Create("journal.txt")
+		if err != nil {
+			return printJournal(os.Stdout)
+		}
+		defer func() {
+			err = errors.Join(f.Close())
+		}()
+
+		return printJournal(io.MultiWriter(os.Stdout, f))
 	}
 
 	return nil
