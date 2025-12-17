@@ -27,10 +27,24 @@ func (v *VM) HasNode() bool {
 }
 
 func (v *VM) MenuItem() string {
+	var sb strings.Builder
+
 	if v.Name == "" {
-		return "empty"
+		sb.WriteString("empty")
+	} else {
+		sb.WriteString(v.Name)
 	}
-	return v.Name
+
+	switch {
+	case len(v.Description) > 50:
+		sb.WriteString(" - ")
+		sb.WriteString(v.Description[:50])
+	case v.Description != "":
+		sb.WriteString(" - ")
+		sb.WriteString(v.Description)
+	}
+
+	return sb.String()
 }
 
 func (v *VM) ToPrint() string {

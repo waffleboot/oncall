@@ -78,6 +78,15 @@ func (s *Link) MenuItem() string {
 		sb.WriteString(s.Address)
 	}
 
+	switch {
+	case len(s.Description) > 50:
+		sb.WriteString(" - ")
+		sb.WriteString(s.Description[:50])
+	case s.Description != "":
+		sb.WriteString(" - ")
+		sb.WriteString(s.Description)
+	}
+
 	return sb.String()
 }
 
