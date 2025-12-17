@@ -2,7 +2,6 @@ package model
 
 import (
 	"cmp"
-	"fmt"
 	"strings"
 	"time"
 
@@ -29,13 +28,6 @@ type (
 		Links       []Link
 		VMs         []VM
 		Title       string
-		Description string
-	}
-	Link struct {
-		ID          int
-		Public      bool
-		Address     string
-		DeletedAt   time.Time
 		Description string
 	}
 )
@@ -135,16 +127,6 @@ func (s *Item) PrintedLinks() []Link {
 	return links
 }
 
-func (s *Item) PrintedVMs() []VM {
-	vms := make([]VM, 0, len(s.VMs))
-	for _, vm := range s.VMs {
-		if !vm.IsDeleted() && strings.TrimSpace(vm.Name) != "" {
-			vms = append(vms, vm)
-		}
-	}
-	return vms
-}
-
 func (s *Item) CreateLink() Link {
 	var maxID int
 	for i := range s.Links {
@@ -187,37 +169,14 @@ func (s *Item) ToPublish() string {
 	var sb strings.Builder
 
 	sb.WriteString(s.MenuItem())
-	sb.WriteString(fmt.Sprintf(" #%d", s.Num))
+	// sb.WriteString(fmt.Sprintf(" #%d", s.Num))
 
-	switch {
-	case s.IsActive():
-		sb.WriteString(" (in progress)")
-	case s.IsSleep():
-		sb.WriteString(" (in progress, in waiting)")
-	}
+	// switch {
+	// case s.IsActive():
+	// 	sb.WriteString(" (in progress)")
+	// case s.IsSleep():
+	// 	sb.WriteString(" (in progress, in waiting)")
+	// }
 
 	return sb.String()
-}
-
-func (s *Link) IsDeleted() bool {
-	return !s.DeletedAt.IsZero()
-}
-
-func (s *Link) MenuItem() string {
-	var sb strings.Builder
-	if s.Address == "" {
-		sb.WriteString("empty")
-	} else {
-		sb.WriteString(s.Address)
-	}
-	if s.Public {
-		sb.WriteString(" - public")
-	} else {
-		sb.WriteString(" - private")
-	}
-	return sb.String()
-}
-
-func (s *Link) ToPublish() string {
-	return s.Address
 }

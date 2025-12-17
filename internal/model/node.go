@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"fmt"
+	"strings"
+	"time"
+)
 
 type Node struct {
 	ID        int
@@ -8,15 +12,23 @@ type Node struct {
 	DeletedAt time.Time
 }
 
-func (s *Node) IsDeleted() bool {
-	return !s.DeletedAt.IsZero()
+func (n *Node) IsDeleted() bool {
+	return !n.DeletedAt.IsZero()
 }
 
-func (s *Node) MenuItem() string {
-	if s.Name == "" {
+func (n *Node) MenuItem() string {
+	if n.Name == "" {
 		return "empty"
 	}
-	return s.Name
+	return n.Name
+}
+
+func (n *Node) Printed() bool {
+	return !n.IsDeleted() && strings.TrimSpace(n.Name) != ""
+}
+
+func (n *Node) ToPublish() string {
+	return fmt.Sprintf("host: %s", n.Name)
 }
 
 func (s *Item) ActiveNodes() []Node {
@@ -58,4 +70,25 @@ func (s *Item) DeleteNode(node Node, at time.Time) {
 			break
 		}
 	}
+}
+
+func (s *Item) PrintedNodes() []Node {
+	m := make(map[string]Node)
+
+	for _, node := range s.Nodes {
+		if node.Printed() {
+			m[node.Name] = node
+		}
+	}
+
+	for _, vm := range s.PrintedVMs() {
+		delete(m, vm.Node)
+	}
+
+	nodes := make([]Node, 0, len(m))
+	for _, node := range m {
+		nodes = append(nodes, node)
+	}
+
+	return nodes
 }

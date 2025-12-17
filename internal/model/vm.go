@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -13,22 +14,22 @@ type VM struct {
 	Description string
 }
 
-func (s *VM) IsDeleted() bool {
-	return !s.DeletedAt.IsZero()
+func (v *VM) IsDeleted() bool {
+	return !v.DeletedAt.IsZero()
 }
 
-func (s *VM) MenuItem() string {
-	if s.Name == "" {
+func (v *VM) MenuItem() string {
+	if v.Name == "" {
 		return "empty"
 	}
-	return s.Name
+	return v.Name
 }
 
-func (s *VM) ToPublish() string {
-	if s.Node != "" {
-		return fmt.Sprintf("%s@%s", s.Name, s.Node)
+func (v *VM) ToPublish() string {
+	if v.Node != "" {
+		return fmt.Sprintf("vm: %s\nhost: %s", v.Name, v.Node)
 	}
-	return s.Name
+	return fmt.Sprintf("vm: %s", v.Name)
 }
 
 func (s *Item) ActiveVMs() []VM {
@@ -70,4 +71,18 @@ func (s *Item) DeleteVM(vm VM, at time.Time) {
 			break
 		}
 	}
+}
+
+func (v *VM) Printed() bool {
+	return !v.IsDeleted() && strings.TrimSpace(v.Name) != ""
+}
+
+func (s *Item) PrintedVMs() []VM {
+	vms := make([]VM, 0, len(s.VMs))
+	for _, vm := range s.VMs {
+		if vm.Printed() {
+			vms = append(vms, vm)
+		}
+	}
+	return vms
 }

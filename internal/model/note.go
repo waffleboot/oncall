@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 type Note struct {
 	ID        int
@@ -21,6 +24,10 @@ func (s *Note) MenuItem() string {
 	default:
 		return s.Text[:50] + " ..."
 	}
+}
+
+func (s *Note) ToPublish() string {
+	return s.Text
 }
 
 func (s *Item) CreateNote() Note {
@@ -58,6 +65,16 @@ func (s *Item) ActiveNotes() []Note {
 	notes := make([]Note, 0, len(s.Notes))
 	for _, note := range s.Notes {
 		if !note.IsDeleted() {
+			notes = append(notes, note)
+		}
+	}
+	return notes
+}
+
+func (s *Item) PrintedNotes() []Note {
+	notes := make([]Note, 0, len(s.Notes))
+	for _, note := range s.Notes {
+		if !note.IsDeleted() && strings.TrimSpace(note.Text) != "" {
 			notes = append(notes, note)
 		}
 	}

@@ -18,6 +18,8 @@ func NewJournalService(storage port.Storage) *JournalService {
 }
 
 func (s *JournalService) PrintJournal(w io.Writer) (err error) {
+	_, _ = fmt.Fprintln(w, time.Now().Format(time.DateOnly))
+
 	items, err := s.storage.GetItems()
 	if err != nil {
 		return fmt.Errorf("get items: %w", err)
@@ -28,9 +30,6 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 	for _, item := range items {
 		m[item.Type] = append(m[item.Type], item)
 	}
-
-	_, _ = fmt.Fprintln(w)
-	_, _ = fmt.Fprintln(w, time.Now().Format(time.DateOnly))
 
 	for _, itemType := range []model.ItemType{
 		model.ItemTypeInc,
@@ -67,7 +66,14 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 			if vms := item.PrintedVMs(); len(vms) > 0 {
 				for _, vm := range vms {
 					_, _ = fmt.Fprintln(w)
-					_, _ = fmt.Fprintf(w, "vm: %s\n", vm.ToPublish())
+					_, _ = fmt.Fprintln(w, vm.ToPublish())
+				}
+			}
+
+			if nodes := item.PrintedNodes(); len(nodes) > 0 {
+				for _, node := range nodes {
+					_, _ = fmt.Fprintln(w)
+					_, _ = fmt.Fprintln(w, node.ToPublish())
 				}
 			}
 
@@ -78,6 +84,12 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 				}
 			}
 
+			if notes := item.PrintedNotes(); len(notes) > 0 {
+				for _, note := range notes {
+					_, _ = fmt.Fprintln(w)
+					_, _ = fmt.Fprintln(w, note.ToPublish())
+				}
+			}
 		}
 	}
 
