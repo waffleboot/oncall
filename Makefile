@@ -5,3 +5,7 @@ build:
 .PHONY: run
 run: build
 	./bin/oncall
+
+.PHONY: zip
+zip:
+	rm ../oncall.zip && zip -r ../oncall.zip . -x '.*' 'bin/*' '*.log' '*.json' 'journal.txt'

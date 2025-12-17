@@ -9,6 +9,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
+	"github.com/waffleboot/oncall/pkg/tea/button"
+	"github.com/waffleboot/oncall/pkg/tea/tabs"
 	"go.uber.org/zap"
 )
 
@@ -51,6 +53,7 @@ type (
 		menuVMs                  *Menu
 		menuNotes                *Menu
 		menuNodes                *Menu
+		tabs                     tabs.Model
 		textinputLinkAddress     textinput.Model
 		textinputLinkDescription textarea.Model
 		textinputItemTitle       textinput.Model
@@ -61,7 +64,13 @@ type (
 		textinputNode            textinput.Model
 		textinputNodes           textarea.Model
 		textinputNote            textarea.Model
-		textInput                string
+		submitVM                 button.Model
+		submitTitle              button.Model
+		submitLink               button.Model
+		submitNote               button.Model
+		submitNodes              button.Model
+		submitAsPublicLink       button.Model
+		submitAsPrivateLink      button.Model
 		printJournal             bool
 		log                      *zap.Logger
 		err                      error
@@ -308,4 +317,17 @@ func (m *TeaModel) PrintJournal() bool {
 
 func (m *TeaModel) Err() error {
 	return m.err
+}
+
+func (m *TeaModel) exitScreen() (tea.Model, tea.Cmd) {
+	return m, func() tea.Msg { return "exit" }
+}
+
+func (m *TeaModel) runAndExitScreen(f func() error) (tea.Model, tea.Cmd) {
+	return m, func() tea.Msg {
+		if err := f(); err != nil {
+			return err
+		}
+		return "exit"
+	}
 }

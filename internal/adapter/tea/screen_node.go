@@ -6,7 +6,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/waffleboot/oncall/internal/model"
 )
 
 func (m *TeaModel) updateNode(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
@@ -14,21 +13,22 @@ func (m *TeaModel) updateNode(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
-			m.currentScreen = screenNodes
-			return m, m.getItem
+			return m.exitScreen()
 		case "enter":
-			return m, func() tea.Msg {
+			return m.runAndExitScreen(func() error {
 				m.selectedNode.Name = m.textinputNode.Value()
 				m.selectedItem.UpdateNode(m.selectedNode)
 				if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 					return fmt.Errorf("update item: %w", err)
 				}
-				return m.getItem()
-			}
+				return nil
+			})
 		}
-	case model.Item:
-		m.currentScreen = screenNodes
-		return m, m.getItem
+	case string:
+		if msg == "exit" {
+			m.currentScreen = screenNodes
+			return m, m.getItem
+		}
 	}
 
 	m.textinputNode, cmd = m.textinputNode.Update(msg)
