@@ -201,12 +201,12 @@ func (m *TeaModel) Init() tea.Cmd {
 		case "new":
 			return "Добавить заметку ..."
 		case "notes":
-			note := m.notes[pos]
+			return m.notes[pos].MenuItem()
 
-			var s strings.Builder
-			s.WriteString(fmt.Sprintf("#%d - ", note.ID))
-			s.WriteString(note.MenuItem())
-			return s.String()
+			// var s strings.Builder
+			// s.WriteString(fmt.Sprintf("#%d - ", note.ID))
+			// s.WriteString(note.MenuItem())
+			// return s.String()
 		default:
 			return group
 		}

@@ -39,6 +39,18 @@ func (m *TeaModel) updateNotes(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "n":
 			return m, newNote
+		case "p":
+			if g, p := m.menuNotes.GetGroup(); g == "notes" {
+				return m, func() tea.Msg {
+					note := m.notes[p]
+					note.Public = !note.Public
+					m.selectedItem.UpdateNote(note)
+					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+						return fmt.Errorf("update item: %w", err)
+					}
+					return m.getItem()
+				}
+			}
 		case "enter", " ":
 			switch g, p := m.menuNotes.GetGroup(); g {
 			case "exit":

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -8,6 +9,7 @@ import (
 type Note struct {
 	ID        int
 	Text      string
+	Public    bool
 	DeletedAt time.Time
 }
 
@@ -16,14 +18,26 @@ func (n *Note) IsDeleted() bool {
 }
 
 func (n *Note) MenuItem() string {
+	sb := new(strings.Builder)
+
+	if n.Public {
+		sb.WriteString("  ")
+	} else {
+		sb.WriteString("p ")
+	}
+
+	fmt.Fprintf(sb, "#%d - ", n.ID)
+
 	switch {
 	case n.Text == "":
-		return "empty"
+		sb.WriteString("empty")
 	case len(n.Text) < 50:
-		return n.Text
+		sb.WriteString(n.Text)
 	default:
-		return n.Text[:50] + " ..."
+		sb.WriteString(n.Text[:50] + " ...")
 	}
+
+	return sb.String()
 }
 
 func (n *Note) ToPrint() string {
@@ -38,7 +52,7 @@ func (s *Item) CreateNote() Note {
 			maxID = note.ID
 		}
 	}
-	note := Note{ID: maxID + 1}
+	note := Note{ID: maxID + 1, Public: true}
 	s.Notes = append(s.Notes, note)
 	return note
 }
@@ -72,7 +86,7 @@ func (s *Item) ActiveNotes() []Note {
 }
 
 func (n *Note) Printed() bool {
-	return !n.IsDeleted() && strings.TrimSpace(n.Text) != ""
+	return !n.IsDeleted() && n.Public && strings.TrimSpace(n.Text) != ""
 }
 
 func (s *Item) PrintedNotes() []Note {
