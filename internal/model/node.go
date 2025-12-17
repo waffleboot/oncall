@@ -7,9 +7,10 @@ import (
 )
 
 type Node struct {
-	ID        int
-	Name      string
-	DeletedAt time.Time
+	ID          int
+	Name        string
+	Description string
+	DeletedAt   time.Time
 }
 
 func (n *Node) IsDeleted() bool {
