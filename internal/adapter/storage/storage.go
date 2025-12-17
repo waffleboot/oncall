@@ -48,9 +48,9 @@ func (s *Storage) GenerateNum() int {
 }
 
 func (s *Storage) GetItem(itemID uuid.UUID) (model.Item, error) {
-	for i := range s.items {
-		if s.items[i].ID == itemID {
-			return s.items[i].toDomain(), nil
+	for _, item := range s.items {
+		if item.ID == itemID {
+			return item.toDomain(), nil
 		}
 	}
 
