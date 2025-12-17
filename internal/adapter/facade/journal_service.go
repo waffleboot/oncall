@@ -56,7 +56,7 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 		}
 
 		for i, item := range items {
-			_, _ = fmt.Fprintf(w, "\n%d) %s\n", i+1, item.ToPublish())
+			_, _ = fmt.Fprintf(w, "\n%d) %s\n", i+1, item.ToPrint())
 
 			if len(item.Description) > 0 {
 				_, _ = fmt.Fprintln(w)
@@ -66,28 +66,28 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 			if vms := item.PrintedVMs(); len(vms) > 0 {
 				for _, vm := range vms {
 					_, _ = fmt.Fprintln(w)
-					_, _ = fmt.Fprintln(w, vm.ToPublish())
+					_, _ = fmt.Fprintln(w, vm.ToPrint())
 				}
 			}
 
 			if nodes := item.PrintedNodes(); len(nodes) > 0 {
 				for _, node := range nodes {
 					_, _ = fmt.Fprintln(w)
-					_, _ = fmt.Fprintln(w, node.ToPublish())
+					_, _ = fmt.Fprintln(w, node.ToPrint())
 				}
 			}
 
 			if links := item.PrintedLinks(); len(links) > 0 {
 				for _, link := range links {
 					_, _ = fmt.Fprintln(w)
-					_, _ = fmt.Fprintln(w, link.ToPublish())
+					_, _ = fmt.Fprintln(w, link.ToPrint())
 				}
 			}
 
 			if notes := item.PrintedNotes(); len(notes) > 0 {
 				for _, note := range notes {
 					_, _ = fmt.Fprintln(w)
-					_, _ = fmt.Fprintln(w, note.ToPublish())
+					_, _ = fmt.Fprintln(w, note.ToPrint())
 				}
 			}
 		}

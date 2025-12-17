@@ -26,7 +26,7 @@ func (n *Note) MenuItem() string {
 	}
 }
 
-func (n *Note) ToPublish() string {
+func (n *Note) ToPrint() string {
 	return n.Text
 }
 

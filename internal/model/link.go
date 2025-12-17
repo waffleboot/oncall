@@ -14,7 +14,7 @@ type Link struct {
 	Description string
 }
 
-func (s *Link) ToPublish() string {
+func (s *Link) ToPrint() string {
 	description := strings.TrimSpace(s.Description)
 	if description != "" {
 		return fmt.Sprintf("%s - %s", s.Address, description)

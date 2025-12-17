@@ -165,7 +165,7 @@ func (s *Item) MenuItem() string {
 	return "no title"
 }
 
-func (s *Item) ToPublish() string {
+func (s *Item) ToPrint() string {
 	var sb strings.Builder
 
 	sb.WriteString(s.MenuItem())

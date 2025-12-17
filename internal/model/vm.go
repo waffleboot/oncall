@@ -25,7 +25,7 @@ func (v *VM) MenuItem() string {
 	return v.Name
 }
 
-func (v *VM) ToPublish() string {
+func (v *VM) ToPrint() string {
 	if v.Node != "" {
 		return fmt.Sprintf("vm: %s\nhost: %s", v.Name, v.Node)
 	}

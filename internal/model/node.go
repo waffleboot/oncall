@@ -23,11 +23,7 @@ func (n *Node) MenuItem() string {
 	return n.Name
 }
 
-func (n *Node) Printed() bool {
-	return !n.IsDeleted() && strings.TrimSpace(n.Name) != ""
-}
-
-func (n *Node) ToPublish() string {
+func (n *Node) ToPrint() string {
 	return fmt.Sprintf("host: %s", n.Name)
 }
 
@@ -70,6 +66,10 @@ func (s *Item) DeleteNode(node Node, at time.Time) {
 			break
 		}
 	}
+}
+
+func (n *Node) Printed() bool {
+	return !n.IsDeleted() && strings.TrimSpace(n.Name) != ""
 }
 
 func (s *Item) PrintedNodes() []Node {
