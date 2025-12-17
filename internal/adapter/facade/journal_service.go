@@ -63,23 +63,28 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 				_, _ = fmt.Fprintln(w, item.Description)
 			}
 
+			newline := true
 			if vms := item.PrintedVMs(); len(vms) > 0 {
 				for _, vm := range vms {
-					_, _ = fmt.Fprintln(w)
+					if newline {
+						_, _ = fmt.Fprintln(w)
+						newline = false
+					}
 					_, _ = fmt.Fprintln(w, vm.ToPrint())
+					newline = vm.HasNode()
 				}
 			}
 
 			if nodes := item.PrintedNodes(); len(nodes) > 0 {
+				_, _ = fmt.Fprintln(w)
 				for _, node := range nodes {
-					_, _ = fmt.Fprintln(w)
 					_, _ = fmt.Fprintln(w, node.ToPrint())
 				}
 			}
 
 			if links := item.PrintedLinks(); len(links) > 0 {
+				_, _ = fmt.Fprintln(w)
 				for _, link := range links {
-					_, _ = fmt.Fprintln(w)
 					_, _ = fmt.Fprintln(w, link.ToPrint())
 				}
 			}

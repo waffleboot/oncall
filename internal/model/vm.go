@@ -18,6 +18,10 @@ func (v *VM) IsDeleted() bool {
 	return !v.DeletedAt.IsZero()
 }
 
+func (v *VM) HasNode() bool {
+	return strings.TrimSpace(v.Node) != ""
+}
+
 func (v *VM) MenuItem() string {
 	if v.Name == "" {
 		return "empty"
