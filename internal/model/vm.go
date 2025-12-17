@@ -29,6 +29,8 @@ func (v *VM) HasNode() bool {
 func (v *VM) MenuItem() string {
 	var sb strings.Builder
 
+	sb.WriteString(fmt.Sprintf("#%d - ", v.ID))
+
 	if v.Name == "" {
 		sb.WriteString("empty")
 	} else {

@@ -169,12 +169,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		case "new":
 			return "Добавить ВМ ..."
 		case "vms":
-			vm := m.vms[pos]
-
-			var s strings.Builder
-			s.WriteString(fmt.Sprintf("#%d - ", vm.ID))
-			s.WriteString(vm.MenuItem())
-			return s.String()
+			return m.vms[pos].MenuItem()
 		default:
 			return group
 		}
