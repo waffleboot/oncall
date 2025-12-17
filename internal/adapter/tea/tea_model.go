@@ -20,6 +20,7 @@ const (
 	screenLink     screen = "link"
 	screenNodes    screen = "nodes"
 	screenNode     screen = "node"
+	screenNewNodes screen = "new_nodes"
 	screenNotes    screen = "notes"
 	screenNote     screen = "note"
 	screenVMs      screen = "vms"
@@ -57,8 +58,8 @@ type (
 		textinputVmName          textinput.Model
 		textinputVmNode          textinput.Model
 		textinputVmDescription   textarea.Model
-		textinputNodeName        textinput.Model
-		textinputNodeNames       textarea.Model
+		textinputNode            textinput.Model
+		textinputNodes           textarea.Model
 		textinputNote            textarea.Model
 		textInput                string
 		printJournal             bool
@@ -183,7 +184,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		case "exit":
 			return "Exit"
 		case "new":
-			return "Добавить узел ..."
+			return "Добавить узлы ..."
 		case "nodes":
 			node := m.nodes[pos]
 
@@ -233,6 +234,8 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateNodes(msg)
 	case screenNode:
 		return m.updateNode(msg)
+	case screenNewNodes:
+		return m.updateNewNodes(msg)
 	case screenNotes:
 		return m.updateNotes(msg)
 	case screenNote:
@@ -264,6 +267,8 @@ func (m *TeaModel) View() string {
 		return m.viewNodes()
 	case screenNode:
 		return m.viewNode()
+	case screenNewNodes:
+		return m.viewNewNodes()
 	case screenNotes:
 		return m.viewNotes()
 	case screenNote:
@@ -279,8 +284,7 @@ func (m *TeaModel) View() string {
 	case screenTitle:
 		return m.viewTitle()
 	}
-	m.log.Error("no screen", zap.String("screen", string(m.currentScreen)))
-	return ""
+	return string(m.currentScreen)
 }
 
 func (m *TeaModel) getItems() tea.Msg {

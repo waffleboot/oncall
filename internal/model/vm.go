@@ -14,6 +14,10 @@ type VM struct {
 	Description string
 }
 
+func (v *VM) Exists() bool {
+	return v.ID != 0
+}
+
 func (v *VM) NotDeleted() bool {
 	return v.DeletedAt.IsZero()
 }

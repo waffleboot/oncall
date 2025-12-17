@@ -137,7 +137,7 @@ func (m *TeaModel) updateLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 func (m *TeaModel) viewLink() string {
 	var s strings.Builder
 
-	if m.selectedLink.ID != 0 {
+	if m.selectedLink.Exists() {
 		s.WriteString(fmt.Sprintf("ID: %d\n", m.selectedLink.ID))
 	}
 	s.WriteString("Address:\n  ")

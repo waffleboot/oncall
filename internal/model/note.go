@@ -13,6 +13,10 @@ type Note struct {
 	DeletedAt time.Time
 }
 
+func (n *Note) Exists() bool {
+	return n.ID != 0
+}
+
 func (n *Note) IsDeleted() bool {
 	return !n.DeletedAt.IsZero()
 }
@@ -45,25 +49,26 @@ func (n *Note) ToPrint() string {
 }
 
 func (s *Item) CreateNote() Note {
-	var maxID int
-	for _, note := range s.Notes {
-		if note.ID > maxID {
-			maxID = note.ID
-		}
-	}
-	return Note{ID: maxID + 1, Public: true}
+	return Note{Public: true}
 }
 
 func (s *Item) UpdateNote(note Note) {
 	var maxID int
+	var found bool
 	for i, n := range s.Notes {
 		if n.ID == note.ID {
 			s.Notes[i] = note
 			return
 		}
-		if n.ID > maxID {
-			maxID = note.ID
+		if n.Text == note.Text {
+			found = true
 		}
+		if n.ID > maxID {
+			maxID = n.ID
+		}
+	}
+	if found {
+		return
 	}
 	note.ID = maxID + 1
 	s.Notes = append(s.Notes, note)

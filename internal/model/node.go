@@ -44,14 +44,21 @@ func (s *Item) CreateNode() Node {
 
 func (s *Item) UpdateNode(node Node) {
 	var maxID int
+	var found bool
 	for i, n := range s.Nodes {
 		if n.ID == node.ID {
 			s.Nodes[i] = node
 			return
 		}
+		if n.Name == node.Name {
+			found = true
+		}
 		if n.ID > maxID {
 			maxID = n.ID
 		}
+	}
+	if found {
+		return
 	}
 	node.ID = maxID + 1
 	s.Nodes = append(s.Nodes, node)

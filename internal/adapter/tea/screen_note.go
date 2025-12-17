@@ -46,7 +46,7 @@ func (m *TeaModel) updateNote(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 				}
 			case "submit":
 				m.textInput = "text"
-				m.textinputNodeName.Focus()
+				m.textinputNote.Focus()
 				return m, nil
 			}
 		case "esc":
@@ -67,10 +67,13 @@ func (m *TeaModel) updateNote(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 				}
 			case "submit":
 				return m, func() tea.Msg {
-					m.selectedNote.Text = m.textinputNote.Value()
-					m.selectedItem.UpdateNote(m.selectedNote)
-					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
-						return fmt.Errorf("update item: %w", err)
+					note := m.textinputNote.Value()
+					if strings.TrimSpace(note) != "" {
+						m.selectedNote.Text = note
+						m.selectedItem.UpdateNote(m.selectedNote)
+						if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+							return fmt.Errorf("update item: %w", err)
+						}
 					}
 					return m.getItem()
 				}
@@ -93,7 +96,9 @@ func (m *TeaModel) updateNote(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 func (m *TeaModel) viewNote() string {
 	var s strings.Builder
 
-	s.WriteString(fmt.Sprintf("ID: %d\n", m.selectedNote.ID))
+	if m.selectedNote.Exists() {
+		s.WriteString(fmt.Sprintf("ID: %d\n", m.selectedNote.ID))
+	}
 	s.WriteString("Note:\n")
 	s.WriteString(m.textinputNote.View())
 	s.WriteString("\n")
@@ -109,11 +114,9 @@ func (m *TeaModel) viewNote() string {
 
 func (m *TeaModel) resetNote() {
 	m.textInput = "text"
-
 	m.textinputNote = textarea.New()
 	m.textinputNote.Placeholder = "note"
 	m.textinputNote.Focus()
-	m.textinputNote.Prompt = "  "
 	m.textinputNote.ShowLineNumbers = false
 	m.textinputNote.SetHeight(4)
 	m.textinputNote.SetWidth(80)

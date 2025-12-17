@@ -12,10 +12,6 @@ func (m *TeaModel) updateNodes(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	newNode := func() tea.Msg {
-		return m.selectedItem.CreateNode()
-	}
-
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -33,14 +29,18 @@ func (m *TeaModel) updateNodes(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case "n":
-			return m, newNode
+			m.currentScreen = screenNewNodes
+			m.resetNewNodes()
+			return m, nil
 		case "enter", " ":
 			switch g, p := m.menuNodes.GetGroup(); g {
 			case "exit":
 				m.currentScreen = screenItem
 				return m, m.getItem
 			case "new":
-				return m, newNode
+				m.currentScreen = screenNewNodes
+				m.resetNewNodes()
+				return m, nil
 			case "nodes":
 				return m, func() tea.Msg { return m.nodes[p] }
 			}

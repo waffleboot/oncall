@@ -20,14 +20,21 @@ func (s *Item) CreateLink() Link {
 
 func (s *Item) UpdateLink(link Link) {
 	var maxID int
+	var found bool
 	for i, l := range s.Links {
 		if l.ID == link.ID {
 			s.Links[i] = link
 			return
 		}
+		if l.Address == link.Address {
+			found = true
+		}
 		if l.ID > maxID {
 			maxID = l.ID
 		}
+	}
+	if found {
+		return
 	}
 	link.ID = maxID + 1
 	s.Links = append(s.Links, link)
@@ -40,6 +47,10 @@ func (s *Item) DeleteLink(link Link) {
 			return
 		}
 	}
+}
+
+func (s *Link) Exists() bool {
+	return s.ID != 0
 }
 
 func (s *Link) ToPrint() string {

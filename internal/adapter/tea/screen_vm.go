@@ -140,7 +140,9 @@ func (m *TeaModel) updateVM(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 func (m *TeaModel) viewVM() string {
 	var s strings.Builder
 
-	s.WriteString(fmt.Sprintf("ID: %d\n", m.selectedVM.ID))
+	if m.selectedVM.Exists() {
+		s.WriteString(fmt.Sprintf("ID: %d\n", m.selectedVM.ID))
+	}
 	s.WriteString("Name:\n  ")
 	s.WriteString(m.textinputVmName.View())
 	s.WriteString("\nNode:\n  ")
