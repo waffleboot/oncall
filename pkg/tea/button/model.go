@@ -17,9 +17,7 @@ type (
 	}
 )
 
-func New(value string) Model {
-	return Model{value: value}
-}
+func New(value string) Model { return Model{value: value} }
 
 func (b Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	if !b.focused {
@@ -30,9 +28,7 @@ func (b Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "enter", " ":
-			return b, func() tea.Msg {
-				return PressedMsg{Value: b.value}
-			}
+			return b, func() tea.Msg { return PressedMsg{Value: b.value} }
 		}
 	}
 
@@ -42,9 +38,8 @@ func (b Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 func (b Model) View() string {
 	if b.focused {
 		return fmt.Sprintf("[[ %s ]]", strings.ToUpper(b.value))
-	} else {
-		return fmt.Sprintf("[ %s ]", strings.ToLower(b.value))
 	}
+	return fmt.Sprintf("[ %s ]", strings.ToLower(b.value))
 }
 
 func (b Model) Focused() bool {

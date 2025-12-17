@@ -28,55 +28,55 @@ func New() Model {
 	}
 }
 
-func (b Model) Update(msg tea.Msg) (Model, tea.Cmd, bool) {
+func (t Model) Update(msg tea.Msg) (Model, tea.Cmd, bool) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "tab":
-			b.Items[b.focus].Blur()
-			b.focus = b.nextFocus(b.focus, +1)
-			return b, b.Items[b.focus].Focus(), true
+			t.Items[t.focus].Blur()
+			t.focus = t.nextFocus(t.focus, +1)
+			return t, t.Items[t.focus].Focus(), true
 		case "shift+tab":
-			b.Items[b.focus].Blur()
-			b.focus = b.nextFocus(b.focus, -1)
-			return b, b.Items[b.focus].Focus(), true
+			t.Items[t.focus].Blur()
+			t.focus = t.nextFocus(t.focus, -1)
+			return t, t.Items[t.focus].Focus(), true
 		case "up":
-			if b.CanUp(b.focus) {
-				b.Items[b.focus].Blur()
-				b.focus = b.nextFocus(b.focus, -1)
-				return b, b.Items[b.focus].Focus(), true
+			if t.CanUp(t.focus) {
+				t.Items[t.focus].Blur()
+				t.focus = t.nextFocus(t.focus, -1)
+				return t, t.Items[t.focus].Focus(), true
 			}
 		case "down":
-			if b.CanDown(b.focus) {
-				b.Items[b.focus].Blur()
-				b.focus = b.nextFocus(b.focus, +1)
-				return b, b.Items[b.focus].Focus(), true
+			if t.CanDown(t.focus) {
+				t.Items[t.focus].Blur()
+				t.focus = t.nextFocus(t.focus, +1)
+				return t, t.Items[t.focus].Focus(), true
 			}
 		}
 	}
-	return b, nil, false
+	return t, nil, false
 }
 
-func (b Model) Next() (Model, tea.Cmd, bool) {
-	if b.CanDown(b.focus) {
-		b.Items[b.focus].Blur()
-		b.focus = b.nextFocus(b.focus, +1)
-		return b, b.Items[b.focus].Focus(), true
+func (t Model) Next() (Model, tea.Cmd, bool) {
+	if t.CanDown(t.focus) {
+		t.Items[t.focus].Blur()
+		t.focus = t.nextFocus(t.focus, +1)
+		return t, t.Items[t.focus].Focus(), true
 	}
-	return b, nil, false
+	return t, nil, false
 }
 
-func (b Model) nextFocus(current, delta int) int {
+func (t Model) nextFocus(current, delta int) int {
 	current += delta
 	if current >= 0 {
-		current = current % len(b.Items)
+		current = current % len(t.Items)
 	} else {
-		current = len(b.Items) - 1
+		current = len(t.Items) - 1
 	}
-	if b.Visible(current) {
+	if t.Visible(current) {
 		return current
 	} else {
-		return b.nextFocus(current, delta)
+		return t.nextFocus(current, delta)
 	}
 }
 
