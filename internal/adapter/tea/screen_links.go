@@ -32,13 +32,25 @@ func (m *TeaModel) updateLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, func() tea.Msg {
 					m.selectedItem.DeleteLink(m.links[p], time.Now())
 					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
-						return fmt.Errorf("update item link: %w", err)
+						return fmt.Errorf("update item: %w", err)
 					}
 					return m.getItem()
 				}
 			}
 		case "n":
 			return m, newLink
+		case "p":
+			if g, p := m.linksMenu.GetGroup(); g == "links" {
+				return m, func() tea.Msg {
+					link := m.links[p]
+					link.Public = !link.Public
+					m.selectedItem.UpdateLink(link)
+					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+						return fmt.Errorf("update item: %w", err)
+					}
+					return m.getItem()
+				}
+			}
 		case "enter", " ":
 			switch g, p := m.linksMenu.GetGroup(); g {
 			case "exit":

@@ -23,17 +23,22 @@ func (s *Link) ToPrint() string {
 }
 
 func (s *Link) MenuItem() string {
-	var sb strings.Builder
+	sb := new(strings.Builder)
+
+	if s.Public {
+		sb.WriteString("  ")
+	} else {
+		sb.WriteString("p ")
+	}
+
+	fmt.Fprintf(sb, "#%d ", s.ID)
+
 	if s.Address == "" {
 		sb.WriteString("empty")
 	} else {
 		sb.WriteString(s.Address)
 	}
-	if s.Public {
-		sb.WriteString(" - public")
-	} else {
-		sb.WriteString(" - private")
-	}
+
 	return sb.String()
 }
 

@@ -155,12 +155,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		case "new":
 			return "Добавить ссылку ..."
 		case "links":
-			link := m.links[pos]
-
-			var s strings.Builder
-			s.WriteString(fmt.Sprintf("#%d - ", link.ID))
-			s.WriteString(link.MenuItem())
-			return s.String()
+			return m.links[pos].MenuItem()
 		default:
 			return group
 		}
@@ -224,6 +219,9 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
+			return m, tea.Quit
+		case "ctrl+p":
+			m.printJournal = true
 			return m, tea.Quit
 		}
 	}
