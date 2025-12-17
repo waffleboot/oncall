@@ -44,6 +44,10 @@ func run() (err error) {
 		return fmt.Errorf("tea run: %w", err)
 	}
 
+	if err := teaModel.Err(); err != nil {
+		return fmt.Errorf("tea err: %w", err)
+	}
+
 	if teaModel.PrintJournal() {
 		fmt.Println("----------")
 

@@ -64,6 +64,7 @@ type (
 		textInput                string
 		printJournal             bool
 		log                      *zap.Logger
+		err                      error
 	}
 	itemCreatedMsg struct {
 		item model.Item
@@ -216,6 +217,9 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.printJournal = true
 			return m, tea.Quit
 		}
+	case error:
+		m.err = msg
+		return m, tea.Quit
 	}
 
 	switch m.currentScreen {
@@ -246,8 +250,8 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case screenTitle:
 		return m.updateItemTitle(msg)
 	}
-	m.log.Error("no screen", zap.String("screen", string(m.currentScreen)))
-	return m, nil
+
+	return m, func() tea.Msg { return fmt.Errorf("screen not found: %s", m.currentScreen) }
 }
 
 func (m *TeaModel) View() string {
@@ -300,4 +304,8 @@ func (m *TeaModel) getItem() tea.Msg {
 
 func (m *TeaModel) PrintJournal() bool {
 	return m.printJournal
+}
+
+func (m *TeaModel) Err() error {
+	return m.err
 }

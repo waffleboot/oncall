@@ -29,10 +29,10 @@ go.work.sum
 
 # Editor/IDE
 # .idea/
-# .vscode/
+.vscode/
 
 #
 *.log
-bin
-oncall.json*
-journal.txt
+/bin
+/oncall.json*
+/journal.txt
