@@ -18,7 +18,7 @@ func (s *vm) fromDomain(vm model.VM) {
 	s.ID = vm.ID
 	s.Name = vm.Name
 	s.Node = vm.Node
-	s.DeletedAt = vm.DeletedAt
+	s.DeletedAt = vm.DeletedAt.UTC()
 	s.Description = vm.Description
 }
 

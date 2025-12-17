@@ -17,7 +17,7 @@ func (s *note) fromDomain(note model.Note) {
 	s.ID = note.ID
 	s.Text = note.Text
 	s.Public = note.Public
-	s.DeletedAt = note.DeletedAt
+	s.DeletedAt = note.DeletedAt.UTC()
 }
 
 func (s *note) toDomain() model.Note {

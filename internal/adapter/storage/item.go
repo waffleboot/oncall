@@ -34,6 +34,7 @@ func (s *item) fromDomain(item model.Item) {
 	s.SleepAt = item.SleepAt.UTC()
 	s.CreatedAt = item.CreatedAt.UTC()
 	s.UpdatedAt = item.UpdatedAt.UTC()
+	s.DeletedAt = item.DeletedAt.UTC()
 	s.ClosedAt = item.ClosedAt.UTC()
 	s.Type = string(item.Type)
 	s.Title = item.Title
@@ -87,6 +88,7 @@ func (s *item) toDomain() model.Item {
 		SleepAt:     s.SleepAt,
 		CreatedAt:   s.CreatedAt,
 		UpdatedAt:   s.UpdatedAt,
+		DeletedAt:   s.DeletedAt,
 		ClosedAt:    s.ClosedAt,
 		Type:        model.ItemType(s.Type),
 		Title:       s.Title,

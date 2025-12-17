@@ -26,11 +26,11 @@ type (
 		Items   []item `json:"items,omitempty"`
 	}
 	storedLink struct {
-		ID          int       `json:"id"`
-		Link        string    `json:"link,omitempty"`
-		Public      bool      `json:"public"`
-		DeletedAt   time.Time `json:"deleted_at,omitempty"`
-		Description string    `json:"description,omitempty"`
+		ID          int        `json:"id"`
+		Link        string     `json:"link,omitempty"`
+		Public      bool       `json:"public"`
+		DeletedAt   *time.Time `json:"deleted_at,omitempty"`
+		Description string     `json:"description,omitempty"`
 	}
 )
 
@@ -180,7 +180,7 @@ func (s *storedLink) fromDomain(link model.Link) {
 	s.ID = link.ID
 	s.Link = link.Address
 	s.Public = link.Public
-	s.DeletedAt = link.DeletedAt
+	s.DeletedAt = from(link.DeletedAt)
 	s.Description = link.Description
 }
 
@@ -189,7 +189,23 @@ func (s *storedLink) toDomain() model.Link {
 		ID:          s.ID,
 		Address:     s.Link,
 		Public:      s.Public,
-		DeletedAt:   s.DeletedAt,
+		DeletedAt:   to(s.DeletedAt),
 		Description: s.Description,
 	}
+}
+
+func from(t time.Time) *time.Time {
+	if t.IsZero() {
+		return nil
+	}
+	t = t.UTC()
+	return &t
+}
+
+func to[T any](p *T) T {
+	var zero T
+	if p == nil {
+		return zero
+	}
+	return *p
 }

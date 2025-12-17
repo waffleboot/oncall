@@ -15,7 +15,7 @@ type node struct {
 func (s *node) fromDomain(node model.Node) {
 	s.ID = node.ID
 	s.Name = node.Name
-	s.DeletedAt = node.DeletedAt
+	s.DeletedAt = node.DeletedAt.UTC()
 }
 
 func (s *node) toDomain() model.Node {

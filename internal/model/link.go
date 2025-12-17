@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 )
@@ -41,6 +42,12 @@ func (s *Item) UpdateLink(link Link) {
 }
 
 func (s *Item) DeleteLink(link Link) {
+	if link.Empty() {
+		s.Links = slices.DeleteFunc(s.Links, func(l Link) bool {
+			return l.ID == link.ID
+		})
+		return
+	}
 	for i := range s.Links {
 		if s.Links[i].ID == link.ID {
 			s.Links[i].DeletedAt = time.Now()
@@ -51,6 +58,10 @@ func (s *Item) DeleteLink(link Link) {
 
 func (s *Link) Exists() bool {
 	return s.ID != 0
+}
+
+func (s *Link) Empty() bool {
+	return strings.TrimSpace(s.Address) == "" && strings.TrimSpace(s.Description) == ""
 }
 
 func (s *Link) ToPrint() string {
