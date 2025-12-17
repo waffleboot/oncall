@@ -11,23 +11,23 @@ type Note struct {
 	DeletedAt time.Time
 }
 
-func (s *Note) IsDeleted() bool {
-	return !s.DeletedAt.IsZero()
+func (n *Note) IsDeleted() bool {
+	return !n.DeletedAt.IsZero()
 }
 
-func (s *Note) MenuItem() string {
+func (n *Note) MenuItem() string {
 	switch {
-	case s.Text == "":
+	case n.Text == "":
 		return "empty"
-	case len(s.Text) < 50:
-		return s.Text
+	case len(n.Text) < 50:
+		return n.Text
 	default:
-		return s.Text[:50] + " ..."
+		return n.Text[:50] + " ..."
 	}
 }
 
-func (s *Note) ToPublish() string {
-	return s.Text
+func (n *Note) ToPublish() string {
+	return n.Text
 }
 
 func (s *Item) CreateNote() Note {
@@ -71,10 +71,14 @@ func (s *Item) ActiveNotes() []Note {
 	return notes
 }
 
+func (n *Note) Printed() bool {
+	return !n.IsDeleted() && strings.TrimSpace(n.Text) != ""
+}
+
 func (s *Item) PrintedNotes() []Note {
 	notes := make([]Note, 0, len(s.Notes))
 	for _, note := range s.Notes {
-		if !note.IsDeleted() && strings.TrimSpace(note.Text) != "" {
+		if note.Printed() {
 			notes = append(notes, note)
 		}
 	}
