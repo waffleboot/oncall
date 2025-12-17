@@ -91,7 +91,7 @@ func (s *Storage) DeleteItem(itemID uuid.UUID) error {
 	}
 
 	if !found {
-		return fmt.Errorf("item not found")
+		return fmt.Errorf("not found")
 	}
 
 	if err := s.saveData(); err != nil {
