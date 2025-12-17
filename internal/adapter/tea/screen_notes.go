@@ -2,7 +2,6 @@ package tea
 
 import (
 	"fmt"
-	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
@@ -14,11 +13,7 @@ func (m *TeaModel) updateNotes(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	newNote := func() tea.Msg {
-		note := m.selectedItem.CreateNote()
-		if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
-			return fmt.Errorf("update item: %w", err)
-		}
-		return note
+		return m.selectedItem.CreateNote()
 	}
 
 	switch msg := msg.(type) {
@@ -30,7 +25,7 @@ func (m *TeaModel) updateNotes(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "d":
 			if g, p := m.menuNotes.GetGroup(); g == "notes" {
 				return m, func() tea.Msg {
-					m.selectedItem.DeleteNote(m.notes[p], time.Now())
+					m.selectedItem.DeleteNote(m.notes[p])
 					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
 					}

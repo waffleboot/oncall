@@ -23,6 +23,7 @@ type (
 		SleepAt     time.Time
 		CreatedAt   time.Time
 		UpdatedAt   time.Time
+		DeletedAt   time.Time
 		ClosedAt    time.Time
 		Type        ItemType
 		Notes       []Note
@@ -56,16 +57,16 @@ func (i *Item) IsClosed() bool {
 	return !i.ClosedAt.IsZero()
 }
 
-func (i *Item) Sleep(at time.Time) {
-	i.SleepAt = at
+func (i *Item) Sleep() {
+	i.SleepAt = time.Now()
 }
 
 func (i *Item) Awake() {
 	i.SleepAt = time.Time{}
 }
 
-func (i *Item) Close(at time.Time) {
-	i.ClosedAt = at
+func (i *Item) Close() {
+	i.ClosedAt = time.Now()
 }
 
 func (t ItemType) String() string {
@@ -161,10 +162,10 @@ func (s *Item) UpdateLink(link Link) {
 	}
 }
 
-func (s *Item) DeleteLink(link Link, at time.Time) {
+func (s *Item) DeleteLink(link Link) {
 	for i := range s.Links {
 		if s.Links[i].ID == link.ID {
-			s.Links[i].DeletedAt = at
+			s.Links[i].DeletedAt = time.Now()
 			break
 		}
 	}

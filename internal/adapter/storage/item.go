@@ -1,11 +1,39 @@
 package storage
 
-import "github.com/waffleboot/oncall/internal/model"
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/waffleboot/oncall/internal/model"
+)
+
+type item struct {
+	ID          uuid.UUID    `json:"id"`
+	Num         int          `json:"num"`
+	SleepAt     time.Time    `json:"sleep_at,omitempty"`
+	CreatedAt   time.Time    `json:"created_at,omitempty"`
+	UpdatedAt   time.Time    `json:"updated_at,omitempty"`
+	DeletedAt   time.Time    `json:"deleted_at,omitempty"`
+	ClosedAt    time.Time    `json:"closed_at,omitempty"`
+	Links       []storedLink `json:"links,omitempty"`
+	Notes       []note       `json:"notes,omitempty"`
+	Nodes       []node       `json:"nodes,omitempty"`
+	VMs         []vm         `json:"vms,omitempty"`
+	Type        string       `json:"type,omitempty"`
+	Title       string       `json:"title,omitempty"`
+	Description string       `json:"description,omitempty"`
+}
+
+func (s *item) NotDeleted() bool {
+	return s.DeletedAt.IsZero()
+}
 
 func (s *item) fromDomain(item model.Item) {
 	s.ID = item.ID
 	s.Num = item.Num
 	s.SleepAt = item.SleepAt.UTC()
+	s.CreatedAt = item.CreatedAt.UTC()
+	s.UpdatedAt = item.UpdatedAt.UTC()
 	s.ClosedAt = item.ClosedAt.UTC()
 	s.Type = string(item.Type)
 	s.Title = item.Title
@@ -57,6 +85,8 @@ func (s *item) toDomain() model.Item {
 		ID:          s.ID,
 		Num:         s.Num,
 		SleepAt:     s.SleepAt,
+		CreatedAt:   s.CreatedAt,
+		UpdatedAt:   s.UpdatedAt,
 		ClosedAt:    s.ClosedAt,
 		Type:        model.ItemType(s.Type),
 		Title:       s.Title,

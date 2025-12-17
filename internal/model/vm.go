@@ -64,10 +64,10 @@ func (s *Item) UpdateVM(vm VM) {
 	}
 }
 
-func (s *Item) DeleteVM(vm VM, at time.Time) {
+func (s *Item) DeleteVM(vm VM) {
 	for i := range s.VMs {
 		if s.VMs[i].ID == vm.ID {
-			s.VMs[i].DeletedAt = at
+			s.VMs[i].DeletedAt = time.Now()
 			break
 		}
 	}

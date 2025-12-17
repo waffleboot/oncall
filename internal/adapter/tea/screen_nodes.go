@@ -2,7 +2,6 @@ package tea
 
 import (
 	"fmt"
-	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
@@ -30,7 +29,7 @@ func (m *TeaModel) updateNodes(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "d":
 			if g, p := m.menuNodes.GetGroup(); g == "nodes" {
 				return m, func() tea.Msg {
-					m.selectedItem.DeleteNode(m.nodes[p], time.Now())
+					m.selectedItem.DeleteNode(m.nodes[p])
 					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
 					}

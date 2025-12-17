@@ -42,7 +42,7 @@ func (s *ItemService) GetItems() ([]model.Item, error) {
 }
 
 func (s *ItemService) SleepItem(item model.Item) (model.Item, error) {
-	item.Sleep(time.Now())
+	item.Sleep()
 	if err := s.storage.UpdateItem(item); err != nil {
 		return model.Item{}, fmt.Errorf("update item: %w", err)
 	}
@@ -58,7 +58,7 @@ func (s *ItemService) AwakeItem(item model.Item) (model.Item, error) {
 }
 
 func (s *ItemService) CloseItem(item model.Item) error {
-	item.Close(time.Now())
+	item.Close()
 	if err := s.storage.UpdateItem(item); err != nil {
 		return fmt.Errorf("update item: %w", err)
 	}

@@ -25,20 +25,6 @@ type (
 		LastNum int    `json:"last_num,omitempty"`
 		Items   []item `json:"items,omitempty"`
 	}
-	item struct {
-		ID          uuid.UUID    `json:"id"`
-		Num         int          `json:"num"`
-		SleepAt     time.Time    `json:"sleepAt,omitempty"`
-		ClosedAt    time.Time    `json:"closedAt,omitempty"`
-		DeletedAt   time.Time    `json:"deletedAt,omitempty"`
-		Links       []storedLink `json:"links,omitempty"`
-		Notes       []note       `json:"notes,omitempty"`
-		Nodes       []node       `json:"nodes,omitempty"`
-		VMs         []vm         `json:"vms,omitempty"`
-		Type        string       `json:"type,omitempty"`
-		Title       string       `json:"title,omitempty"`
-		Description string       `json:"description,omitempty"`
-	}
 	storedLink struct {
 		ID          int       `json:"id"`
 		Link        string    `json:"link,omitempty"`
@@ -119,7 +105,7 @@ func (s *Storage) GetItems() ([]model.Item, error) {
 	items := make([]model.Item, 0, len(s.items))
 
 	for i := range s.items {
-		if s.items[i].DeletedAt.IsZero() {
+		if s.items[i].NotDeleted() {
 			items = append(items, s.items[i].toDomain())
 		}
 	}

@@ -46,30 +46,28 @@ func (n *Note) ToPrint() string {
 
 func (s *Item) CreateNote() Note {
 	var maxID int
-	for i := range s.Notes {
-		note := s.Notes[i]
+	for _, note := range s.Notes {
 		if note.ID > maxID {
 			maxID = note.ID
 		}
 	}
-	note := Note{ID: maxID + 1, Public: true}
-	s.Notes = append(s.Notes, note)
-	return note
+	return Note{ID: maxID + 1, Public: true}
 }
 
 func (s *Item) UpdateNote(note Note) {
 	for i := range s.Notes {
 		if s.Notes[i].ID == note.ID {
 			s.Notes[i] = note
-			break
+			return
 		}
 	}
+	s.Notes = append(s.Notes, note)
 }
 
-func (s *Item) DeleteNote(note Note, at time.Time) {
+func (s *Item) DeleteNote(note Note) {
 	for i := range s.Notes {
 		if s.Notes[i].ID == note.ID {
-			s.Notes[i].DeletedAt = at
+			s.Notes[i].DeletedAt = time.Now()
 			break
 		}
 	}

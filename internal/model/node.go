@@ -60,10 +60,10 @@ func (s *Item) UpdateNode(node Node) {
 	}
 }
 
-func (s *Item) DeleteNode(node Node, at time.Time) {
+func (s *Item) DeleteNode(node Node) {
 	for i := range s.Nodes {
 		if s.Nodes[i].ID == node.ID {
-			s.Nodes[i].DeletedAt = at
+			s.Nodes[i].DeletedAt = time.Now()
 			break
 		}
 	}

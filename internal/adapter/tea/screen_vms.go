@@ -2,7 +2,6 @@ package tea
 
 import (
 	"fmt"
-	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
@@ -32,7 +31,7 @@ func (m *TeaModel) updateVMs(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "d":
 			if g, p := m.menuVMs.GetGroup(); g == "vms" {
 				return m, func() tea.Msg {
-					m.selectedItem.DeleteVM(m.vms[p], time.Now())
+					m.selectedItem.DeleteVM(m.vms[p])
 					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
 					}
