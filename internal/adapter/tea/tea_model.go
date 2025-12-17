@@ -58,6 +58,7 @@ type (
 		textinputVmNode          textinput.Model
 		textinputVmDescription   textarea.Model
 		textinputNodeName        textinput.Model
+		textinputNodeNames       textarea.Model
 		textinputNote            textarea.Model
 		textInput                string
 		printJournal             bool

@@ -5,7 +5,6 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
-	"go.uber.org/zap"
 )
 
 func (m *TeaModel) updateVMs(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -14,12 +13,7 @@ func (m *TeaModel) updateVMs(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	newVM := func() tea.Msg {
-		vm := m.selectedItem.CreateVM()
-		m.log.Info("create vm", zap.Int("id", vm.ID))
-		if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
-			return fmt.Errorf("update item: %w", err)
-		}
-		return vm
+		return m.selectedItem.CreateVM()
 	}
 
 	switch msg := msg.(type) {

@@ -13,11 +13,7 @@ func (m *TeaModel) updateNodes(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	newNode := func() tea.Msg {
-		node := m.selectedItem.CreateNode()
-		if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
-			return fmt.Errorf("update item: %w", err)
-		}
-		return node
+		return m.selectedItem.CreateNode()
 	}
 
 	switch msg := msg.(type) {

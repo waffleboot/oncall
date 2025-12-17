@@ -14,8 +14,8 @@ type VM struct {
 	Description string
 }
 
-func (v *VM) IsDeleted() bool {
-	return !v.DeletedAt.IsZero()
+func (v *VM) NotDeleted() bool {
+	return v.DeletedAt.IsZero()
 }
 
 func (v *VM) HasNode() bool {
@@ -39,7 +39,7 @@ func (v *VM) ToPrint() string {
 func (s *Item) ActiveVMs() []VM {
 	vms := make([]VM, 0, len(s.VMs))
 	for _, vm := range s.VMs {
-		if !vm.IsDeleted() {
+		if vm.NotDeleted() {
 			vms = append(vms, vm)
 		}
 	}
@@ -47,25 +47,22 @@ func (s *Item) ActiveVMs() []VM {
 }
 
 func (s *Item) CreateVM() VM {
-	var maxID int
-	for i := range s.VMs {
-		vm := s.VMs[i]
-		if vm.ID > maxID {
-			maxID = vm.ID
-		}
-	}
-	vm := VM{ID: maxID + 1}
-	s.VMs = append(s.VMs, vm)
-	return vm
+	return VM{}
 }
 
 func (s *Item) UpdateVM(vm VM) {
-	for i := range s.VMs {
-		if s.VMs[i].ID == vm.ID {
+	var maxID int
+	for i, v := range s.VMs {
+		if v.ID == vm.ID {
 			s.VMs[i] = vm
-			break
+			return
+		}
+		if v.ID > maxID {
+			maxID = v.ID
 		}
 	}
+	vm.ID = maxID + 1
+	s.VMs = append(s.VMs, vm)
 }
 
 func (s *Item) DeleteVM(vm VM) {
@@ -78,7 +75,7 @@ func (s *Item) DeleteVM(vm VM) {
 }
 
 func (v *VM) Printed() bool {
-	return !v.IsDeleted() && strings.TrimSpace(v.Name) != ""
+	return v.NotDeleted() && strings.TrimSpace(v.Name) != ""
 }
 
 func (s *Item) PrintedVMs() []VM {

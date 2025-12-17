@@ -14,6 +14,34 @@ type Link struct {
 	Description string
 }
 
+func (s *Item) CreateLink() Link {
+	return Link{Public: true}
+}
+
+func (s *Item) UpdateLink(link Link) {
+	var maxID int
+	for i, l := range s.Links {
+		if l.ID == link.ID {
+			s.Links[i] = link
+			return
+		}
+		if l.ID > maxID {
+			maxID = l.ID
+		}
+	}
+	link.ID = maxID + 1
+	s.Links = append(s.Links, link)
+}
+
+func (s *Item) DeleteLink(link Link) {
+	for i := range s.Links {
+		if s.Links[i].ID == link.ID {
+			s.Links[i].DeletedAt = time.Now()
+			return
+		}
+	}
+}
+
 func (s *Link) ToPrint() string {
 	description := strings.TrimSpace(s.Description)
 	if description != "" {
@@ -42,6 +70,26 @@ func (s *Link) MenuItem() string {
 	return sb.String()
 }
 
-func (s *Link) IsDeleted() bool {
-	return !s.DeletedAt.IsZero()
+func (s *Link) NotDeleted() bool {
+	return s.DeletedAt.IsZero()
+}
+
+func (s *Item) ActiveLinks() []Link {
+	links := make([]Link, 0, len(s.Links))
+	for _, link := range s.Links {
+		if link.NotDeleted() {
+			links = append(links, link)
+		}
+	}
+	return links
+}
+
+func (s *Item) PrintedLinks() []Link {
+	links := make([]Link, 0, len(s.Links))
+	for _, link := range s.Links {
+		if link.NotDeleted() && link.Public && strings.TrimSpace(link.Address) != "" {
+			links = append(links, link)
+		}
+	}
+	return links
 }

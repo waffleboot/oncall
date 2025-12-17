@@ -13,8 +13,8 @@ type Node struct {
 	DeletedAt   time.Time
 }
 
-func (n *Node) IsDeleted() bool {
-	return !n.DeletedAt.IsZero()
+func (n *Node) NotDeleted() bool {
+	return n.DeletedAt.IsZero()
 }
 
 func (n *Node) MenuItem() string {
@@ -31,7 +31,7 @@ func (n *Node) ToPrint() string {
 func (s *Item) ActiveNodes() []Node {
 	nodes := make([]Node, 0, len(s.Nodes))
 	for _, node := range s.Nodes {
-		if !node.IsDeleted() {
+		if node.NotDeleted() {
 			nodes = append(nodes, node)
 		}
 	}
@@ -39,38 +39,35 @@ func (s *Item) ActiveNodes() []Node {
 }
 
 func (s *Item) CreateNode() Node {
-	var maxID int
-	for i := range s.Nodes {
-		node := s.Nodes[i]
-		if node.ID > maxID {
-			maxID = node.ID
-		}
-	}
-	node := Node{ID: maxID + 1}
-	s.Nodes = append(s.Nodes, node)
-	return node
+	return Node{}
 }
 
 func (s *Item) UpdateNode(node Node) {
-	for i := range s.Nodes {
-		if s.Nodes[i].ID == node.ID {
+	var maxID int
+	for i, n := range s.Nodes {
+		if n.ID == node.ID {
 			s.Nodes[i] = node
-			break
+			return
+		}
+		if n.ID > maxID {
+			maxID = n.ID
 		}
 	}
+	node.ID = maxID + 1
+	s.Nodes = append(s.Nodes, node)
 }
 
 func (s *Item) DeleteNode(node Node) {
 	for i := range s.Nodes {
 		if s.Nodes[i].ID == node.ID {
 			s.Nodes[i].DeletedAt = time.Now()
-			break
+			return
 		}
 	}
 }
 
 func (n *Node) Printed() bool {
-	return !n.IsDeleted() && strings.TrimSpace(n.Name) != ""
+	return n.NotDeleted() && strings.TrimSpace(n.Name) != ""
 }
 
 func (s *Item) PrintedNodes() []Node {

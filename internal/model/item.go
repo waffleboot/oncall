@@ -120,57 +120,6 @@ func (t Item) Compare(o Item) int {
 	return t.Type.Compare(o.Type)
 }
 
-func (s *Item) ActiveLinks() []Link {
-	links := make([]Link, 0, len(s.Links))
-	for _, link := range s.Links {
-		if !link.IsDeleted() {
-			links = append(links, link)
-		}
-	}
-	return links
-}
-
-func (s *Item) PrintedLinks() []Link {
-	links := make([]Link, 0, len(s.Links))
-	for _, link := range s.Links {
-		if !link.IsDeleted() && link.Public && strings.TrimSpace(link.Address) != "" {
-			links = append(links, link)
-		}
-	}
-	return links
-}
-
-func (s *Item) CreateLink() Link {
-	var maxID int
-	for i := range s.Links {
-		link := s.Links[i]
-		if link.ID > maxID {
-			maxID = link.ID
-		}
-	}
-	link := Link{ID: maxID + 1, Public: true}
-	s.Links = append(s.Links, link)
-	return link
-}
-
-func (s *Item) UpdateLink(link Link) {
-	for i := range s.Links {
-		if s.Links[i].ID == link.ID {
-			s.Links[i] = link
-			break
-		}
-	}
-}
-
-func (s *Item) DeleteLink(link Link) {
-	for i := range s.Links {
-		if s.Links[i].ID == link.ID {
-			s.Links[i].DeletedAt = time.Now()
-			break
-		}
-	}
-}
-
 func (s *Item) MenuItem() string {
 	if len(s.Title) > 0 {
 		return s.Title

@@ -55,12 +55,17 @@ func (s *Item) CreateNote() Note {
 }
 
 func (s *Item) UpdateNote(note Note) {
-	for i := range s.Notes {
-		if s.Notes[i].ID == note.ID {
+	var maxID int
+	for i, n := range s.Notes {
+		if n.ID == note.ID {
 			s.Notes[i] = note
 			return
 		}
+		if n.ID > maxID {
+			maxID = note.ID
+		}
 	}
+	note.ID = maxID + 1
 	s.Notes = append(s.Notes, note)
 }
 
