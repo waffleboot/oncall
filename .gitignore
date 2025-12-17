@@ -34,5 +34,5 @@ go.work.sum
 #
 *.log
 bin
-oncall.json
+oncall.json*
 journal.txt
