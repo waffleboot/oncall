@@ -41,7 +41,7 @@ func (m *TeaModel) updateNewNodes(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 			if err := s.Err(); err != nil {
 				return fmt.Errorf("scan: %w", err)
 			}
-			if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+			if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 				return fmt.Errorf("update item: %w", err)
 			}
 			return nil

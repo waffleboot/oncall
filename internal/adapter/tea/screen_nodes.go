@@ -22,7 +22,7 @@ func (m *TeaModel) updateNodes(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if g, p := m.menuNodes.GetGroup(); g == "nodes" {
 				return m, func() tea.Msg {
 					m.selectedItem.DeleteNode(m.nodes[p])
-					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+					if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
 					}
 					return m.getItem()

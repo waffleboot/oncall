@@ -40,7 +40,7 @@ func (m *TeaModel) updateVM(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 			m.selectedVM.Node = m.textinputVmNode.Value()
 			m.selectedVM.Description = m.textinputVmDescription.Value()
 			m.selectedItem.UpdateVM(m.selectedVM)
-			if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+			if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 				return fmt.Errorf("update item: %w", err)
 			}
 			return nil

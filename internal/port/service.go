@@ -6,14 +6,17 @@ import (
 )
 
 type ItemService interface {
+}
+
+type ItemService2 interface {
 	GetItem(id uuid.UUID) (model.Item, error)
-	GetItems() ([]model.Item, error)
+	GetItems() []model.Item
 	CreateItem() (model.Item, error)
-	UpdateItem(model.Item) error
-	CloseItem(model.Item) error
-	SleepItem(model.Item) (model.Item, error)
+	UpdateItem(model.Item) (model.Item, error)
+	DeleteItem(model.Item) (model.Item, error)
 	AwakeItem(model.Item) (model.Item, error)
-	DeleteItem(model.Item) error
+	SleepItem(model.Item) (model.Item, error)
+	CloseItem(model.Item) (model.Item, error)
 }
 
 type JournalService interface {

@@ -4,6 +4,7 @@ build:
 
 .PHONY: run
 run: build
+	rm debug.log
 	./bin/oncall
 
 .PHONY: zip

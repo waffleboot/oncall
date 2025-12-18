@@ -45,7 +45,7 @@ func NewItem(num int) Item {
 	}
 }
 
-func (i *Item) IsActive() bool {
+func (i *Item) InProgress() bool {
 	return !i.IsClosed() && i.SleepAt.IsZero()
 }
 
@@ -55,6 +55,10 @@ func (i *Item) IsSleep() bool {
 
 func (i *Item) IsClosed() bool {
 	return !i.ClosedAt.IsZero()
+}
+
+func (i *Item) IsDeleted() bool {
+	return !i.DeletedAt.IsZero()
 }
 
 func (i *Item) Sleep() {
@@ -67,6 +71,10 @@ func (i *Item) Awake() {
 
 func (i *Item) Close() {
 	i.ClosedAt = time.Now()
+}
+
+func (i *Item) Delete() {
+	i.DeletedAt = time.Now()
 }
 
 func (t ItemType) String() string {
@@ -104,7 +112,7 @@ func (t ItemType) Compare(o ItemType) int {
 func (t Item) Compare(o Item) int {
 	pri := func(t Item) int {
 		switch {
-		case t.IsActive():
+		case t.InProgress():
 			return 1
 		case t.IsSleep():
 			return 2

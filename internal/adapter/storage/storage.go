@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/waffleboot/oncall/internal/model"
+	"go.uber.org/zap"
 )
 
 type (
@@ -17,92 +17,32 @@ type (
 		Filename string
 	}
 	Storage struct {
-		config  Config
 		lastNum int
-		items   []item
+		config  Config
+		log     *zap.Logger
 	}
 )
 
-func NewStorage(config Config) (*Storage, error) {
-	s := &Storage{config: config}
-	if err := s.loadData(); err != nil {
-		return nil, fmt.Errorf("load items: %w", err)
-	}
-	return s, nil
+func NewStorage(config Config, log *zap.Logger) *Storage {
+	return &Storage{config: config, log: log}
 }
 
-func (s *Storage) GenerateNum() int {
-	s.lastNum++
-	return s.lastNum
+func (s *Storage) GetJournal() (model.Journal, error) {
+	j, err := s.loadJournal()
+	if err != nil {
+		return model.Journal{}, err
+	}
+	return j.toDomain(), nil
 }
 
-func (s *Storage) GetItem(itemID uuid.UUID) (model.Item, error) {
-	for _, item := range s.items {
-		if item.ID == itemID {
-			return item.toDomain(), nil
-		}
-	}
-
-	return model.Item{}, errors.New("not found")
+func (s *Storage) SaveJournal(j model.Journal) error {
+	s.log.Debug("save journal", zap.Int("items_count", len(j.Items)))
+	var st journal
+	st.fromDomain(j)
+	return s.saveJournal(st)
 }
 
-func (s *Storage) UpdateItem(it model.Item) error {
-	var found bool
-
-	for i := range s.items {
-		if s.items[i].ID == it.ID {
-			s.items[i].fromDomain(it)
-			found = true
-		}
-	}
-
-	if !found {
-		var st item
-		st.fromDomain(it)
-		s.items = append(s.items, st)
-	}
-
-	if err := s.saveData(); err != nil {
-		return fmt.Errorf("save data: %w", err)
-	}
-
-	return nil
-}
-
-func (s *Storage) DeleteItem(itemID uuid.UUID) error {
-	var found bool
-
-	for i := range s.items {
-		if s.items[i].ID == itemID {
-			s.items[i].DeletedAt = time.Now()
-			found = true
-		}
-	}
-
-	if !found {
-		return nil
-	}
-
-	if err := s.saveData(); err != nil {
-		return fmt.Errorf("save data: %w", err)
-	}
-
-	return nil
-}
-
-func (s *Storage) GetItems() ([]model.Item, error) {
-	items := make([]model.Item, 0, len(s.items))
-
-	for i := range s.items {
-		if s.items[i].NotDeleted() {
-			items = append(items, s.items[i].toDomain())
-		}
-	}
-
-	return items, nil
-}
-
-func (s *Storage) CloseJournal() error {
+func (s *Storage) CloseJournal(j model.Journal) error {
 	ts := time.Now().Format("2006-01-02-15-04-05")
 	to := fmt.Sprintf("%s.%s", s.config.Filename, ts)
 
@@ -110,36 +50,50 @@ func (s *Storage) CloseJournal() error {
 		return fmt.Errorf("rename: %w", err)
 	}
 
-	s.lastNum = 0
-	s.items = nil
-	return s.saveData()
+	return nil
 }
 
-func (s *Storage) loadData() error {
+func (s *Storage) GenerateNum() (int, error) {
+	j, err := s.loadJournal()
+	if err != nil {
+		return 0, err
+	}
+	s.lastNum++
+	if err := s.saveJournal(j); err != nil {
+		return 0, err
+	}
+	s.log.Debug("generate num", zap.Int("num", s.lastNum))
+	return s.lastNum, nil
+}
+
+func (s *Storage) loadJournal() (journal, error) {
 	f, err := os.Open(s.config.Filename)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
-			return nil
+			return journal{}, nil
 		}
-		return fmt.Errorf("open file: %w", err)
+		return journal{}, fmt.Errorf("open file: %w", err)
 	}
 	defer func() {
 		err = errors.Join(err, f.Close())
 	}()
 
-	var data journal
+	var st journal
 
-	if err := json.NewDecoder(f).Decode(&data); err != nil {
-		return fmt.Errorf("json decode: %w", err)
+	if err := json.NewDecoder(f).Decode(&st); err != nil {
+		return journal{}, fmt.Errorf("json decode: %w", err)
 	}
 
-	s.lastNum = data.LastNum
-	s.items = data.Items
+	s.lastNum = st.LastNum
 
-	return nil
+	s.log.Debug("journal loaded", zap.Int("items_count", len(st.Items)), zap.Int("last_num", st.LastNum))
+
+	return st, nil
 }
 
-func (s *Storage) saveData() error {
+func (s *Storage) saveJournal(j journal) error {
+	j.LastNum = s.lastNum
+
 	f, err := os.Create(s.config.Filename)
 	if err != nil {
 		return fmt.Errorf("os create: %w", err)
@@ -151,10 +105,7 @@ func (s *Storage) saveData() error {
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", " ")
 
-	if err := enc.Encode(journal{
-		LastNum: s.lastNum,
-		Items:   s.items,
-	}); err != nil {
+	if err := enc.Encode(j); err != nil {
 		return fmt.Errorf("json encode: %w", err)
 	}
 
@@ -162,21 +113,7 @@ func (s *Storage) saveData() error {
 		return fmt.Errorf("sync: %w", err)
 	}
 
+	s.log.Debug("journal saved", zap.Int("items_count", len(j.Items)), zap.Int("last_num", j.LastNum))
+
 	return nil
-}
-
-func from(t time.Time) *time.Time {
-	if t.IsZero() {
-		return nil
-	}
-	t = t.UTC()
-	return &t
-}
-
-func to[T any](p *T) T {
-	var zero T
-	if p == nil {
-		return zero
-	}
-	return *p
 }

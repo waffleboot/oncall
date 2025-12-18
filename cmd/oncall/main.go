@@ -29,16 +29,16 @@ func run() (err error) {
 		err = errors.Join(err, log.Sync())
 	}()
 
-	storage, err := storageAdapter.NewStorage(storageAdapter.Config{Filename: "oncall.json"})
+	storage := storageAdapter.NewStorage(storageAdapter.Config{Filename: "oncall.json"}, log.Named("storage"))
+
+	itemService, err := facade.NewItemService(storage, storage, log.Named("item_service"))
 	if err != nil {
-		return fmt.Errorf("new storage: %w", err)
+		return fmt.Errorf("new item service: %w", err)
 	}
 
-	itemService := facade.NewItemService(storage, storage)
+	journalService := facade.NewJournalService(itemService)
 
-	journalService := facade.NewJournalService(storage)
-
-	teaModel := teaAdapter.NewTeaModel(itemService, journalService, log)
+	teaModel := teaAdapter.NewTeaModel(itemService, itemService, log)
 
 	if _, err := tea.NewProgram(teaModel).Run(); err != nil {
 		return fmt.Errorf("tea run: %w", err)
@@ -75,7 +75,7 @@ func run() (err error) {
 func getLogger() (*zap.Logger, error) {
 	config := zap.NewDevelopmentConfig()
 	config.OutputPaths = []string{"debug.log"}
-	config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
+	config.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
 
 	log, err := config.Build()
 	if err != nil {

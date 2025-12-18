@@ -30,7 +30,7 @@ func (m *TeaModel) updateNote(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 		return m.runAndExitScreen(func() error {
 			m.selectedNote.Text = m.textinputNote.Value()
 			m.selectedItem.UpdateNote(m.selectedNote)
-			if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+			if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 				return fmt.Errorf("update item: %w", err)
 			}
 			return nil

@@ -10,24 +10,21 @@ import (
 )
 
 type JournalService struct {
-	storage port.Storage
+	itemService port.ItemService2
 }
 
-func NewJournalService(storage port.Storage) *JournalService {
-	return &JournalService{storage: storage}
+func NewJournalService(itemService port.ItemService2) *JournalService {
+	return &JournalService{itemService: itemService}
 }
 
-func (s *JournalService) PrintJournal(w io.Writer) (err error) {
+func (s *JournalService) PrintJournal(w io.Writer) error {
 	write := func(format string, args ...any) {
 		_, _ = fmt.Fprintf(w, format+"\n", args...)
 	}
 
 	write("# %s", time.Now().Format(time.DateOnly))
 
-	items, err := s.storage.GetItems()
-	if err != nil {
-		return fmt.Errorf("get items: %w", err)
-	}
+	items := s.itemService.GetItems()
 
 	m := make(map[model.ItemType][]model.Item)
 
@@ -103,8 +100,4 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 	}
 
 	return nil
-}
-
-func (s *JournalService) CloseJournal() error {
-	return s.storage.CloseJournal()
 }

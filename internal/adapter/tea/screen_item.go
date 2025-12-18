@@ -42,14 +42,14 @@ func (m *TeaModel) updateItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case "close":
 				return m, func() tea.Msg {
-					if err := m.itemService.CloseItem(m.selectedItem); err != nil {
+					if _, err := m.itemService.CloseItem(m.selectedItem); err != nil {
 						return fmt.Errorf("close item: %w", err)
 					}
 					return itemClosedMsg{}
 				}
 			case "delete":
 				return m, func() tea.Msg {
-					if err := m.itemService.DeleteItem(m.selectedItem); err != nil {
+					if _, err := m.itemService.DeleteItem(m.selectedItem); err != nil {
 						return fmt.Errorf("delete item: %w", err)
 					}
 					return itemDeletedMsg{}
@@ -147,7 +147,7 @@ func (m *TeaModel) resetEditItem(toGroup string) {
 	m.menuItem.AddGroup(string(screenNotes))
 	m.menuItem.AddDelimiter()
 
-	if m.selectedItem.IsActive() {
+	if m.selectedItem.InProgress() {
 		m.menuItem.AddGroup("sleep")
 	}
 

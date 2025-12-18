@@ -33,7 +33,7 @@ const (
 type (
 	screen   string
 	TeaModel struct {
-		itemService              port.ItemService
+		itemService              port.ItemService2
 		journalService           port.JournalService
 		currentScreen            screen
 		items                    []model.Item
@@ -86,8 +86,12 @@ type (
 	}
 )
 
-func NewTeaModel(itemService port.ItemService, journalService port.JournalService, log *zap.Logger) *TeaModel {
-	return &TeaModel{itemService: itemService, journalService: journalService, log: log}
+func NewTeaModel(itemService port.ItemService2, journalService port.JournalService, log *zap.Logger) *TeaModel {
+	return &TeaModel{
+		itemService:    itemService,
+		journalService: journalService,
+		log:            log,
+	}
 }
 
 func (m *TeaModel) Init() tea.Cmd {
@@ -296,17 +300,13 @@ func (m *TeaModel) View() string {
 }
 
 func (m *TeaModel) getItems() tea.Msg {
-	items, err := m.itemService.GetItems()
-	if err != nil {
-		return fmt.Errorf("get items: %w", err)
-	}
-	return items
+	return m.itemService.GetItems()
 }
 
 func (m *TeaModel) getItem() tea.Msg {
 	item, err := m.itemService.GetItem(m.selectedItem.ID)
 	if err != nil {
-		return fmt.Errorf("get items: %w", err)
+		return fmt.Errorf("get item: %w", err)
 	}
 	return item
 }

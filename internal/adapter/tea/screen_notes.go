@@ -26,7 +26,7 @@ func (m *TeaModel) updateNotes(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if g, p := m.menuNotes.GetGroup(); g == "notes" {
 				return m, func() tea.Msg {
 					m.selectedItem.DeleteNote(m.notes[p])
-					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+					if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
 					}
 					return m.getItem()
@@ -40,7 +40,7 @@ func (m *TeaModel) updateNotes(msg tea.Msg) (tea.Model, tea.Cmd) {
 					note := m.notes[p]
 					note.Public = !note.Public
 					m.selectedItem.UpdateNote(note)
-					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+					if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
 					}
 					return m.getItem()

@@ -14,7 +14,7 @@ func (m *TeaModel) updateLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	newLink := func() tea.Msg {
 		link := m.selectedItem.CreateLink()
-		if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+		if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 			return fmt.Errorf("update item link: %w", err)
 		}
 		return itemLinkCreatedMsg{link: link}
@@ -30,7 +30,7 @@ func (m *TeaModel) updateLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if g, p := m.linksMenu.GetGroup(); g == "links" {
 				return m, func() tea.Msg {
 					m.selectedItem.DeleteLink(m.links[p])
-					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+					if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
 					}
 					return m.getItem()
@@ -44,7 +44,7 @@ func (m *TeaModel) updateLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 					link := m.links[p]
 					link.Public = !link.Public
 					m.selectedItem.UpdateLink(link)
-					if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+					if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 						return fmt.Errorf("update item: %w", err)
 					}
 					return m.getItem()

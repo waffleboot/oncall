@@ -22,7 +22,7 @@ func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 			g, _ := m.menuItemType.GetGroup()
 			return m, func() tea.Msg {
 				m.selectedItem.Type = model.ItemType(g)
-				if err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+				if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
 					return fmt.Errorf("update item: %w", err)
 				} else {
 					return itemUpdatedMsg{}
