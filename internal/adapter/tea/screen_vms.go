@@ -8,7 +8,7 @@ import (
 )
 
 func (m *TeaModel) updateVMs(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if m.menuVMs.ProcessMsg(msg) {
+	if m.menuVMs.Update(msg) {
 		return m, nil
 	}
 

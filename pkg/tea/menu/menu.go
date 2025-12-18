@@ -242,7 +242,7 @@ func (m *Model) jumpTo(toGroup string, find func(pos int) bool) {
 	}
 }
 
-func (m *Model) ProcessMsg(msg tea.Msg) bool {
+func (m *Model) Update(msg tea.Msg) bool {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {

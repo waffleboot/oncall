@@ -8,7 +8,7 @@ import (
 )
 
 func (m *TeaModel) updateItems(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if m.menuAllItems.ProcessMsg(msg) {
+	if m.menuAllItems.Update(msg) {
 		return m, nil
 	}
 

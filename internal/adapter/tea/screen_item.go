@@ -9,7 +9,7 @@ import (
 )
 
 func (m *TeaModel) updateItem(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if m.menuItem.ProcessMsg(msg) {
+	if m.menuItem.Update(msg) {
 		return m, nil
 	}
 
