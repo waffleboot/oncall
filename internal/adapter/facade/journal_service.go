@@ -18,7 +18,11 @@ func NewJournalService(storage port.Storage) *JournalService {
 }
 
 func (s *JournalService) PrintJournal(w io.Writer) (err error) {
-	_, _ = fmt.Fprintf(w, "# %s\n", time.Now().Format(time.DateOnly))
+	write := func(format string, args ...any) {
+		_, _ = fmt.Fprintf(w, format+"\n", args...)
+	}
+
+	write("# %s", time.Now().Format(time.DateOnly))
 
 	items, err := s.storage.GetItems()
 	if err != nil {
@@ -42,35 +46,35 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 			continue
 		}
 
-		_, _ = fmt.Fprintln(w)
+		write("")
 
 		switch itemType {
 		case model.ItemTypeInc:
-			_, _ = fmt.Fprintln(w, "## Инциденты")
+			write("## Инциденты")
 		case model.ItemTypeAdhoc:
-			_, _ = fmt.Fprintln(w, "## ADHOC")
+			write("## ADHOC")
 		case model.ItemTypeAsk:
-			_, _ = fmt.Fprintln(w, "## Обращения")
+			write("## Обращения")
 		case model.ItemTypeAlert:
-			_, _ = fmt.Fprintln(w, "## Алерты")
+			write("## Алерты")
 		}
 
 		for i, item := range items {
-			_, _ = fmt.Fprintf(w, "\n%d) %s\n", i+1, item.ToPrint())
+			write("\n%d) %s\n", i+1, item.ToPrint())
 
 			if len(item.Description) > 0 {
-				_, _ = fmt.Fprintln(w)
-				_, _ = fmt.Fprintln(w, item.Description)
+				write("")
+				write(item.Description)
 			}
 
 			newline := true
 			if vms := item.PrintedVMs(); len(vms) > 0 {
 				for _, vm := range vms {
 					if newline {
-						_, _ = fmt.Fprintln(w)
+						write("")
 						newline = false
 					}
-					_, _ = fmt.Fprintln(w, vm.ToPrint())
+					write(vm.ToPrint())
 					newline = vm.HasNode()
 				}
 			}
@@ -78,21 +82,21 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 			if nodes := item.PrintedNodes(); len(nodes) > 0 {
 				_, _ = fmt.Fprintln(w)
 				for _, node := range nodes {
-					_, _ = fmt.Fprintln(w, node.ToPrint())
+					write(node.ToPrint())
 				}
 			}
 
 			if links := item.PrintedLinks(); len(links) > 0 {
 				_, _ = fmt.Fprintln(w)
 				for _, link := range links {
-					_, _ = fmt.Fprintln(w, link.ToPrint())
+					write(link.ToPrint())
 				}
 			}
 
 			if notes := item.PrintedNotes(); len(notes) > 0 {
 				for _, note := range notes {
-					_, _ = fmt.Fprintln(w)
-					_, _ = fmt.Fprintln(w, note.ToPrint())
+					write("")
+					write(note.ToPrint())
 				}
 			}
 		}
