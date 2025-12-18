@@ -1,6 +1,7 @@
 package model
 
 import (
+	"bufio"
 	"fmt"
 	"strings"
 	"time"
@@ -30,18 +31,27 @@ func (n *Note) MenuItem() string {
 		sb.WriteString("p ")
 	}
 
-	fmt.Fprintf(sb, "#%d - ", n.ID)
-
-	switch {
-	case n.Text == "":
-		sb.WriteString("empty")
-	case len(n.Text) < 50:
-		sb.WriteString(n.Text)
-	default:
-		sb.WriteString(n.Text[:50] + " ...")
-	}
+	fmt.Fprintf(sb, "#%d - %s", n.ID, n.trimNote())
 
 	return sb.String()
+}
+
+func (n *Note) trimNote() string {
+	s := bufio.NewScanner(strings.NewReader(n.Text))
+	for s.Scan() {
+		switch t := strings.TrimSpace(s.Text()); {
+		case t == "":
+			continue
+		case len(t) < 50:
+			return t
+		default:
+			return (string([]rune(t)[:50]) + " ...")
+		}
+	}
+	if err := s.Err(); err != nil {
+		return err.Error()
+	}
+	return "empty"
 }
 
 func (n *Note) ToPrint() string {

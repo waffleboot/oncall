@@ -74,7 +74,7 @@ func (m *TeaModel) resetNote() {
 	m.textinputNote.Placeholder = "note"
 	m.textinputNote.Focus()
 	m.textinputNote.ShowLineNumbers = false
-	m.textinputNote.SetHeight(4)
+	m.textinputNote.SetHeight(16)
 	m.textinputNote.SetWidth(80)
 	m.textinputNote.CharLimit = 1000
 	m.textinputNote.SetValue(m.selectedNote.Text)
