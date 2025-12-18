@@ -21,10 +21,6 @@ type (
 		lastNum int
 		items   []item
 	}
-	storedData struct {
-		LastNum int    `json:"last_num,omitempty"`
-		Items   []item `json:"items,omitempty"`
-	}
 	storedLink struct {
 		ID          int        `json:"id"`
 		Link        string     `json:"link,omitempty"`
