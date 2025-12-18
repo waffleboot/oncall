@@ -77,14 +77,14 @@ func (s *JournalService) PrintJournal(w io.Writer) error {
 			}
 
 			if nodes := item.PrintedNodes(); len(nodes) > 0 {
-				_, _ = fmt.Fprintln(w)
+				write("")
 				for _, node := range nodes {
 					write(node.ToPrint())
 				}
 			}
 
 			if links := item.PrintedLinks(); len(links) > 0 {
-				_, _ = fmt.Fprintln(w)
+				write("")
 				for _, link := range links {
 					write(link.ToPrint())
 				}
