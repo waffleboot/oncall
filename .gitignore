@@ -18,22 +18,20 @@ coverage.*
 profile.cov
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
 
 # Go workspace file
 go.work
 go.work.sum
-vendor
 
 # env file
 .env
 
 # Editor/IDE
-# .idea/
 .vscode/
 
 #
 *.log
-/bin
-/oncall.json*
-/journal.txt
+bin/
+oncall.json*
+journal.txt
