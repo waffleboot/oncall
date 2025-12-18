@@ -47,6 +47,9 @@ func (s *Storage) CloseJournal(j model.Journal) error {
 	to := fmt.Sprintf("%s.%s", s.config.Filename, ts)
 
 	if err := os.Rename(s.config.Filename, to); err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return nil
+		}
 		return fmt.Errorf("rename: %w", err)
 	}
 
