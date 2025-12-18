@@ -9,7 +9,7 @@ import (
 
 type MenuTestSuite struct {
 	suite.Suite
-	menu *Menu
+	menu *Model
 }
 
 func TestMenu(t *testing.T) {
@@ -17,7 +17,7 @@ func TestMenu(t *testing.T) {
 }
 
 func (s *MenuTestSuite) SetupTest() {
-	s.menu = NewMenu(func(group string, pos int) string {
+	s.menu = New(func(group string, pos int) string {
 		switch group {
 		case "action 1", "action 2", "action 3":
 			return group

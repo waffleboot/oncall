@@ -10,7 +10,7 @@ import (
 const menuDelimiter = "---"
 
 type (
-	Menu struct {
+	Model struct {
 		labelGen    func(group string, pos int) string
 		groupNames  []string
 		groupSizes  []int
@@ -19,24 +19,24 @@ type (
 		notSelected string
 		log         *zap.Logger
 	}
-	MenuOption func(*Menu)
+	MenuOption func(*Model)
 )
 
 func WithLogger(log *zap.Logger) MenuOption {
-	return func(menu *Menu) {
+	return func(menu *Model) {
 		menu.log = log
 	}
 }
 
 func WithSelection(selected, notSelected string) MenuOption {
-	return func(menu *Menu) {
+	return func(menu *Model) {
 		menu.selected = selected
 		menu.notSelected = notSelected
 	}
 }
 
-func NewMenu(labelGen func(group string, pos int) string, opts ...MenuOption) *Menu {
-	m := &Menu{labelGen: labelGen}
+func New(labelGen func(group string, pos int) string, opts ...MenuOption) *Model {
+	m := &Model{labelGen: labelGen}
 	m.log = zap.NewNop()
 	m.selected = ">"
 	m.notSelected = " "
@@ -46,37 +46,37 @@ func NewMenu(labelGen func(group string, pos int) string, opts ...MenuOption) *M
 	return m
 }
 
-func (m *Menu) ResetCursor() {
+func (m *Model) ResetCursor() {
 	m.cursor = 0
 }
 
-func (m *Menu) ResetMenu() {
+func (m *Model) ResetMenu() {
 	m.groupNames = nil
 	m.groupSizes = nil
 }
 
-func (m *Menu) AddGroup(group string) {
+func (m *Model) AddGroup(group string) {
 	m.groupNames = append(m.groupNames, group)
 	m.groupSizes = append(m.groupSizes, 1)
 }
 
-func (m *Menu) AddGroupWithItems(group string, itemsCount int) {
+func (m *Model) AddGroupWithItems(group string, itemsCount int) {
 	m.groupNames = append(m.groupNames, group)
 	m.groupSizes = append(m.groupSizes, itemsCount)
 }
 
-func (m *Menu) AdjustCursor() {
+func (m *Model) AdjustCursor() {
 	if g, _ := m.GetGroup(); g == "" {
 		m.cursor = m.maxCursor()
 	}
 }
 
-func (m *Menu) AddDelimiter() {
+func (m *Model) AddDelimiter() {
 	m.groupNames = append(m.groupNames, menuDelimiter)
 	m.groupSizes = append(m.groupSizes, 1)
 }
 
-func (m *Menu) GenerateMenu() string {
+func (m *Model) GenerateMenu() string {
 	var cursor int
 	var s strings.Builder
 
@@ -110,7 +110,7 @@ func (m *Menu) GenerateMenu() string {
 	return s.String()
 }
 
-func (m *Menu) GetGroup() (group string, pos int) {
+func (m *Model) GetGroup() (group string, pos int) {
 	var count int
 
 	for i, group := range m.groupNames {
@@ -128,7 +128,7 @@ func (m *Menu) GetGroup() (group string, pos int) {
 	return "", 0
 }
 
-func (m *Menu) maxCursor() int {
+func (m *Model) maxCursor() int {
 	var count int
 	for i, group := range m.groupNames {
 		if group == menuDelimiter {
@@ -139,7 +139,7 @@ func (m *Menu) maxCursor() int {
 	return count - 1
 }
 
-func (m *Menu) MoveCursorUp() {
+func (m *Model) MoveCursorUp() {
 	if m.cursor > 0 {
 		m.cursor = m.cursor - 1
 	} else {
@@ -147,7 +147,7 @@ func (m *Menu) MoveCursorUp() {
 	}
 }
 
-func (m *Menu) MoveCursorDown() {
+func (m *Model) MoveCursorDown() {
 	if m.cursor < m.maxCursor() {
 		m.cursor = m.cursor + 1
 	} else {
@@ -155,13 +155,13 @@ func (m *Menu) MoveCursorDown() {
 	}
 }
 
-func (m *Menu) JumpToItem(group string, f func(pos int) (found bool)) {
+func (m *Model) JumpToItem(group string, f func(pos int) (found bool)) {
 	m.jumpTo(group, func(pos int) bool {
 		return f(pos)
 	})
 }
 
-func (m *Menu) JumpToPos(toGroup string, pos int) {
+func (m *Model) JumpToPos(toGroup string, pos int) {
 	var cursor int
 	for i, group := range m.groupNames {
 		if group == menuDelimiter {
@@ -179,13 +179,13 @@ func (m *Menu) JumpToPos(toGroup string, pos int) {
 	}
 }
 
-func (m *Menu) JumpToGroup(group string) {
+func (m *Model) JumpToGroup(group string) {
 	m.jumpTo(group, func(_ int) bool {
 		return true
 	})
 }
 
-func (m *Menu) jumpTo(toGroup string, find func(pos int) bool) {
+func (m *Model) jumpTo(toGroup string, find func(pos int) bool) {
 	var cursor int
 
 	log := m.log.With(zap.String("toGroup", toGroup), zap.Int("groups", len(m.groupNames)))
@@ -242,7 +242,7 @@ func (m *Menu) jumpTo(toGroup string, find func(pos int) bool) {
 	}
 }
 
-func (m *Menu) ProcessMsg(msg tea.Msg) bool {
+func (m *Model) ProcessMsg(msg tea.Msg) bool {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
