@@ -18,7 +18,7 @@ func NewJournalService(storage port.Storage) *JournalService {
 }
 
 func (s *JournalService) PrintJournal(w io.Writer) (err error) {
-	_, _ = fmt.Fprintln(w, time.Now().Format(time.DateOnly))
+	_, _ = fmt.Fprintf(w, "# %s\n", time.Now().Format(time.DateOnly))
 
 	items, err := s.storage.GetItems()
 	if err != nil {
@@ -46,13 +46,13 @@ func (s *JournalService) PrintJournal(w io.Writer) (err error) {
 
 		switch itemType {
 		case model.ItemTypeInc:
-			_, _ = fmt.Fprintln(w, "# Инциденты")
+			_, _ = fmt.Fprintln(w, "## Инциденты")
 		case model.ItemTypeAdhoc:
-			_, _ = fmt.Fprintln(w, "# ADHOC")
+			_, _ = fmt.Fprintln(w, "## ADHOC")
 		case model.ItemTypeAsk:
-			_, _ = fmt.Fprintln(w, "# Обращения")
+			_, _ = fmt.Fprintln(w, "## Обращения")
 		case model.ItemTypeAlert:
-			_, _ = fmt.Fprintln(w, "# Алерты")
+			_, _ = fmt.Fprintln(w, "## Алерты")
 		}
 
 		for i, item := range items {
