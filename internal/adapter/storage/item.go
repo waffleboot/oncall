@@ -8,20 +8,20 @@ import (
 )
 
 type item struct {
-	ID          uuid.UUID    `json:"id"`
-	Num         int          `json:"num"`
-	SleepAt     time.Time    `json:"sleep_at,omitempty"`
-	CreatedAt   time.Time    `json:"created_at,omitempty"`
-	UpdatedAt   time.Time    `json:"updated_at,omitempty"`
-	DeletedAt   time.Time    `json:"deleted_at,omitempty"`
-	ClosedAt    time.Time    `json:"closed_at,omitempty"`
-	Links       []storedLink `json:"links,omitempty"`
-	Notes       []note       `json:"notes,omitempty"`
-	Nodes       []node       `json:"nodes,omitempty"`
-	VMs         []vm         `json:"vms,omitempty"`
-	Type        string       `json:"type,omitempty"`
-	Title       string       `json:"title,omitempty"`
-	Description string       `json:"description,omitempty"`
+	ID          uuid.UUID `json:"id"`
+	Num         int       `json:"num"`
+	SleepAt     time.Time `json:"sleep_at,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+	DeletedAt   time.Time `json:"deleted_at,omitempty"`
+	ClosedAt    time.Time `json:"closed_at,omitempty"`
+	Links       []link    `json:"links,omitempty"`
+	Notes       []note    `json:"notes,omitempty"`
+	Nodes       []node    `json:"nodes,omitempty"`
+	VMs         []vm      `json:"vms,omitempty"`
+	Type        string    `json:"type,omitempty"`
+	Title       string    `json:"title,omitempty"`
+	Description string    `json:"description,omitempty"`
 }
 
 func (s *item) NotDeleted() bool {
@@ -55,7 +55,7 @@ func (s *item) fromDomain(item model.Item) {
 		s.Nodes[i].fromDomain(item.Nodes[i])
 	}
 
-	s.Links = make([]storedLink, len(item.Links))
+	s.Links = make([]link, len(item.Links))
 	for i := range item.Links {
 		s.Links[i].fromDomain(item.Links[i])
 	}
