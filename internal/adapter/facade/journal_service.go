@@ -17,7 +17,7 @@ func NewJournalService(itemService port.ItemService) *JournalService {
 	return &JournalService{itemService: itemService}
 }
 
-func (s *JournalService) PrintJournal(w io.Writer) error {
+func (s *JournalService) PrintJournal(w io.Writer, at time.Time) error {
 	write := func(format string, args ...any) {
 		_, _ = fmt.Fprintf(w, format+"\n", args...)
 	}
@@ -39,9 +39,6 @@ func (s *JournalService) PrintJournal(w io.Writer) error {
 		model.ItemTypeAlert,
 	} {
 		items := m[itemType]
-		if len(items) == 0 {
-			continue
-		}
 
 		write("")
 

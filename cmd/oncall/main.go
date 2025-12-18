@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/adapter/facade"
@@ -52,7 +53,7 @@ func run() (err error) {
 		fmt.Println("----------")
 
 		printJournal := func(w io.Writer) error {
-			if err := journalService.PrintJournal(w); err != nil {
+			if err := journalService.PrintJournal(w, time.Now()); err != nil {
 				return fmt.Errorf("print journal: %w", err)
 			}
 			return nil
