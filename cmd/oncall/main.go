@@ -22,6 +22,11 @@ func main() {
 }
 
 func run() (err error) {
+	filename := "oncall.json"
+	if len(os.Args) > 1 {
+		filename = os.Args[1]
+	}
+
 	log, err := getLogger()
 	if err != nil {
 		return fmt.Errorf("get logger: %w", err)
@@ -30,7 +35,7 @@ func run() (err error) {
 		err = errors.Join(err, log.Sync())
 	}()
 
-	storage := storageAdapter.NewStorage(storageAdapter.Config{Filename: "oncall.json"}, log.Named("storage"))
+	storage := storageAdapter.NewStorage(storageAdapter.Config{Filename: filename}, log.Named("storage"))
 
 	itemService, err := facade.NewItemService(storage, storage, log.Named("item_service"))
 	if err != nil {
