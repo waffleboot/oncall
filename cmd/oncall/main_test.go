@@ -2,6 +2,7 @@ package main_test
 
 import (
 	_ "embed"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -42,4 +43,6 @@ func TestReport(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, report, sb.String())
+
+	os.WriteFile("journal.txt", []byte(sb.String()), 0o644)
 }

@@ -54,45 +54,47 @@ func (s *JournalService) PrintJournal(w io.Writer, at time.Time) error {
 		}
 
 		for i, item := range items {
-			write("\n%d) %s\n", i+1, item.ToPrint())
+			write("")
+			write("%d) %s", i+1, item.ToPrint())
+			// write("")
 
 			if len(item.Description) > 0 {
 				write("")
 				write(item.Description)
 			}
 
-			newline := true
-			if vms := item.PrintedVMs(); len(vms) > 0 {
-				for _, vm := range vms {
-					if newline {
-						write("")
-						newline = false
-					}
-					write(vm.ToPrint())
-					newline = vm.HasNode()
-				}
-			}
+			// newline := true
+			// if vms := item.PrintedVMs(); len(vms) > 0 {
+			// 	for _, vm := range vms {
+			// 		if newline {
+			// 			write("")
+			// 			newline = false
+			// 		}
+			// 		write(vm.ToPrint())
+			// 		newline = vm.HasNode()
+			// 	}
+			// }
 
-			if nodes := item.PrintedNodes(); len(nodes) > 0 {
-				write("")
-				for _, node := range nodes {
-					write(node.ToPrint())
-				}
-			}
+			// if nodes := item.PrintedNodes(); len(nodes) > 0 {
+			// 	write("")
+			// 	for _, node := range nodes {
+			// 		write(node.ToPrint())
+			// 	}
+			// }
 
-			if links := item.PrintedLinks(); len(links) > 0 {
-				write("")
-				for _, link := range links {
-					write(link.ToPrint())
-				}
-			}
+			// if links := item.PrintedLinks(); len(links) > 0 {
+			// 	write("")
+			// 	for _, link := range links {
+			// 		write(link.ToPrint())
+			// 	}
+			// }
 
-			if notes := item.PrintedNotes(); len(notes) > 0 {
-				for _, note := range notes {
-					write("")
-					write(note.ToPrint())
-				}
-			}
+			// if notes := item.PrintedNotes(); len(notes) > 0 {
+			// 	for _, note := range notes {
+			// 		write("")
+			// 		write(note.ToPrint())
+			// 	}
+			// }
 		}
 	}
 
