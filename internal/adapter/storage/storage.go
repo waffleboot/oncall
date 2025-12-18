@@ -127,7 +127,7 @@ func (s *Storage) loadData() error {
 		err = errors.Join(err, f.Close())
 	}()
 
-	var data storedData
+	var data journal
 
 	if err := json.NewDecoder(f).Decode(&data); err != nil {
 		return fmt.Errorf("json decode: %w", err)
@@ -151,7 +151,7 @@ func (s *Storage) saveData() error {
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", " ")
 
-	if err := enc.Encode(storedData{
+	if err := enc.Encode(journal{
 		LastNum: s.lastNum,
 		Items:   s.items,
 	}); err != nil {
