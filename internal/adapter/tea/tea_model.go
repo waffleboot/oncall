@@ -10,6 +10,7 @@ import (
 	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
 	"github.com/waffleboot/oncall/pkg/tea/button"
+	"github.com/waffleboot/oncall/pkg/tea/menu"
 	"github.com/waffleboot/oncall/pkg/tea/tabs"
 	"go.uber.org/zap"
 )
@@ -46,13 +47,13 @@ type (
 		selectedVM               model.VM
 		selectedNode             model.Node
 		selectedNote             model.Note
-		menuAllItems             *Menu
-		menuItem                 *Menu
-		menuItemType             *Menu
-		linksMenu                *Menu
-		menuVMs                  *Menu
-		menuNotes                *Menu
-		menuNodes                *Menu
+		menuAllItems             *menu.Menu
+		menuItem                 *menu.Menu
+		menuItemType             *menu.Menu
+		linksMenu                *menu.Menu
+		menuVMs                  *menu.Menu
+		menuNotes                *menu.Menu
+		menuNodes                *menu.Menu
 		tabs                     tabs.Model
 		textinputLinkAddress     textinput.Model
 		textinputLinkDescription textarea.Model
@@ -96,7 +97,7 @@ func NewTeaModel(itemService port.ItemService, journalService port.JournalServic
 
 func (m *TeaModel) Init() tea.Cmd {
 	m.currentScreen = screenItems
-	m.menuAllItems = NewMenu(func(group string, pos int) string {
+	m.menuAllItems = menu.NewMenu(func(group string, pos int) string {
 		switch {
 		case group == "exit":
 			return "Exit"
@@ -120,7 +121,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		return group
 	})
 	m.resetItems(nil)
-	m.menuItem = NewMenu(func(group string, pos int) string {
+	m.menuItem = menu.NewMenu(func(group string, pos int) string {
 		switch {
 		case group == "exit":
 			return "Exit"
@@ -147,7 +148,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return group
 	})
-	m.menuItemType = NewMenu(func(group string, pos int) string {
+	m.menuItemType = menu.NewMenu(func(group string, pos int) string {
 		switch model.ItemType(group) {
 		case model.ItemTypeInc:
 			return "Инцидент"
@@ -164,7 +165,7 @@ func (m *TeaModel) Init() tea.Cmd {
 	m.menuItemType.AddGroup(string(model.ItemTypeInc))
 	m.menuItemType.AddGroup(string(model.ItemTypeAlert))
 	m.menuItemType.AddGroup(string(model.ItemTypeAdhoc))
-	m.linksMenu = NewMenu(func(group string, pos int) string {
+	m.linksMenu = menu.NewMenu(func(group string, pos int) string {
 		switch group {
 		case "exit":
 			return "Exit"
@@ -176,7 +177,7 @@ func (m *TeaModel) Init() tea.Cmd {
 			return group
 		}
 	})
-	m.menuVMs = NewMenu(func(group string, pos int) string {
+	m.menuVMs = menu.NewMenu(func(group string, pos int) string {
 		switch group {
 		case "exit":
 			return "Exit"
@@ -188,7 +189,7 @@ func (m *TeaModel) Init() tea.Cmd {
 			return group
 		}
 	})
-	m.menuNodes = NewMenu(func(group string, pos int) string {
+	m.menuNodes = menu.NewMenu(func(group string, pos int) string {
 		switch group {
 		case "exit":
 			return "Exit"
@@ -205,7 +206,7 @@ func (m *TeaModel) Init() tea.Cmd {
 			return group
 		}
 	})
-	m.menuNotes = NewMenu(func(group string, pos int) string {
+	m.menuNotes = menu.NewMenu(func(group string, pos int) string {
 		switch group {
 		case "exit":
 			return "Exit"

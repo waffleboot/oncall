@@ -1,4 +1,4 @@
-package tea
+package menu
 
 import (
 	"fmt"
