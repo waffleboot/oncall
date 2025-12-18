@@ -39,6 +39,6 @@ func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *TeaModel) viewItemType() string {
 	var s strings.Builder
 	s.WriteString("  Тип обращения:\n\n")
-	s.WriteString(m.menuItemType.GenerateMenu())
+	s.WriteString(m.menuItemType.View())
 	return s.String()
 }

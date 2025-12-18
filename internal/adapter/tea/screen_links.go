@@ -76,7 +76,7 @@ func (m *TeaModel) updateLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TeaModel) viewLinks() string {
-	return m.linksMenu.GenerateMenu()
+	return m.linksMenu.View()
 }
 
 func (m *TeaModel) resetLinks(toGroup string) {

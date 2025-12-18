@@ -75,7 +75,7 @@ func (m *TeaModel) updateItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TeaModel) viewItems() string {
-	return m.menuAllItems.GenerateMenu()
+	return m.menuAllItems.View()
 }
 
 func (m *TeaModel) resetItems(items []model.Item) {

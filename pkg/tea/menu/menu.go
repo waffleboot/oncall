@@ -76,7 +76,7 @@ func (m *Model) AddDelimiter() {
 	m.groupSizes = append(m.groupSizes, 1)
 }
 
-func (m *Model) GenerateMenu() string {
+func (m *Model) View() string {
 	var cursor int
 	var s strings.Builder
 

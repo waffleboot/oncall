@@ -58,7 +58,7 @@ func (m *TeaModel) updateNodes(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TeaModel) viewNodes() string {
-	return m.menuNodes.GenerateMenu()
+	return m.menuNodes.View()
 }
 
 func (m *TeaModel) resetNodes(toGroup string) {

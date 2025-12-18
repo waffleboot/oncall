@@ -70,7 +70,7 @@ func (m *TeaModel) updateNotes(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TeaModel) viewNotes() string {
-	return m.menuNotes.GenerateMenu()
+	return m.menuNotes.View()
 }
 
 func (m *TeaModel) resetNotes(toGroup string) {

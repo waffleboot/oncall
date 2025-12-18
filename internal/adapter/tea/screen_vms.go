@@ -58,7 +58,7 @@ func (m *TeaModel) updateVMs(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TeaModel) viewVMs() string {
-	return m.menuVMs.GenerateMenu()
+	return m.menuVMs.View()
 }
 
 func (m *TeaModel) resetVMs(toGroup string) {

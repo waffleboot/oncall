@@ -92,7 +92,7 @@ func (s *MenuTestSuite) TestGenerateMenu() {
   action 2
 
   action 3
-`, s.menu.GenerateMenu())
+`, s.menu.View())
 	})
 
 	s.menu.JumpToGroup("action 2")
@@ -105,7 +105,7 @@ func (s *MenuTestSuite) TestGenerateMenu() {
 > action 2
 
   action 3
-`, s.menu.GenerateMenu())
+`, s.menu.View())
 	})
 
 	s.menu.JumpToGroup("action 3")
@@ -118,7 +118,7 @@ func (s *MenuTestSuite) TestGenerateMenu() {
   action 2
 
 > action 3
-`, s.menu.GenerateMenu())
+`, s.menu.View())
 	})
 
 	s.menu.JumpToGroup("unknown")
