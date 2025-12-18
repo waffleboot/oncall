@@ -25,7 +25,11 @@ func (n *Node) MenuItem() string {
 }
 
 func (n *Node) ToPrint() string {
-	return fmt.Sprintf("host: %s", n.Name)
+	description := n.Description
+	if description != "" {
+		description = "\n\n" + description
+	}
+	return fmt.Sprintf("host: %s%s", n.Name, description)
 }
 
 func (s *Item) ActiveNodes() []Node {

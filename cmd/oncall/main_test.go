@@ -2,7 +2,6 @@ package main_test
 
 import (
 	_ "embed"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -27,9 +26,53 @@ func TestReport(t *testing.T) {
 	assert.NoError(t, err)
 
 	itemInc, err := itemService.CreateItem()
-	assert.NoError(t, err)
+	itemInc.Title = "какой-то инцидент"
+	itemInc.Description = "здесь дается описание на несколько строк\nс переводом строки\n\nдва раза"
 
 	itemInc.Type = model.ItemTypeInc
+	assert.NoError(t, err)
+
+	itemInc.VMs = append(itemInc.VMs, model.VM{
+		Name:        "vm-1",
+		Node:        "node-1",
+		Description: "можно дать описание вм\nна несколько строк",
+	})
+
+	itemInc.VMs = append(itemInc.VMs, model.VM{
+		Name: "vm-2",
+	})
+
+	itemInc.Nodes = append(itemInc.Nodes, model.Node{
+		Name:        "node-3",
+		Description: "можно дать описание узла\nна несколько строк",
+	})
+
+	itemInc.Links = append(itemInc.Links, model.Link{
+		Public:  true,
+		Address: "http://jira.com",
+	})
+
+	itemInc.Links = append(itemInc.Links, model.Link{
+		Public:      false,
+		Address:     "http://confluence.com",
+		Description: "описание работы сервиса",
+	})
+
+	itemInc.Notes = append(itemInc.Notes, model.Note{
+		Text:   "выдали рекомендацию 1",
+		Public: true,
+	})
+
+	itemInc.Notes = append(itemInc.Notes, model.Note{
+		Text:   "выдали рекомендацию 2",
+		Public: true,
+	})
+
+	itemInc.Notes = append(itemInc.Notes, model.Note{
+		Text:   "этого описания не должно быть",
+		Public: false,
+	})
+
 	itemInc, err = itemService.UpdateItem(itemInc)
 	assert.NoError(t, err)
 
@@ -44,5 +87,5 @@ func TestReport(t *testing.T) {
 
 	assert.Equal(t, report, sb.String())
 
-	os.WriteFile("journal.txt", []byte(sb.String()), 0o644)
+	// os.WriteFile("journal.txt", []byte(sb.String()), 0o644)
 }

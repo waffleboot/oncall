@@ -50,10 +50,14 @@ func (v *VM) MenuItem() string {
 }
 
 func (v *VM) ToPrint() string {
-	if v.Node != "" {
-		return fmt.Sprintf("vm: %s\nhost: %s", v.Name, v.Node)
+	description := v.Description
+	if description != "" {
+		description = "\n\n" + description
 	}
-	return fmt.Sprintf("vm: %s", v.Name)
+	if v.Node != "" {
+		return fmt.Sprintf("vm: %s\nhost: %s%s", v.Name, v.Node, description)
+	}
+	return fmt.Sprintf("vm: %s%s", v.Name, description)
 }
 
 func (s *Item) ActiveVMs() []VM {
