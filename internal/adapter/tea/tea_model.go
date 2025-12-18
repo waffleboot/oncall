@@ -33,7 +33,7 @@ const (
 type (
 	screen   string
 	TeaModel struct {
-		itemService              port.ItemService2
+		itemService              port.ItemService
 		journalService           port.JournalService
 		currentScreen            screen
 		items                    []model.Item
@@ -86,7 +86,7 @@ type (
 	}
 )
 
-func NewTeaModel(itemService port.ItemService2, journalService port.JournalService, log *zap.Logger) *TeaModel {
+func NewTeaModel(itemService port.ItemService, journalService port.JournalService, log *zap.Logger) *TeaModel {
 	return &TeaModel{
 		itemService:    itemService,
 		journalService: journalService,

@@ -6,9 +6,6 @@ import (
 )
 
 type ItemService interface {
-}
-
-type ItemService2 interface {
 	GetItem(id uuid.UUID) (model.Item, error)
 	GetItems() []model.Item
 	CreateItem() (model.Item, error)

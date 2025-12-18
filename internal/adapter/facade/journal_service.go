@@ -10,10 +10,10 @@ import (
 )
 
 type JournalService struct {
-	itemService port.ItemService2
+	itemService port.ItemService
 }
 
-func NewJournalService(itemService port.ItemService2) *JournalService {
+func NewJournalService(itemService port.ItemService) *JournalService {
 	return &JournalService{itemService: itemService}
 }
 
