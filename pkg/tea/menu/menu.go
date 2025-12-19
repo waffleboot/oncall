@@ -249,7 +249,7 @@ func (m *Model) Update(msg tea.Msg) bool {
 		case "up", "k":
 			m.MoveCursorUp()
 			return true
-		case "down", "j":
+		case "down", "j", "tab":
 			m.MoveCursorDown()
 			return true
 		}
