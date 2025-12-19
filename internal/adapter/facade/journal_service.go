@@ -11,10 +11,11 @@ import (
 
 type JournalService struct {
 	itemService port.ItemService
+	userService port.UserService
 }
 
-func NewJournalService(itemService port.ItemService) *JournalService {
-	return &JournalService{itemService: itemService}
+func NewJournalService(itemService port.ItemService, userService port.UserService) *JournalService {
+	return &JournalService{itemService: itemService, userService: userService}
 }
 
 func (s *JournalService) PrintJournal(w io.Writer, at time.Time) error {
@@ -22,7 +23,7 @@ func (s *JournalService) PrintJournal(w io.Writer, at time.Time) error {
 		_, _ = fmt.Fprintf(w, format+"\n", args...)
 	}
 
-	write("# %s", time.Now().Format(time.DateOnly))
+	write("# %s", at.Format(time.DateOnly))
 
 	items := s.itemService.GetItems()
 
@@ -96,6 +97,15 @@ func (s *JournalService) PrintJournal(w io.Writer, at time.Time) error {
 				}
 			}
 		}
+
+	}
+
+	write("")
+	write("#dpl")
+
+	if user := s.userService.GetUser(); user != nil {
+		write("")
+		write("@%s fyi", user.Nick)
 	}
 
 	return nil

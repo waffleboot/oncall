@@ -41,6 +41,10 @@ func (m *TeaModel) updateItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "print_journal":
 				m.printJournal = true
 				return m.exitScreen()
+			case "next":
+				m.currentScreen = screenUsers
+				m.resetUsers(m.userService.GetUser())
+				return m, nil
 			case "items":
 				m.selectedItem = m.items[p]
 				m.resetEditItem("exit")
@@ -85,6 +89,7 @@ func (m *TeaModel) resetItems(items []model.Item) {
 	m.menuAllItems.AddGroup("new")
 	m.menuAllItems.AddGroup("close_journal")
 	m.menuAllItems.AddGroup("print_journal")
+	m.menuAllItems.AddGroup("next")
 	m.menuAllItems.AddGroupWithItems("items", len(m.items))
 	if len(m.items) == 0 {
 		m.menuAllItems.JumpToGroup("new")

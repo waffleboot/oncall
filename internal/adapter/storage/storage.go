@@ -15,6 +15,7 @@ import (
 type (
 	Config struct {
 		Filename string
+		Users    []model.User
 	}
 	Storage struct {
 		lastNum int
@@ -32,7 +33,16 @@ func (s *Storage) GetJournal() (model.Journal, error) {
 	if err != nil {
 		return model.Journal{}, err
 	}
-	return j.toDomain(), nil
+
+	var user *model.User
+	for i := range s.config.Users {
+		if s.config.Users[i].Nick == j.Next {
+			user = &s.config.Users[i]
+			break
+		}
+	}
+
+	return j.toDomain(user), nil
 }
 
 func (s *Storage) SaveJournal(j model.Journal) error {
@@ -81,22 +91,18 @@ func (s *Storage) loadJournal() (journal, error) {
 		err = errors.Join(err, f.Close())
 	}()
 
-	var st journal
+	var j journal
 
-	if err := json.NewDecoder(f).Decode(&st); err != nil {
+	if err := json.NewDecoder(f).Decode(&j); err != nil {
 		return journal{}, fmt.Errorf("json decode: %w", err)
 	}
 
-	s.lastNum = st.LastNum
+	s.log.Debug("journal loaded", zap.Int("items_count", len(j.Items)), zap.Int("last_num", j.LastNum))
 
-	s.log.Debug("journal loaded", zap.Int("items_count", len(st.Items)), zap.Int("last_num", st.LastNum))
-
-	return st, nil
+	return s.afterLoadJournal(j), nil
 }
 
 func (s *Storage) saveJournal(j journal) error {
-	j.LastNum = s.lastNum
-
 	f, err := os.Create(s.config.Filename)
 	if err != nil {
 		return fmt.Errorf("os create: %w", err)
@@ -108,7 +114,7 @@ func (s *Storage) saveJournal(j journal) error {
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", " ")
 
-	if err := enc.Encode(j); err != nil {
+	if err := enc.Encode(s.beforeSaveJournal(j)); err != nil {
 		return fmt.Errorf("json encode: %w", err)
 	}
 
@@ -119,4 +125,14 @@ func (s *Storage) saveJournal(j journal) error {
 	s.log.Debug("journal saved", zap.Int("items_count", len(j.Items)), zap.Int("last_num", j.LastNum))
 
 	return nil
+}
+
+func (s *Storage) beforeSaveJournal(j journal) journal {
+	j.LastNum = s.lastNum
+	return j
+}
+
+func (s *Storage) afterLoadJournal(j journal) journal {
+	s.lastNum = j.LastNum
+	return j
 }

@@ -16,6 +16,11 @@ type ItemService interface {
 	CloseItem(model.Item) (model.Item, error)
 }
 
+type UserService interface {
+	GetUser() *model.User
+	SetUser(model.User) error
+}
+
 type JournalService interface {
 	CloseJournal() error
 }

@@ -35,16 +35,30 @@ func run() (err error) {
 		err = errors.Join(err, log.Sync())
 	}()
 
-	storage := storageAdapter.NewStorage(storageAdapter.Config{Filename: filename}, log.Named("storage"))
+	users, err := storageAdapter.GetUsers("users.json")
+	if err != nil {
+		return fmt.Errorf("get users: %w", err)
+	}
+
+	storage := storageAdapter.NewStorage(storageAdapter.Config{
+		Filename: filename,
+		Users:    users,
+	}, log.Named("storage"))
 
 	itemService, err := facade.NewItemService(storage, storage, log.Named("item_service"))
 	if err != nil {
 		return fmt.Errorf("new item service: %w", err)
 	}
 
-	journalService := facade.NewJournalService(itemService)
+	journalService := facade.NewJournalService(itemService, itemService)
 
-	teaModel := teaAdapter.NewTeaModel(itemService, itemService, log)
+	teaModel := teaAdapter.NewTeaModel(
+		itemService,
+		itemService,
+		itemService,
+		users,
+		log,
+	)
 
 	if _, err := tea.NewProgram(teaModel).Run(); err != nil {
 		return fmt.Errorf("tea run: %w", err)

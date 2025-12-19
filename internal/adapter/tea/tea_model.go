@@ -29,14 +29,17 @@ const (
 	screenVMs      screen = "vms"
 	screenVM       screen = "vm"
 	screenTitle    screen = "title"
+	screenUsers    screen = "users"
 )
 
 type (
 	screen   string
 	TeaModel struct {
+		userService              port.UserService
 		itemService              port.ItemService
 		journalService           port.JournalService
 		currentScreen            screen
+		users                    []model.User
 		items                    []model.Item
 		vms                      []model.VM
 		links                    []model.Link
@@ -54,6 +57,7 @@ type (
 		menuVMs                  *menu.Model
 		menuNotes                *menu.Model
 		menuNodes                *menu.Model
+		menuUsers                *menu.Model
 		tabs                     tabs.Model
 		textinputLinkAddress     textinput.Model
 		textinputLinkDescription textarea.Model
@@ -87,10 +91,17 @@ type (
 	}
 )
 
-func NewTeaModel(itemService port.ItemService, journalService port.JournalService, log *zap.Logger) *TeaModel {
+func NewTeaModel(
+	userService port.UserService,
+	itemService port.ItemService,
+	journalService port.JournalService,
+	users []model.User,
+	log *zap.Logger) *TeaModel {
 	return &TeaModel{
+		userService:    userService,
 		itemService:    itemService,
 		journalService: journalService,
+		users:          users,
 		log:            log,
 	}
 }
@@ -107,6 +118,12 @@ func (m *TeaModel) Init() tea.Cmd {
 			return "Закрыть журнал"
 		case group == "print_journal":
 			return "Распечатать журнал"
+		case group == "next":
+			if user := m.userService.GetUser(); user != nil {
+				return fmt.Sprintf("Next is %s ...", user.Name)
+			} else {
+				return "Set next ..."
+			}
 		case group == "items":
 			marker := " "
 			item := m.items[pos]
@@ -218,6 +235,15 @@ func (m *TeaModel) Init() tea.Cmd {
 			return group
 		}
 	})
+	m.menuUsers = menu.New(func(group string, pos int) string {
+		switch group {
+		case "exit":
+			return "Exit"
+		case "users":
+			return m.users[pos].MenuItem()
+		}
+		return ""
+	})
 	return m.getItems
 }
 
@@ -263,6 +289,8 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateVM(msg)
 	case screenTitle:
 		return m.updateItemTitle(msg)
+	case screenUsers:
+		return m.updateUsers(msg)
 	}
 
 	return m, func() tea.Msg { return fmt.Errorf("screen not found: %s", m.currentScreen) }
@@ -296,6 +324,8 @@ func (m *TeaModel) View() string {
 		return m.viewVM()
 	case screenTitle:
 		return m.viewTitle()
+	case screenUsers:
+		return m.viewUsers()
 	}
 	return string(m.currentScreen)
 }

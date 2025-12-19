@@ -9,7 +9,7 @@ import (
 
 type Journal struct {
 	Items []Item
-	Next  string
+	Next  *User
 }
 
 func NewJournal() Journal {

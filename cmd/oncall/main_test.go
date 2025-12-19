@@ -2,6 +2,7 @@ package main_test
 
 import (
 	_ "embed"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -11,6 +12,7 @@ import (
 	"github.com/waffleboot/oncall/internal/adapter/facade"
 	storageAdapter "github.com/waffleboot/oncall/internal/adapter/storage"
 	"github.com/waffleboot/oncall/internal/model"
+	"github.com/waffleboot/oncall/internal/port/testutil"
 	"go.uber.org/zap/zaptest"
 )
 
@@ -76,7 +78,7 @@ func TestReport(t *testing.T) {
 	itemInc, err = itemService.UpdateItem(itemInc)
 	assert.NoError(t, err)
 
-	journalService := facade.NewJournalService(itemService)
+	journalService := facade.NewJournalService(itemService, testutil.UserService("nick"))
 
 	sb := new(strings.Builder)
 
@@ -87,5 +89,7 @@ func TestReport(t *testing.T) {
 
 	assert.Equal(t, report, sb.String())
 
-	// os.WriteFile("journal.txt", []byte(sb.String()), 0o644)
+	if t.Failed() {
+		os.WriteFile("journal.txt", []byte(sb.String()), 0o644)
+	}
 }

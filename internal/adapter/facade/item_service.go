@@ -105,3 +105,12 @@ func (s *ItemService) saveJournal() error {
 	s.log.Debug("journal saved", zap.Int("items_count", len(s.journal.Items)))
 	return nil
 }
+
+func (s *ItemService) GetUser() *model.User {
+	return s.journal.Next
+}
+
+func (s *ItemService) SetUser(user model.User) error {
+	s.journal.Next = &user
+	return s.saveJournal()
+}
