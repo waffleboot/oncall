@@ -264,14 +264,14 @@ func (m *TeaModel) Init() tea.Cmd {
 			return "Exit"
 		case "new":
 			return "Добавить console log ..."
-		case "notes":
+		case "console_logs":
 			return m.consoleLogs[pos].MenuItem()
 		default:
 			return group
 		}
 	})
 	m.menuConsoleLogVMs = menu.New(func(group string, pos int) string {
-		return m.selectedItem.ActiveConsoleLogs()[pos].MenuItem()
+		return m.selectedItem.ActiveVMs()[pos].MenuItem()
 	})
 	return m.getItems
 }

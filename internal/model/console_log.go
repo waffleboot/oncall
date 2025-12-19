@@ -2,6 +2,7 @@ package model
 
 import (
 	"slices"
+	"strings"
 	"time"
 )
 
@@ -19,7 +20,13 @@ func (s ConsoleLog) Empty() bool {
 }
 
 func (s ConsoleLog) MenuItem() string {
-	return s.AddedAt.Format(time.DateTime)
+	var sb strings.Builder
+	sb.WriteString(s.AddedAt.Format(time.DateTime))
+	if s.VMID != "" {
+		sb.WriteString(" - ")
+		sb.WriteString(s.VMID)
+	}
+	return sb.String()
 }
 
 func (s ConsoleLog) NotDeleted() bool {
