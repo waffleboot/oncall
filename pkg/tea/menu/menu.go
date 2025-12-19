@@ -246,7 +246,7 @@ func (m *Model) Update(msg tea.Msg) bool {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "up", "k":
+		case "up", "k", "shift+tab":
 			m.MoveCursorUp()
 			return true
 		case "down", "j", "tab":

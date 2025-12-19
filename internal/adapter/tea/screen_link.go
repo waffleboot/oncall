@@ -80,12 +80,12 @@ func (m *TeaModel) updateLink(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 }
 
 func (m *TeaModel) viewLink() string {
-	var s strings.Builder
+	s := new(strings.Builder)
 
 	if m.selectedLink.HasID() {
-		s.WriteString(fmt.Sprintf("ID: %d\n", m.selectedLink.ID))
+		fmt.Fprintf(s, "ID: %d\n", m.selectedLink.ID)
 	}
-	s.WriteString("Address:\n  ")
+	s.WriteString("Address:\n")
 	s.WriteString(m.textinputLinkAddress.View())
 	s.WriteString("\n")
 	s.WriteString("Description:\n")

@@ -63,7 +63,9 @@ type (
 		menuNodes                *menu.Model
 		menuUsers                *menu.Model
 		menuConsoleLogs          *menu.Model
+		menuConsoleLogVMs        *menu.Model
 		tabs                     tabs.Model
+		textinputConsoleLogVMID  textinput.Model
 		textinputLinkAddress     textinput.Model
 		textinputLinkDescription textarea.Model
 		textinputItemTitle       textinput.Model
@@ -265,6 +267,9 @@ func (m *TeaModel) Init() tea.Cmd {
 		default:
 			return group
 		}
+	})
+	m.menuConsoleLogVMs = menu.New(func(group string, pos int) string {
+		return m.selectedItem.ActiveVMs()[pos].MenuItem()
 	})
 	return m.getItems
 }
