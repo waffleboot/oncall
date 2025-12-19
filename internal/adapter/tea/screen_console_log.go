@@ -107,10 +107,10 @@ func (m *TeaModel) viewConsoleLog() string {
 	var sb strings.Builder
 	sb.WriteString("VMID:\n")
 	sb.WriteString(m.textinputConsoleLogVMID.View())
-	if len(m.selectedItem.ActiveVMs()) > 0 {
-		sb.WriteString("\n\nVMID:\n")
-		sb.WriteString(m.menuConsoleLogVMs.View())
-	}
+	// if len(m.selectedItem.ActiveVMs()) > 0 {
+	// 	sb.WriteString("\n\nVMID:\n")
+	// 	sb.WriteString(m.menuConsoleLogVMs.View())
+	// }
 	sb.WriteString("\n\nFilepath:\n")
 	sb.WriteString(m.textinputConsoleLogPath.View())
 	sb.WriteString("\n\n")
