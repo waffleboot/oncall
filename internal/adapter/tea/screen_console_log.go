@@ -17,6 +17,48 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 			return m.exitScreen()
 		case "q":
 			return m.exitScreen()
+		case "up", "shift+tab":
+			if m.textinputConsoleLogVMID.Focused() {
+				m.textinputConsoleLogVMID.Blur()
+				m.downloadConsoleLog.Focus()
+				return m, nil
+			}
+			if m.textinputConsoleLogPath.Focused() {
+				m.textinputConsoleLogPath.Blur()
+				m.textinputConsoleLogVMID.Focus()
+				return m, nil
+			}
+			if m.submitConsoleLog.Focused() {
+				m.submitConsoleLog.Blur()
+				m.textinputConsoleLogPath.Focus()
+				return m, nil
+			}
+			if m.downloadConsoleLog.Focused() {
+				m.downloadConsoleLog.Blur()
+				m.submitConsoleLog.Focus()
+				return m, nil
+			}
+		case "down", "tab":
+			if m.textinputConsoleLogVMID.Focused() {
+				m.textinputConsoleLogVMID.Blur()
+				m.textinputConsoleLogPath.Focus()
+				return m, nil
+			}
+			if m.textinputConsoleLogPath.Focused() {
+				m.textinputConsoleLogPath.Blur()
+				m.submitConsoleLog.Focus()
+				return m, nil
+			}
+			if m.submitConsoleLog.Focused() {
+				m.submitConsoleLog.Blur()
+				m.downloadConsoleLog.Focus()
+				return m, nil
+			}
+			if m.downloadConsoleLog.Focused() {
+				m.downloadConsoleLog.Blur()
+				m.textinputConsoleLogVMID.Focus()
+				return m, nil
+			}
 		case "enter":
 			if m.textinputConsoleLogVMID.Focused() {
 				m.textinputConsoleLogVMID.Blur()
@@ -73,7 +115,7 @@ func (m *TeaModel) viewConsoleLog() string {
 	sb.WriteString(m.textinputConsoleLogPath.View())
 	sb.WriteString("\n\n")
 	sb.WriteString(m.submitConsoleLog.View())
-	sb.WriteString(" ")
+	sb.WriteString("\n\n")
 	sb.WriteString(m.downloadConsoleLog.View())
 	return sb.String()
 }
