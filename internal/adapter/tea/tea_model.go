@@ -66,6 +66,7 @@ type (
 		menuConsoleLogVMs        *menu.Model
 		tabs                     tabs.Model
 		textinputConsoleLogVMID  textinput.Model
+		textinputConsoleLogPath  textinput.Model
 		textinputLinkAddress     textinput.Model
 		textinputLinkDescription textarea.Model
 		textinputItemTitle       textinput.Model
@@ -81,6 +82,7 @@ type (
 		submitLink               button.Model
 		submitNote               button.Model
 		submitNodes              button.Model
+		submitConsoleLog         button.Model
 		submitAsPublicLink       button.Model
 		submitAsPrivateLink      button.Model
 		printJournal             bool

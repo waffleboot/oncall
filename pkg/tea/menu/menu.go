@@ -79,16 +79,18 @@ func (m *Model) AddDelimiter() {
 func (m *Model) View() string {
 	var cursor int
 	var s strings.Builder
+	var newline string
 
 	for i, group := range m.groupNames {
 		if group == menuDelimiter {
+			s.WriteString(newline)
 			s.WriteString("\n")
 			continue
 		}
 		for pos := 0; pos < m.groupSizes[i]; pos++ {
+			s.WriteString(newline)
 			if cursor == m.cursor {
 				s.WriteString(m.selected)
-
 			} else {
 				s.WriteString(m.notSelected)
 			}
@@ -100,7 +102,7 @@ func (m *Model) View() string {
 			}
 
 			s.WriteString(label)
-			s.WriteString("\n")
+			newline = "\n"
 			cursor++
 		}
 	}
