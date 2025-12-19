@@ -76,13 +76,15 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	case button.PressedMsg:
 		if msg.Value == "submit" {
 			return m.runAndExitScreen(func() error {
-				p, err := m.fileStorage.UploadFile(m.textinputConsoleLogPath.Value())
-				if err != nil {
-					return consoleLogErrorMsg(fmt.Errorf("upload file: %w", err))
+				src := m.textinputConsoleLogPath.Value()
+				if src != "" {
+					fileID, err := m.fileStorage.UploadFile(src)
+					if err != nil {
+						return consoleLogErrorMsg(fmt.Errorf("upload file: %w", err))
+					}
+					m.selectedConsoleLog.FileID = fileID
 				}
-
 				m.selectedConsoleLog.VMID = m.textinputConsoleLogVMID.Value()
-				m.selectedConsoleLog.Filepath = p
 
 				m.selectedItem.UpdateConsoleLog(m.selectedConsoleLog)
 				if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
@@ -92,8 +94,9 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 			})
 		} else {
 			return m.runAndExitScreen(func() error {
-				err := m.fileStorage.DownloadFile(m.textinputConsoleLogPath.Value(), m.selectedConsoleLog.DownloadAs())
-				if err != nil {
+				fileID := m.textinputConsoleLogPath.Value()
+				destination := m.selectedConsoleLog.DownloadAs()
+				if err := m.fileStorage.DownloadFile(fileID, destination); err != nil {
 					return consoleLogErrorMsg(fmt.Errorf("download file: %w", err))
 				}
 				return nil

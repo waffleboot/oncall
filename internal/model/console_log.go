@@ -9,20 +9,20 @@ import (
 type ConsoleLog struct {
 	ID          int
 	VMID        string
-	Filepath    string
+	FileID      string
 	AddedAt     time.Time
 	DeletedAt   time.Time
 	Description string
 }
 
-func (s ConsoleLog) Empty() bool {
-	return s.Filepath == ""
+func (s ConsoleLog) NoFile() bool {
+	return s.FileID == ""
 }
 
 func (s ConsoleLog) DownloadAs() string {
 	filename := s.AddedAt.Format("2006-01-02-150405")
 	if s.VMID != "" {
-		filename = filename + "_" + s.VMID
+		filename = filename + "-" + s.VMID
 	}
 	return filename + ".txt"
 }
@@ -55,15 +55,15 @@ func (s *Item) ActiveConsoleLogs() []ConsoleLog {
 	return consoleLogs
 }
 
-func (s *Item) DeleteConsoleLog(log ConsoleLog) {
-	if log.Empty() {
+func (s *Item) DeleteConsoleLog(consoleLog ConsoleLog) {
+	if consoleLog.NoFile() {
 		s.ConsoleLogs = slices.DeleteFunc(s.ConsoleLogs, func(it ConsoleLog) bool {
-			return it.ID == log.ID
+			return it.ID == consoleLog.ID
 		})
 		return
 	}
 	for i := range s.ConsoleLogs {
-		if s.ConsoleLogs[i].ID == log.ID {
+		if s.ConsoleLogs[i].ID == consoleLog.ID {
 			s.ConsoleLogs[i].DeletedAt = time.Now()
 			return
 		}

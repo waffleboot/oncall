@@ -11,35 +11,41 @@ import (
 )
 
 func (s *Storage) UploadFile(src string) (_ string, err error) {
+	filename := filepath.Join(s.filesDir(), uuid.NewString())
+	if err := s.copyFile(src, filename); err != nil {
+		return "", fmt.Errorf("copy file: %w", err)
+	}
+	return filename, nil
+}
+
+func (s *Storage) DownloadFile(src, dst string) error {
+	return s.copyFile(src, dst)
+}
+
+func (s *Storage) copyFile(src, dst string) error {
 	f, err := os.Open(src)
 	if err != nil {
-		return "", fmt.Errorf("os open: %w", err)
+		return fmt.Errorf("os open: %w", err)
 	}
 	defer func() {
 		err = errors.Join(err, f.Close())
 	}()
 
-	filename := filepath.Join(s.filesDir(), uuid.NewString())
-
-	d, err := os.Create(filename)
+	d, err := os.Create(dst)
 	if err != nil {
-		return "", fmt.Errorf("os create: %w", err)
+		return fmt.Errorf("os create: %w", err)
 	}
 	defer func() {
 		err = errors.Join(err, d.Close())
 	}()
 
 	if _, err := io.Copy(d, f); err != nil {
-		return "", fmt.Errorf("io copy: %w", err)
+		return fmt.Errorf("io copy: %w", err)
 	}
 
 	if err := d.Sync(); err != nil {
-		return "", fmt.Errorf("sync: %w", err)
+		return fmt.Errorf("sync: %w", err)
 	}
 
-	return filename, nil
-}
-
-func (s *Storage) DownloadFile(src, dst string) error {
 	return nil
 }
