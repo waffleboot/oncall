@@ -15,8 +15,8 @@ type ConsoleLog struct {
 	Description string
 }
 
-func (s ConsoleLog) NoFile() bool {
-	return s.FileID == ""
+func (s ConsoleLog) HasFile() bool {
+	return s.FileID != ""
 }
 
 func (s ConsoleLog) DownloadAs() string {
@@ -56,7 +56,7 @@ func (s *Item) ActiveConsoleLogs() []ConsoleLog {
 }
 
 func (s *Item) DeleteConsoleLog(consoleLog ConsoleLog) {
-	if consoleLog.NoFile() {
+	if !consoleLog.HasFile() {
 		s.ConsoleLogs = slices.DeleteFunc(s.ConsoleLogs, func(it ConsoleLog) bool {
 			return it.ID == consoleLog.ID
 		})

@@ -92,16 +92,15 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 				}
 				return nil
 			})
-		} else {
-			return m.runAndExitScreen(func() error {
-				fileID := m.textinputConsoleLogPath.Value()
-				destination := m.selectedConsoleLog.DownloadAs()
-				if err := m.fileStorage.DownloadFile(fileID, destination); err != nil {
-					return consoleLogErrorMsg(fmt.Errorf("download file: %w", err))
-				}
-				return nil
-			})
 		}
+		return m.runAndExitScreen(func() error {
+			fileID := m.selectedConsoleLog.FileID
+			destination := m.selectedConsoleLog.DownloadAs()
+			if err := m.fileStorage.DownloadFile(fileID, destination); err != nil {
+				return consoleLogErrorMsg(fmt.Errorf("download file: %w", err))
+			}
+			return nil
+		})
 	case consoleLogErrorMsg:
 		m.consoleLogError = msg
 		return m, nil
@@ -122,6 +121,9 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	case m.submitConsoleLog.Focused():
 		m.submitConsoleLog, cmd = m.submitConsoleLog.Update(msg)
 		return m, cmd
+	case m.downloadConsoleLog.Focused():
+		m.downloadConsoleLog, cmd = m.downloadConsoleLog.Update(msg)
+		return m, cmd
 	}
 
 	return m, nil
@@ -139,8 +141,10 @@ func (m *TeaModel) viewConsoleLog() string {
 	sb.WriteString(m.textinputConsoleLogPath.View())
 	sb.WriteString("\n\n")
 	sb.WriteString(m.submitConsoleLog.View())
-	sb.WriteString("\n\n")
-	sb.WriteString(m.downloadConsoleLog.View())
+	if m.selectedConsoleLog.HasFile() {
+		sb.WriteString("\n\n")
+		sb.WriteString(m.downloadConsoleLog.View())
+	}
 	if m.consoleLogError != nil {
 		sb.WriteString("\n\n")
 		sb.WriteString(m.consoleLogError.Error())
