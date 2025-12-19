@@ -20,9 +20,9 @@ import (
 var report string
 
 func TestReport(t *testing.T) {
-	journalFile := filepath.Join(t.TempDir(), "oncall.json")
+	journalName := filepath.Join(t.TempDir(), "oncall")
 	storageService := storageAdapter.NewStorage(storageAdapter.Config{
-		Filename: journalFile,
+		JournalName: journalName,
 	}, zaptest.NewLogger(t))
 	itemService, err := facade.NewItemService(storageService, storageService, zaptest.NewLogger(t))
 	assert.NoError(t, err)

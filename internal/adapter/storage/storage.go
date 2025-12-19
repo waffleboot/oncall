@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/waffleboot/oncall/internal/model"
@@ -14,8 +15,8 @@ import (
 
 type (
 	Config struct {
-		Filename string
-		Users    []model.User
+		JournalName string
+		Users       []model.User
 	}
 	Storage struct {
 		lastNum int
@@ -54,9 +55,9 @@ func (s *Storage) SaveJournal(j model.Journal) error {
 
 func (s *Storage) CloseJournal(j model.Journal) error {
 	ts := time.Now().Format("2006-01-02-15-04-05")
-	to := fmt.Sprintf("%s.%s", s.config.Filename, ts)
+	to := fmt.Sprintf("%s.%s", s.config.JournalName, ts)
 
-	if err := os.Rename(s.config.Filename, to); err != nil {
+	if err := os.Rename(s.config.JournalName, to); err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			return nil
 		}
@@ -80,7 +81,7 @@ func (s *Storage) GenerateNum() (int, error) {
 }
 
 func (s *Storage) loadJournal() (journal, error) {
-	f, err := os.Open(s.config.Filename)
+	f, err := os.Open(s.journalJson())
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			return journal{}, nil
@@ -103,7 +104,11 @@ func (s *Storage) loadJournal() (journal, error) {
 }
 
 func (s *Storage) saveJournal(j journal) error {
-	f, err := os.Create(s.config.Filename)
+	if err := os.MkdirAll(s.config.JournalName, 0o775); err != nil {
+		return fmt.Errorf("mkdir: %w", err)
+	}
+
+	f, err := os.Create(s.journalJson())
 	if err != nil {
 		return fmt.Errorf("os create: %w", err)
 	}
@@ -125,6 +130,10 @@ func (s *Storage) saveJournal(j journal) error {
 	s.log.Debug("journal saved", zap.Int("items_count", len(j.Items)), zap.Int("last_num", j.LastNum))
 
 	return nil
+}
+
+func (s *Storage) journalJson() string {
+	return filepath.Join(s.config.JournalName, "journal.json")
 }
 
 func (s *Storage) beforeSaveJournal(j journal) journal {

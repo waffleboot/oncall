@@ -22,9 +22,9 @@ func main() {
 }
 
 func run() (err error) {
-	filename := "oncall.json"
+	journalName := "oncall"
 	if len(os.Args) > 1 {
-		filename = os.Args[1]
+		journalName = os.Args[1]
 	}
 
 	log, err := getLogger()
@@ -41,8 +41,8 @@ func run() (err error) {
 	}
 
 	storage := storageAdapter.NewStorage(storageAdapter.Config{
-		Filename: filename,
-		Users:    users,
+		JournalName: journalName,
+		Users:       users,
 	}, log.Named("storage"))
 
 	itemService, err := facade.NewItemService(storage, storage, log.Named("item_service"))
