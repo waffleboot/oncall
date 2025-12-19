@@ -72,6 +72,9 @@ func (m *TeaModel) updateItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case string(screenVMs):
 				m.currentScreen = screenVMs
 				m.resetVMs("new")
+			case string(screenConsoleLogs):
+				m.currentScreen = screenConsoleLogs
+				m.resetConsoleLogs("new")
 			}
 		case "t":
 			m.menuItem.JumpToGroup(string(screenTitle))
@@ -141,6 +144,7 @@ func (m *TeaModel) resetEditItem(toGroup string) {
 	}
 
 	m.menuItem.AddGroup(string(screenTitle))
+	m.menuItem.AddGroup(string(screenConsoleLogs))
 	m.menuItem.AddGroup(string(screenNodes))
 	m.menuItem.AddGroup(string(screenVMs))
 	m.menuItem.AddGroup(string(screenLinks))

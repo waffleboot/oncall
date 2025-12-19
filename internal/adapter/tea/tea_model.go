@@ -16,20 +16,22 @@ import (
 )
 
 const (
-	screenItems    screen = "items"
-	screenItem     screen = "item"
-	screenItemType screen = "item_type"
-	screenLinks    screen = "links"
-	screenLink     screen = "link"
-	screenNodes    screen = "nodes"
-	screenNode     screen = "node"
-	screenNewNodes screen = "new_nodes"
-	screenNotes    screen = "notes"
-	screenNote     screen = "note"
-	screenVMs      screen = "vms"
-	screenVM       screen = "vm"
-	screenTitle    screen = "title"
-	screenUsers    screen = "users"
+	screenItems       screen = "items"
+	screenItem        screen = "item"
+	screenItemType    screen = "item_type"
+	screenLinks       screen = "links"
+	screenLink        screen = "link"
+	screenNodes       screen = "nodes"
+	screenNode        screen = "node"
+	screenNewNodes    screen = "new_nodes"
+	screenNotes       screen = "notes"
+	screenNote        screen = "note"
+	screenVMs         screen = "vms"
+	screenVM          screen = "vm"
+	screenTitle       screen = "title"
+	screenUsers       screen = "users"
+	screenConsoleLogs screen = "console_logs"
+	screenConsoleLog  screen = "console_log"
 )
 
 type (
@@ -45,11 +47,13 @@ type (
 		links                    []model.Link
 		nodes                    []model.Node
 		notes                    []model.Note
+		consoleLogs              []model.ConsoleLog
 		selectedItem             model.Item
 		selectedLink             model.Link
 		selectedVM               model.VM
 		selectedNode             model.Node
 		selectedNote             model.Note
+		selectedConsoleLog       model.ConsoleLog
 		menuAllItems             *menu.Model
 		menuItem                 *menu.Model
 		menuItemType             *menu.Model
@@ -58,6 +62,7 @@ type (
 		menuNotes                *menu.Model
 		menuNodes                *menu.Model
 		menuUsers                *menu.Model
+		menuConsoleLogs          *menu.Model
 		tabs                     tabs.Model
 		textinputLinkAddress     textinput.Model
 		textinputLinkDescription textarea.Model
@@ -88,6 +93,9 @@ type (
 	itemDeletedMsg     struct{}
 	itemLinkCreatedMsg struct {
 		link model.Link
+	}
+	consoleLogCreatedMsg struct {
+		consoleLog model.ConsoleLog
 	}
 )
 
@@ -162,6 +170,8 @@ func (m *TeaModel) Init() tea.Cmd {
 			return "Хосты, узлы ..."
 		case group == string(screenVMs):
 			return "ВМ-ки ..."
+		case group == string(screenConsoleLogs):
+			return "Console logs ..."
 		}
 		return group
 	})
@@ -244,6 +254,18 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 		return ""
 	})
+	m.menuConsoleLogs = menu.New(func(group string, pos int) string {
+		switch group {
+		case "exit":
+			return "Exit"
+		case "new":
+			return "Добавить console log ..."
+		case "notes":
+			return m.consoleLogs[pos].MenuItem()
+		default:
+			return group
+		}
+	})
 	return m.getItems
 }
 
@@ -291,6 +313,10 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateItemTitle(msg)
 	case screenUsers:
 		return m.updateUsers(msg)
+	case screenConsoleLogs:
+		return m.updateConsoleLogs(msg)
+	case screenConsoleLog:
+		return m.updateConsoleLog(msg)
 	}
 
 	return m, func() tea.Msg { return fmt.Errorf("screen not found: %s", m.currentScreen) }
@@ -326,6 +352,10 @@ func (m *TeaModel) View() string {
 		return m.viewTitle()
 	case screenUsers:
 		return m.viewUsers()
+	case screenConsoleLogs:
+		return m.viewConsoleLogs()
+	case screenConsoleLog:
+		return m.viewConsoleLog()
 	}
 	return string(m.currentScreen)
 }

@@ -7,19 +7,20 @@ import (
 )
 
 type item struct {
-	ID          int       `json:"id"`
-	SleepAt     time.Time `json:"sleep_at,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
-	UpdatedAt   time.Time `json:"updated_at,omitempty"`
-	DeletedAt   time.Time `json:"deleted_at,omitempty"`
-	ClosedAt    time.Time `json:"closed_at,omitempty"`
-	Links       []link    `json:"links,omitempty"`
-	Notes       []note    `json:"notes,omitempty"`
-	Nodes       []node    `json:"nodes,omitempty"`
-	VMs         []vm      `json:"vms,omitempty"`
-	Type        string    `json:"type,omitempty"`
-	Title       string    `json:"title,omitempty"`
-	Description string    `json:"description,omitempty"`
+	ID          int          `json:"id"`
+	SleepAt     time.Time    `json:"sleep_at,omitempty"`
+	CreatedAt   time.Time    `json:"created_at,omitempty"`
+	UpdatedAt   time.Time    `json:"updated_at,omitempty"`
+	DeletedAt   time.Time    `json:"deleted_at,omitempty"`
+	ClosedAt    time.Time    `json:"closed_at,omitempty"`
+	Links       []link       `json:"links,omitempty"`
+	Notes       []note       `json:"notes,omitempty"`
+	Nodes       []node       `json:"nodes,omitempty"`
+	VMs         []vm         `json:"vms,omitempty"`
+	Type        string       `json:"type,omitempty"`
+	Title       string       `json:"title,omitempty"`
+	Description string       `json:"description,omitempty"`
+	ConsoleLogs []consoleLog `json:"console_logs,omitempty"`
 }
 
 func (s *item) NotDeleted() bool {
@@ -56,6 +57,16 @@ func (s *item) fromDomain(item model.Item) {
 	for i := range item.Links {
 		s.Links[i].fromDomain(item.Links[i])
 	}
+
+	s.Links = make([]link, len(item.Links))
+	for i := range item.Links {
+		s.Links[i].fromDomain(item.Links[i])
+	}
+
+	s.ConsoleLogs = make([]consoleLog, len(item.ConsoleLogs))
+	for i := range item.ConsoleLogs {
+		s.ConsoleLogs[i].fromDomain(item.ConsoleLogs[i])
+	}
 }
 
 func (s *item) toDomain() model.Item {
@@ -79,6 +90,11 @@ func (s *item) toDomain() model.Item {
 		links[i] = s.Links[i].toDomain()
 	}
 
+	consoleLogs := make([]model.ConsoleLog, len(s.ConsoleLogs))
+	for i := range s.ConsoleLogs {
+		consoleLogs[i] = s.ConsoleLogs[i].toDomain()
+	}
+
 	return model.Item{
 		ID:          s.ID,
 		SleepAt:     s.SleepAt,
@@ -93,5 +109,6 @@ func (s *item) toDomain() model.Item {
 		Nodes:       nodes,
 		Notes:       notes,
 		VMs:         vms,
+		ConsoleLogs: consoleLogs,
 	}
 }

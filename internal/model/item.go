@@ -29,6 +29,7 @@ type (
 		VMs         []VM
 		Title       string
 		Description string
+		ConsoleLogs []ConsoleLog
 	}
 )
 
