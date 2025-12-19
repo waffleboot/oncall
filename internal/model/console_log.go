@@ -54,3 +54,18 @@ func (s *Item) DeleteConsoleLog(log ConsoleLog) {
 		}
 	}
 }
+
+func (s *Item) UpdateConsoleLog(consoleLog ConsoleLog) {
+	var maxID int
+	for i, log := range s.ConsoleLogs {
+		if log.ID == consoleLog.ID {
+			s.ConsoleLogs[i] = consoleLog
+			return
+		}
+		if log.ID > maxID {
+			maxID = log.ID
+		}
+	}
+	consoleLog.ID = maxID + 1
+	s.ConsoleLogs = append(s.ConsoleLogs, consoleLog)
+}

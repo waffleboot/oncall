@@ -271,7 +271,7 @@ func (m *TeaModel) Init() tea.Cmd {
 		}
 	})
 	m.menuConsoleLogVMs = menu.New(func(group string, pos int) string {
-		return m.selectedItem.ActiveVMs()[pos].MenuItem()
+		return m.selectedItem.ActiveConsoleLogs()[pos].MenuItem()
 	})
 	return m.getItems
 }

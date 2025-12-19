@@ -1,6 +1,7 @@
 package tea
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -27,10 +28,17 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 				m.submitConsoleLog.Focus()
 				return m, nil
 			}
-			if m.submitConsoleLog.Focused() {
-				return m.exitScreen()
-			}
 		}
+	case button.PressedMsg:
+		m.selectedConsoleLog.VMID = m.textinputConsoleLogVMID.Value()
+		m.selectedConsoleLog.Filepath = m.textinputConsoleLogPath.Value()
+		return m.runAndExitScreen(func() error {
+			m.selectedItem.UpdateConsoleLog(m.selectedConsoleLog)
+			if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+				return fmt.Errorf("update item: %w", err)
+			}
+			return nil
+		})
 	case string:
 		if msg == "exit" {
 			m.currentScreen = screenConsoleLogs
