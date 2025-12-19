@@ -15,7 +15,7 @@ func (m *TeaModel) updateLinks(msg tea.Msg) (tea.Model, tea.Cmd) {
 	newLink := func() tea.Msg {
 		link := m.selectedItem.CreateLink()
 		if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
-			return fmt.Errorf("update item link: %w", err)
+			return fmt.Errorf("update item: %w", err)
 		}
 		return itemLinkCreatedMsg{link: link}
 	}

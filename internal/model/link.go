@@ -43,8 +43,8 @@ func (s *Item) UpdateLink(link Link) {
 
 func (s *Item) DeleteLink(link Link) {
 	if link.Empty() {
-		s.Links = slices.DeleteFunc(s.Links, func(l Link) bool {
-			return l.ID == link.ID
+		s.Links = slices.DeleteFunc(s.Links, func(it Link) bool {
+			return it.ID == link.ID
 		})
 		return
 	}
@@ -56,7 +56,7 @@ func (s *Item) DeleteLink(link Link) {
 	}
 }
 
-func (s *Link) Exists() bool {
+func (s *Link) HasID() bool {
 	return s.ID != 0
 }
 
