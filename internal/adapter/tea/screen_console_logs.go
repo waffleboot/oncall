@@ -47,7 +47,7 @@ func (m *TeaModel) updateConsoleLogs(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, newConsoleLog
 			case "console_logs":
 				m.selectedConsoleLog = m.consoleLogs[p]
-				m.currentScreen = screenLink
+				m.currentScreen = screenConsoleLog
 				m.resetConsoleLog()
 			}
 		}

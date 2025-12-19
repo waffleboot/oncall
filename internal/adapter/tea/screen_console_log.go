@@ -73,6 +73,8 @@ func (m *TeaModel) viewConsoleLog() string {
 	sb.WriteString(m.textinputConsoleLogPath.View())
 	sb.WriteString("\n\n")
 	sb.WriteString(m.submitConsoleLog.View())
+	sb.WriteString(" ")
+	sb.WriteString(m.downloadConsoleLog.View())
 	return sb.String()
 }
 
@@ -92,8 +94,16 @@ func (m *TeaModel) resetConsoleLog() {
 	m.textinputConsoleLogPath.Width = 80
 	m.textinputConsoleLogPath.CharLimit = 1000
 
-	m.submitConsoleLog = button.New("Submit")
+	m.submitConsoleLog = button.New("submit")
 	m.submitConsoleLog.Blur()
+
+	filename := m.selectedConsoleLog.AddedAt.Format("2006-01-02-150405")
+	if m.selectedConsoleLog.VMID != "" {
+		filename = filename + "_" + m.selectedConsoleLog.VMID
+	}
+
+	m.downloadConsoleLog = button.New(fmt.Sprintf("download as %s.txt", filename))
+	m.downloadConsoleLog.Blur()
 
 	m.menuConsoleLogVMs.ResetMenu()
 	m.menuConsoleLogVMs.AddGroupWithItems("vms", len(m.selectedItem.ActiveVMs()))

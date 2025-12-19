@@ -85,6 +85,7 @@ type (
 		submitConsoleLog         button.Model
 		submitAsPublicLink       button.Model
 		submitAsPrivateLink      button.Model
+		downloadConsoleLog       button.Model
 		printJournal             bool
 		log                      *zap.Logger
 		err                      error
