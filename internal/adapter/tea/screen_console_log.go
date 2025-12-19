@@ -95,7 +95,10 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 		}
 		return m.runAndExitScreen(func() error {
 			fileID := m.selectedConsoleLog.FileID
-			destination := m.selectedConsoleLog.DownloadAs()
+			destination := m.textinputConsoleLogPath.Value()
+			if destination == "" {
+				destination = m.selectedConsoleLog.DownloadAs()
+			}
 			if err := m.fileStorage.DownloadFile(fileID, destination); err != nil {
 				return consoleLogErrorMsg(fmt.Errorf("download file: %w", err))
 			}
