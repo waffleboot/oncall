@@ -39,13 +39,13 @@ func (n *Note) MenuItem() string {
 func (n *Note) trimNote() string {
 	s := bufio.NewScanner(strings.NewReader(n.Text))
 	for s.Scan() {
-		switch t := strings.TrimSpace(s.Text()); {
-		case t == "":
+		switch runes := []rune(strings.TrimSpace(s.Text())); {
+		case len(runes) == 0:
 			continue
-		case len(t) < 50:
-			return t
+		case len(runes) < 50:
+			return string(runes)
 		default:
-			return (string([]rune(t)[:50]) + " ...")
+			return string(runes[:50]) + " ..."
 		}
 	}
 	if err := s.Err(); err != nil {
