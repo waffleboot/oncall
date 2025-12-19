@@ -39,6 +39,7 @@ type (
 	TeaModel struct {
 		userService              port.UserService
 		itemService              port.ItemService
+		fileStorage              port.FileStorage
 		journalService           port.JournalService
 		currentScreen            screen
 		users                    []model.User
@@ -86,6 +87,7 @@ type (
 		submitAsPublicLink       button.Model
 		submitAsPrivateLink      button.Model
 		downloadConsoleLog       button.Model
+		consoleLogError          consoleLogErrorMsg
 		printJournal             bool
 		log                      *zap.Logger
 		err                      error
@@ -102,11 +104,13 @@ type (
 	consoleLogCreatedMsg struct {
 		consoleLog model.ConsoleLog
 	}
+	consoleLogErrorMsg error
 )
 
 func NewTeaModel(
 	userService port.UserService,
 	itemService port.ItemService,
+	fileStorage port.FileStorage,
 	journalService port.JournalService,
 	users []model.User,
 	log *zap.Logger) *TeaModel {
@@ -114,6 +118,7 @@ func NewTeaModel(
 		userService:    userService,
 		itemService:    itemService,
 		journalService: journalService,
+		fileStorage:    fileStorage,
 		users:          users,
 		log:            log,
 	}
@@ -287,9 +292,6 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.printJournal = true
 			return m, tea.Quit
 		}
-	case error:
-		m.err = msg
-		return m, tea.Quit
 	}
 
 	switch m.currentScreen {
@@ -325,6 +327,13 @@ func (m *TeaModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateConsoleLogs(msg)
 	case screenConsoleLog:
 		return m.updateConsoleLog(msg)
+	}
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+	case error:
+		m.err = msg
+		return m, tea.Quit
 	}
 
 	return m, func() tea.Msg { return fmt.Errorf("screen not found: %s", m.currentScreen) }

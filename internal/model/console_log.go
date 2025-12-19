@@ -19,6 +19,14 @@ func (s ConsoleLog) Empty() bool {
 	return s.Filepath == ""
 }
 
+func (s ConsoleLog) DownloadAs() string {
+	filename := s.AddedAt.Format("2006-01-02-150405")
+	if s.VMID != "" {
+		filename = filename + "_" + s.VMID
+	}
+	return filename + ".txt"
+}
+
 func (s ConsoleLog) MenuItem() string {
 	var sb strings.Builder
 	sb.WriteString(s.AddedAt.Format(time.DateTime))

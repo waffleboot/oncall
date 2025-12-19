@@ -10,6 +10,8 @@ import (
 )
 
 func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
+	m.consoleLogError = nil
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -72,15 +74,34 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 			}
 		}
 	case button.PressedMsg:
-		m.selectedConsoleLog.VMID = m.textinputConsoleLogVMID.Value()
-		m.selectedConsoleLog.Filepath = m.textinputConsoleLogPath.Value()
-		return m.runAndExitScreen(func() error {
-			m.selectedItem.UpdateConsoleLog(m.selectedConsoleLog)
-			if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
-				return fmt.Errorf("update item: %w", err)
-			}
-			return nil
-		})
+		if msg.Value == "submit" {
+			return m.runAndExitScreen(func() error {
+				p, err := m.fileStorage.UploadFile(m.textinputConsoleLogPath.Value())
+				if err != nil {
+					return consoleLogErrorMsg(fmt.Errorf("upload file: %w", err))
+				}
+
+				m.selectedConsoleLog.VMID = m.textinputConsoleLogVMID.Value()
+				m.selectedConsoleLog.Filepath = p
+
+				m.selectedItem.UpdateConsoleLog(m.selectedConsoleLog)
+				if _, err := m.itemService.UpdateItem(m.selectedItem); err != nil {
+					return fmt.Errorf("update item: %w", err)
+				}
+				return nil
+			})
+		} else {
+			return m.runAndExitScreen(func() error {
+				err := m.fileStorage.DownloadFile(m.textinputConsoleLogPath.Value(), m.selectedConsoleLog.DownloadAs())
+				if err != nil {
+					return consoleLogErrorMsg(fmt.Errorf("download file: %w", err))
+				}
+				return nil
+			})
+		}
+	case consoleLogErrorMsg:
+		m.consoleLogError = msg
+		return m, nil
 	case string:
 		if msg == "exit" {
 			m.currentScreen = screenConsoleLogs
@@ -117,6 +138,10 @@ func (m *TeaModel) viewConsoleLog() string {
 	sb.WriteString(m.submitConsoleLog.View())
 	sb.WriteString("\n\n")
 	sb.WriteString(m.downloadConsoleLog.View())
+	if m.consoleLogError != nil {
+		sb.WriteString("\n\n")
+		sb.WriteString(m.consoleLogError.Error())
+	}
 	return sb.String()
 }
 
@@ -139,12 +164,7 @@ func (m *TeaModel) resetConsoleLog() {
 	m.submitConsoleLog = button.New("submit")
 	m.submitConsoleLog.Blur()
 
-	filename := m.selectedConsoleLog.AddedAt.Format("2006-01-02-150405")
-	if m.selectedConsoleLog.VMID != "" {
-		filename = filename + "_" + m.selectedConsoleLog.VMID
-	}
-
-	m.downloadConsoleLog = button.New(fmt.Sprintf("download as %s.txt", filename))
+	m.downloadConsoleLog = button.New(fmt.Sprintf("download as %s", m.selectedConsoleLog.DownloadAs()))
 	m.downloadConsoleLog.Blur()
 
 	m.menuConsoleLogVMs.ResetMenu()

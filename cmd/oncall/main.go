@@ -55,6 +55,7 @@ func run() (err error) {
 	teaModel := teaAdapter.NewTeaModel(
 		itemService,
 		itemService,
+		storage,
 		itemService,
 		users,
 		log,

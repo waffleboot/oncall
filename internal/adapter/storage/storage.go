@@ -108,6 +108,10 @@ func (s *Storage) saveJournal(j journal) error {
 		return fmt.Errorf("mkdir: %w", err)
 	}
 
+	if err := os.MkdirAll(s.filesDir(), 0o775); err != nil {
+		return fmt.Errorf("mkdir: %w", err)
+	}
+
 	f, err := os.Create(s.journalJson())
 	if err != nil {
 		return fmt.Errorf("os create: %w", err)
@@ -144,4 +148,8 @@ func (s *Storage) beforeSaveJournal(j journal) journal {
 func (s *Storage) afterLoadJournal(j journal) journal {
 	s.lastNum = j.LastNum
 	return j
+}
+
+func (s *Storage) filesDir() string {
+	return filepath.Join(s.config.JournalName, "files")
 }
