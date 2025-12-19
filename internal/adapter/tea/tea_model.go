@@ -120,7 +120,7 @@ func (m *TeaModel) Init() tea.Cmd {
 			return "Распечатать журнал"
 		case group == "next":
 			if user := m.userService.GetUser(); user != nil {
-				return fmt.Sprintf("Next is %s ...", user.Name)
+				return fmt.Sprintf("Следующий дежурный - %s ...", user.Name)
 			} else {
 				return "Set next ..."
 			}
