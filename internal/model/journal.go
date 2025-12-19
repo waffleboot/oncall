@@ -3,8 +3,6 @@ package model
 import (
 	"errors"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Journal struct {
@@ -16,7 +14,7 @@ func NewJournal() Journal {
 	return Journal{}
 }
 
-func (s *Journal) GetItem(id uuid.UUID) (Item, error) {
+func (s *Journal) GetItem(id int) (Item, error) {
 	if i, err := s.getItem(id); err != nil {
 		return Item{}, err
 	} else {
@@ -40,7 +38,7 @@ func (s *Journal) UpdateItem(item Item) (Item, error) {
 	}
 }
 
-func (s *Journal) getItem(id uuid.UUID) (int, error) {
+func (s *Journal) getItem(id int) (int, error) {
 	for i := range s.Items {
 		if s.Items[i].ID == id {
 			return i, nil

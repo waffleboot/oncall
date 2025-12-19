@@ -3,13 +3,11 @@ package storage
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/waffleboot/oncall/internal/model"
 )
 
 type item struct {
-	ID          uuid.UUID `json:"id"`
-	Num         int       `json:"num"`
+	ID          int       `json:"id"`
 	SleepAt     time.Time `json:"sleep_at,omitempty"`
 	CreatedAt   time.Time `json:"created_at,omitempty"`
 	UpdatedAt   time.Time `json:"updated_at,omitempty"`
@@ -30,7 +28,6 @@ func (s *item) NotDeleted() bool {
 
 func (s *item) fromDomain(item model.Item) {
 	s.ID = item.ID
-	s.Num = item.Num
 	s.SleepAt = item.SleepAt.UTC()
 	s.CreatedAt = item.CreatedAt.UTC()
 	s.UpdatedAt = item.UpdatedAt.UTC()
@@ -84,7 +81,6 @@ func (s *item) toDomain() model.Item {
 
 	return model.Item{
 		ID:          s.ID,
-		Num:         s.Num,
 		SleepAt:     s.SleepAt,
 		CreatedAt:   s.CreatedAt,
 		UpdatedAt:   s.UpdatedAt,

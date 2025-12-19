@@ -4,8 +4,6 @@ import (
 	"cmp"
 	"strings"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 const (
@@ -18,8 +16,7 @@ const (
 type (
 	ItemType string
 	Item     struct {
-		ID          uuid.UUID
-		Num         int
+		ID          int
 		SleepAt     time.Time
 		CreatedAt   time.Time
 		UpdatedAt   time.Time
@@ -35,10 +32,9 @@ type (
 	}
 )
 
-func NewItem(num int) Item {
+func NewItem(id int) Item {
 	return Item{
-		ID:        uuid.New(),
-		Num:       num,
+		ID:        id,
 		Type:      ItemTypeAsk,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),

@@ -3,7 +3,6 @@ package facade
 import (
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/waffleboot/oncall/internal/model"
 	"github.com/waffleboot/oncall/internal/port"
 	"go.uber.org/zap"
@@ -50,7 +49,7 @@ func (s *ItemService) DeleteItem(item model.Item) (model.Item, error) {
 	return s.updateItem(item)
 }
 
-func (s *ItemService) GetItem(id uuid.UUID) (model.Item, error) {
+func (s *ItemService) GetItem(id int) (model.Item, error) {
 	return s.journal.GetItem(id)
 }
 

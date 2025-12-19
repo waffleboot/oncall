@@ -133,7 +133,7 @@ func (m *TeaModel) Init() tea.Cmd {
 			case item.IsClosed():
 				marker = "x"
 			}
-			return fmt.Sprintf("%s #%d - %s - %s", marker, item.Num, item.Type, item.MenuItem())
+			return fmt.Sprintf("%s #%d - %s - %s", marker, item.ID, item.Type, item.MenuItem())
 		}
 		return group
 	})
