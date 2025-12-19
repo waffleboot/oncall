@@ -81,7 +81,7 @@ func (s *Link) MenuItem() string {
 		sb.WriteString("p ")
 	}
 
-	fmt.Fprintf(sb, "#%d ", s.ID)
+	// fmt.Fprintf(sb, "#%d ", s.ID)
 
 	if s.Address == "" {
 		sb.WriteString("empty")
