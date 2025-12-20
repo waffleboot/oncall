@@ -151,19 +151,26 @@ func (m *TeaModel) resetEditItem(toGroup string) {
 	m.menuItem.AddGroup(string(screenNotes))
 	m.menuItem.AddDelimiter()
 
+	var needDelimiter bool
+
 	if m.selectedItem.InProgress() {
 		m.menuItem.AddGroup("sleep")
+		needDelimiter = true
 	}
 
 	if m.selectedItem.IsSleep() {
 		m.menuItem.AddGroup("awake")
+		needDelimiter = true
 	}
 
 	if !m.selectedItem.IsClosed() {
 		m.menuItem.AddGroup("close")
+		needDelimiter = true
 	}
 
-	m.menuItem.AddDelimiter()
+	if needDelimiter {
+		m.menuItem.AddDelimiter()
+	}
 	m.menuItem.AddGroup("delete")
 
 	if toGroup != "" {

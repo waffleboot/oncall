@@ -85,6 +85,7 @@ func (m *Model) View() string {
 		if group == menuDelimiter {
 			s.WriteString(newline)
 			s.WriteString("\n")
+			newline = ""
 			continue
 		}
 		for pos := 0; pos < m.groupSizes[i]; pos++ {
