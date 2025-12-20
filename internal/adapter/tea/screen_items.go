@@ -2,6 +2,7 @@ package tea
 
 import (
 	"fmt"
+	"strconv"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
@@ -23,8 +24,21 @@ func (m *TeaModel) updateItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc", "q":
+		case "esc", "q", "e":
 			return m.exitScreen()
+		case "1", "2", "3", "4", "5", "6", "7", "8", "9":
+			if len(m.items) > 0 {
+				i, _ := strconv.Atoi(msg.String())
+				if i > len(m.items) {
+					break
+				}
+				m.menuAllItems.JumpToItem("items", func(pos int) (found bool) {
+					return pos == i-1
+				})
+				m.currentScreen = screenItem
+				m.selectedItem = m.items[i-1]
+				m.resetEditItem("exit")
+			}
 		case "enter", " ":
 			switch g, p := m.menuAllItems.GetGroup(); g {
 			case "exit":
@@ -46,9 +60,9 @@ func (m *TeaModel) updateItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.resetUsers(m.userService.GetUser())
 				return m, nil
 			case "items":
+				m.currentScreen = screenItem
 				m.selectedItem = m.items[p]
 				m.resetEditItem("exit")
-				m.currentScreen = screenItem
 			}
 		case "n":
 			return m, newItem

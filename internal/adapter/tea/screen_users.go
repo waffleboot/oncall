@@ -15,7 +15,7 @@ func (m *TeaModel) updateUsers(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc", "q":
+		case "esc", "q", "e":
 			return m.exitScreen()
 		case "enter", " ":
 			switch g, p := m.menuUsers.GetGroup(); g {

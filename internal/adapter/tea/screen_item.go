@@ -16,7 +16,7 @@ func (m *TeaModel) updateItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc", "q":
+		case "esc", "q", "e":
 			m.currentScreen = screenItems
 			return m, m.getItems
 		case "enter", " ":
@@ -96,6 +96,9 @@ func (m *TeaModel) updateItem(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.menuItem.JumpToGroup(string(screenNotes))
 			m.currentScreen = screenNotes
 			m.resetNotes("new")
+		case "z":
+			m.currentScreen = screenConsoleLogs
+			m.resetConsoleLogs("new")
 		case "s":
 			return m.toggleSleep(m.selectedItem)
 		}

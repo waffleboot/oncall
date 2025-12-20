@@ -16,8 +16,16 @@ func (m *TeaModel) updateItemType(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc", "q":
+		case "esc", "q", "e":
 			m.currentScreen = screenItem
+		case "a", "1":
+			m.menuItemType.JumpToGroup(string(model.ItemTypeAsk))
+		case "i", "2":
+			m.menuItemType.JumpToGroup(string(model.ItemTypeInc))
+		case "r", "3":
+			m.menuItemType.JumpToGroup(string(model.ItemTypeAlert))
+		case "d", "4":
+			m.menuItemType.JumpToGroup(string(model.ItemTypeAdhoc))
 		case "enter", " ":
 			g, _ := m.menuItemType.GetGroup()
 			return m, func() tea.Msg {

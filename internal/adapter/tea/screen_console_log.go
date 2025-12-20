@@ -175,6 +175,8 @@ func (m *TeaModel) resetConsoleLog() {
 	m.textinputConsoleLogPath.CharLimit = 1000
 	if m.selectedConsoleLog.HasFile() {
 		m.textinputConsoleLogPath.Placeholder = m.downloadConsoleLogAs()
+	} else {
+		m.textinputConsoleLogPath.Placeholder = "filepath"
 	}
 
 	m.submitConsoleLog = button.New(" submit ")
@@ -185,6 +187,10 @@ func (m *TeaModel) resetConsoleLog() {
 
 	m.menuConsoleLogVMs.ResetMenu()
 	m.menuConsoleLogVMs.AddGroupWithItems("vms", len(m.selectedItem.ActiveVMs()))
+
+	if len(m.selectedItem.ActiveVMs()) == 1 {
+		m.textinputConsoleLogVMID.SetValue(m.selectedItem.ActiveVMs()[0].Name)
+	}
 }
 
 func (m *TeaModel) downloadConsoleLogAs() string {
