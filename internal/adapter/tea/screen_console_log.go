@@ -96,10 +96,7 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 		}
 		return m.runAndExitScreen(func() error {
 			fileID := m.selectedConsoleLog.FileID
-			destination := m.textinputConsoleLogPath.Value()
-			if destination == "" {
-				destination = m.selectedConsoleLog.DownloadAs()
-			}
+			destination := m.downloadConsoleLogAs()
 			if err := m.fileStorage.DownloadFile(fileID, destination); err != nil {
 				return consoleLogErrorMsg(fmt.Errorf("download file: %w", err))
 			}
@@ -118,6 +115,10 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 	switch {
 	case m.textinputConsoleLogVMID.Focused():
 		m.textinputConsoleLogVMID, cmd = m.textinputConsoleLogVMID.Update(msg)
+		m.selectedConsoleLog.VMID = m.textinputConsoleLogVMID.Value()
+		if m.selectedConsoleLog.HasFile() {
+			m.textinputConsoleLogPath.Placeholder = m.downloadConsoleLogAs()
+		}
 		return m, cmd
 	case m.textinputConsoleLogPath.Focused():
 		m.textinputConsoleLogPath, cmd = m.textinputConsoleLogPath.Update(msg)
@@ -149,7 +150,7 @@ func (m *TeaModel) viewConsoleLog() string {
 		sb.WriteString("\n\n")
 		sb.WriteString(m.downloadConsoleLog.View())
 		sb.WriteString(" as ")
-		sb.WriteString(m.selectedConsoleLog.DownloadAs())
+		sb.WriteString(m.downloadConsoleLogAs())
 	}
 	if m.consoleLogError != nil {
 		sb.WriteString("\n\n")
@@ -168,11 +169,13 @@ func (m *TeaModel) resetConsoleLog() {
 	m.textinputConsoleLogVMID.SetValue(m.selectedConsoleLog.VMID)
 
 	m.textinputConsoleLogPath = textinput.New()
-	m.textinputConsoleLogPath.Placeholder = "filepath"
 	m.textinputConsoleLogPath.Prompt = ""
 	m.textinputConsoleLogPath.Blur()
 	m.textinputConsoleLogPath.Width = 80
 	m.textinputConsoleLogPath.CharLimit = 1000
+	if m.selectedConsoleLog.HasFile() {
+		m.textinputConsoleLogPath.Placeholder = m.downloadConsoleLogAs()
+	}
 
 	m.submitConsoleLog = button.New(" submit ")
 	m.submitConsoleLog.Blur()
@@ -182,4 +185,12 @@ func (m *TeaModel) resetConsoleLog() {
 
 	m.menuConsoleLogVMs.ResetMenu()
 	m.menuConsoleLogVMs.AddGroupWithItems("vms", len(m.selectedItem.ActiveVMs()))
+}
+
+func (m *TeaModel) downloadConsoleLogAs() string {
+	if m.textinputConsoleLogPath.Value() != "" {
+		return m.textinputConsoleLogPath.Value()
+	} else {
+		return m.selectedConsoleLog.DownloadAs()
+	}
 }
