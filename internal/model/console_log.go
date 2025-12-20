@@ -10,7 +10,7 @@ type ConsoleLog struct {
 	ID          int
 	VMID        string
 	FileID      string
-	AddedAt     time.Time
+	UpdatedAt   time.Time
 	DeletedAt   time.Time
 	Description string
 }
@@ -20,7 +20,7 @@ func (s ConsoleLog) HasFile() bool {
 }
 
 func (s ConsoleLog) DownloadAs() string {
-	filename := s.AddedAt.Format("2006-01-02-150405")
+	filename := s.UpdatedAt.Format("2006-01-02-150405")
 	if s.VMID != "" {
 		filename = filename + "-" + s.VMID
 	}
@@ -29,7 +29,7 @@ func (s ConsoleLog) DownloadAs() string {
 
 func (s ConsoleLog) MenuItem() string {
 	var sb strings.Builder
-	sb.WriteString(s.AddedAt.Format(time.DateTime))
+	sb.WriteString(s.UpdatedAt.Format(time.DateTime))
 	if s.VMID != "" {
 		sb.WriteString(" - ")
 		sb.WriteString(s.VMID)
@@ -42,7 +42,7 @@ func (s ConsoleLog) NotDeleted() bool {
 }
 
 func (s *Item) CreateConsoleLog() ConsoleLog {
-	return ConsoleLog{AddedAt: time.Now()}
+	return ConsoleLog{UpdatedAt: time.Now()}
 }
 
 func (s *Item) ActiveConsoleLogs() []ConsoleLog {
@@ -71,6 +71,8 @@ func (s *Item) DeleteConsoleLog(consoleLog ConsoleLog) {
 }
 
 func (s *Item) UpdateConsoleLog(consoleLog ConsoleLog) {
+	consoleLog.UpdatedAt = time.Now()
+
 	var maxID int
 	for i, log := range s.ConsoleLogs {
 		if log.ID == consoleLog.ID {
@@ -81,6 +83,7 @@ func (s *Item) UpdateConsoleLog(consoleLog ConsoleLog) {
 			maxID = log.ID
 		}
 	}
+
 	consoleLog.ID = maxID + 1
 	s.ConsoleLogs = append(s.ConsoleLogs, consoleLog)
 }

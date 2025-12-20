@@ -63,6 +63,7 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 			}
 		case "enter":
 			if m.textinputConsoleLogVMID.Focused() {
+				m.selectedConsoleLog.VMID = m.textinputConsoleLogVMID.Value()
 				m.textinputConsoleLogVMID.Blur()
 				m.textinputConsoleLogPath.Focus()
 				return m, nil
@@ -74,7 +75,7 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 			}
 		}
 	case button.PressedMsg:
-		if msg.Value == "submit" {
+		if msg.Value == " submit " {
 			return m.runAndExitScreen(func() error {
 				src := m.textinputConsoleLogPath.Value()
 				if src != "" {
@@ -134,19 +135,21 @@ func (m *TeaModel) updateConsoleLog(msg tea.Msg) (_ tea.Model, cmd tea.Cmd) {
 
 func (m *TeaModel) viewConsoleLog() string {
 	var sb strings.Builder
-	sb.WriteString("VMID:\n")
+	sb.WriteString("VMID: ")
 	sb.WriteString(m.textinputConsoleLogVMID.View())
 	// if len(m.selectedItem.ActiveVMs()) > 0 {
 	// 	sb.WriteString("\n\nVMID:\n")
 	// 	sb.WriteString(m.menuConsoleLogVMs.View())
 	// }
-	sb.WriteString("\n\nFilepath:\n")
+	sb.WriteString("\n\nFilepath to upload or download: ")
 	sb.WriteString(m.textinputConsoleLogPath.View())
 	sb.WriteString("\n\n")
 	sb.WriteString(m.submitConsoleLog.View())
 	if m.selectedConsoleLog.HasFile() {
 		sb.WriteString("\n\n")
 		sb.WriteString(m.downloadConsoleLog.View())
+		sb.WriteString(" as ")
+		sb.WriteString(m.selectedConsoleLog.DownloadAs())
 	}
 	if m.consoleLogError != nil {
 		sb.WriteString("\n\n")
@@ -171,10 +174,10 @@ func (m *TeaModel) resetConsoleLog() {
 	m.textinputConsoleLogPath.Width = 80
 	m.textinputConsoleLogPath.CharLimit = 1000
 
-	m.submitConsoleLog = button.New("submit")
+	m.submitConsoleLog = button.New(" submit ")
 	m.submitConsoleLog.Blur()
 
-	m.downloadConsoleLog = button.New(fmt.Sprintf("download as %s", m.selectedConsoleLog.DownloadAs()))
+	m.downloadConsoleLog = button.New("download")
 	m.downloadConsoleLog.Blur()
 
 	m.menuConsoleLogVMs.ResetMenu()

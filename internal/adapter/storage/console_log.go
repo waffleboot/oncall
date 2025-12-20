@@ -10,7 +10,7 @@ type consoleLog struct {
 	ID        int        `json:"id"`
 	VMID      string     `json:"vmid"`
 	FileID    string     `json:"file"`
-	AddedAt   time.Time  `json:"added_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 }
 
@@ -18,7 +18,7 @@ func (s *consoleLog) fromDomain(log model.ConsoleLog) {
 	s.ID = log.ID
 	s.VMID = log.VMID
 	s.FileID = log.FileID
-	s.AddedAt = log.AddedAt.UTC()
+	s.UpdatedAt = log.UpdatedAt.UTC()
 	s.DeletedAt = from(log.DeletedAt)
 }
 
@@ -27,7 +27,7 @@ func (s *consoleLog) toDomain() model.ConsoleLog {
 		ID:        s.ID,
 		VMID:      s.VMID,
 		FileID:    s.FileID,
-		AddedAt:   s.AddedAt,
+		UpdatedAt: s.UpdatedAt,
 		DeletedAt: to(s.DeletedAt),
 	}
 }
