@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 
 	"github.com/waffleboot/oncall/internal/model"
@@ -22,6 +23,9 @@ type (
 func GetUsers(filename string) (_ []model.User, err error) {
 	f, err := os.Open(filename)
 	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return nil, nil
+		}
 		return nil, fmt.Errorf("open: %w", err)
 	}
 	defer func() {
