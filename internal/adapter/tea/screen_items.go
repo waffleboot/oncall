@@ -3,6 +3,7 @@ package tea
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/waffleboot/oncall/internal/model"
@@ -93,7 +94,10 @@ func (m *TeaModel) updateItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *TeaModel) viewItems() string {
-	return m.menuAllItems.View()
+	var sb strings.Builder
+	sb.WriteString(m.menuAllItems.View())
+	sb.WriteString("\n\nShortcuts:\n  esc - exit\n  q - quit\n  e - exit\n  n - new item\n  s - sleep/awake\n  j/down - move cursor down\n  k/up - move cursor up\n  1-9 - open numbered item\n  p - print journal and exit")
+	return sb.String()
 }
 
 func (m *TeaModel) resetItems(items []model.Item) {
