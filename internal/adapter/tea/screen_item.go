@@ -134,6 +134,25 @@ func (m *TeaModel) viewItem() string {
 	s.WriteString(fmt.Sprintf("  #%d - %s - %s%s\n\n", m.selectedItem.ID, m.selectedItem.Type, m.selectedItem.MenuItem(), state))
 	s.WriteString(m.menuItem.View())
 
+	s.WriteString("\n\nShortcuts:")
+	for _, shortcut := range []string{
+		"q - quit",
+		"e - exit",
+		"n - notes",
+		"s - sleep/awake",
+		"t - title and description",
+		"l - links",
+		"v - vms",
+		"h - hosts, nodes",
+		"z - console logs",
+		"j - move cursor down",
+		"k - move cursor up",
+		"esc - exit",
+	} {
+		s.WriteString("\n  ")
+		s.WriteString(shortcut)
+	}
+
 	return s.String()
 }
 
