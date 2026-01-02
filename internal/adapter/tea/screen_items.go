@@ -96,7 +96,21 @@ func (m *TeaModel) updateItems(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *TeaModel) viewItems() string {
 	var sb strings.Builder
 	sb.WriteString(m.menuAllItems.View())
-	sb.WriteString("\n\nShortcuts:\n  esc - exit\n  q - quit\n  e - exit\n  n - new item\n  s - sleep/awake\n  j/down - move cursor down\n  k/up - move cursor up\n  1-9 - open numbered item\n  p - print journal and exit")
+	sb.WriteString("\n\nShortcuts:")
+	for _, shortcut := range []string{
+		"q - quit",
+		"e - exit",
+		"n - new item",
+		"s - sleep/awake",
+		"p - print journal and exit",
+		"j - move cursor down",
+		"k - move cursor up",
+		"1-9 - open item",
+		"esc - exit",
+	} {
+		sb.WriteString("\n  ")
+		sb.WriteString(shortcut)
+	}
 	return sb.String()
 }
 
